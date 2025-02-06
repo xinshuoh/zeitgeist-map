@@ -6,6 +6,13 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
 
+  var xhr = new XMLHttpRequest()
+  xhr.addEventListener('load', () => {
+    alert(xhr.responseText)
+  })
+  xhr.open('GET', 'http://127.0.0.1:5000/ping')
+  xhr.send()
+
   return (
     <>
       <div>
