@@ -1,5 +1,7 @@
 # zeitgeist-map
 
+Prototype: [https://github.com/robdancer/zeitgeist-prototype](https://github.com/robdancer/zeitgeist-prototype)
+
 ## Development
 
 Run the following:
