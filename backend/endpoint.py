@@ -1,10 +1,16 @@
 # flask --app endpoint run
+import os
 
 from flask import Flask, jsonify
+from flask_sqlalchemy import SQLAlchemy
+
+SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
 from flask_cors import CORS, cross_origin
 from dbupdate import DBUpdate
 
 app = Flask(__name__)
+db = SQLAlchemy(app)
+
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
