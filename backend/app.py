@@ -19,7 +19,7 @@ scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
-dbupdate.setup(scheduler)
+dbupdate.setup(scheduler, db)
 
 # example
 @app.route("/ping")
@@ -31,9 +31,6 @@ def test():
 def get_top_artists():
     return jsonify({'UK': ["Coldplay", "Pink Floyd"]})
 
-#update_thread = DBUpdate()
-#update_thread.start()
-
 @app.cli.command("delete-tables")
 def delete_tables():
     db.drop_all()
@@ -42,6 +39,6 @@ def delete_tables():
 def build_tables():
     db.create_all()
 
-@app.cli.command("all-songs")
+@app.cli.command("get-all-songs")
 def test_db():
     print(db.session.execute(db.select(Song)).all())
