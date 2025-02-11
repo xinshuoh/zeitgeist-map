@@ -2,17 +2,18 @@
 import os
 
 from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
 from flask_cors import CORS, cross_origin
 from dbupdate import DBUpdate
 
-app = Flask(__name__)
-db = SQLAlchemy(app)
+from models import *
 
+app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+db.init_app(app)
 
 # example
 @app.route("/ping")
@@ -26,3 +27,11 @@ def get_top_artists():
 
 #update_thread = DBUpdate()
 #update_thread.start()
+
+@app.cli.command("build-tables")
+def build_tables():
+    db.create_all()
+
+@app.cli.command("all-songs")
+def test_db():
+    print(db.session.execute(db.select(Song)).all())

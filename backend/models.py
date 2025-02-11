@@ -3,8 +3,9 @@ from typing import List
 from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from endpoint import db
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 
 class Song(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
