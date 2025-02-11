@@ -13,4 +13,5 @@ def setup(scheduler: APScheduler, db: SQLAlchemy):
     @scheduler.task('interval', id='kworb', seconds=5)
     def kworb():
         with scheduler.app.app_context():
-            print(db.session.execute(sql.text("SELECT * FROM Songs")))
+            #print(db.session.execute(sql.text("SELECT * FROM songs")))
+            pass
