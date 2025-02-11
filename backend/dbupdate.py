@@ -1,11 +1,4 @@
-from threading import Thread
-from time import sleep
-
-class DBUpdate(Thread):
-    def __init__(self):
-        Thread.__init__(self)
-
-    def run(self):
-        while True:
-            sleep(10)
-            print("Updating database....")
+def setup(scheduler):
+    @scheduler.task('interval', id='job_1', seconds=5)
+    def job1():
+        print("Test")
