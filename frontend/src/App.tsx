@@ -23,19 +23,37 @@ const styleFeature = (feature: any) => ({
   fillOpacity: 0.7
 });
 
+const fetchMusicStats = async (countryName: string) => {
+  return {country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
+};
+
+const onEachFeature = (feature: any, layer: any) => {
+  layer.on('click', async (event: any) => {
+    const countryName = feature.properties.name;
+    const musicData = await fetchMusicStats(countryName);
+    
+    const popupContent = `
+      <strong>${countryName}</strong><br />
+      Top Artist: ${musicData.topArtist}<br />
+      Genre: ${musicData.genre}<br />
+      Streams: ${musicData.streams}
+    `;
+    
+    layer.bindPopup(popupContent).openPopup(event.latlng);
+  });
+};
+
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <h1>Vite + React</h1>
       <div id="map">
         <MapContainer center={[51.505, -0.09]} zoom={3} scrollWheelZoom={false}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <GeoJSON data={worldGeoJSON as GeoJSON.GeoJsonObject} style={styleFeature}/>
+          <GeoJSON data={worldGeoJSON as GeoJSON.GeoJsonObject} style={styleFeature} onEachFeature={onEachFeature}/>
           <Marker position={[51.505, -0.09]}>
             <Popup>
               A pretty CSS3 popup. <br /> Easily customizable.
@@ -43,17 +61,7 @@ function App() {
           </Marker>
         </MapContainer>
       </div>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      
     </>
   )
 }
