@@ -21,15 +21,7 @@ scheduler.start()
 
 dbupdate.setup(scheduler, db)
 
-# example
-@app.route("/ping")
-@cross_origin()
-def test():
-    return "Hello from backend!"
-
-@app.route("/top_artists")
-def get_top_artists():
-    return jsonify({'UK': ["Coldplay", "Pink Floyd"]})
+# --- CLI ---
 
 @app.cli.command("delete-tables")
 def delete_tables():
@@ -39,6 +31,15 @@ def delete_tables():
 def build_tables():
     db.create_all()
 
-@app.cli.command("get-all-songs")
-def test_db():
-    print(db.session.execute(db.select(Song)).all())
+
+# --- REST API ---
+
+# example
+@app.route("/ping")
+@cross_origin()
+def test():
+    return "Hello from backend!"
+
+@app.route("/top_artists")
+def get_top_artists():
+    return jsonify({'UK': ["Coldplay", "Pink Floyd"]})
