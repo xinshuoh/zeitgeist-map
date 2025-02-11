@@ -19,7 +19,7 @@ scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
-dbupdate.setup(scheduler)
+dbupdate.setup(scheduler, db)
 
 # example
 @app.route("/ping")
