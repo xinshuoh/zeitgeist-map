@@ -28,6 +28,10 @@ def get_top_artists():
 #update_thread = DBUpdate()
 #update_thread.start()
 
+@app.cli.command("delete-tables")
+def delete_tables():
+    db.drop_all()
+
 @app.cli.command("build-tables")
 def build_tables():
     db.create_all()
