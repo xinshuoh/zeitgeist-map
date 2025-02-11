@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-To run the backend python server:
+To run the backend Flask server:
 ```
 cd backend
 flask run
