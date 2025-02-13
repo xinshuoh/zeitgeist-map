@@ -31,25 +31,28 @@ const fetchMusicStats = async (countryName: string) => {
   return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
 };
 
-const onEachFeature = (feature: Feature<any, GeoJsonProperties>, layer: Layer) => {
-  layer.on('click', async (event: LeafletMouseEvent) => {
+interface CountryData {
+  countryName: string;
+  topArtist: string;
+  genre: string;
+  streams: string;
+}
+
+function App() {
+  const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
+
+  const onEachFeature = async (feature: Feature<Geometry, GeoJsonProperties>, layer: Layer) => {
     const countryName = feature.properties?.name;
     if (!countryName) return;
 
-    const musicData = await fetchMusicStats(countryName);
-
-    const popupContent = `
-      <strong>${countryName}</strong><br />
-      Top Artist: ${musicData.topArtist}<br />
-      Genre: ${musicData.genre}<br />
-      Streams: ${musicData.streams}
-    `;
-
-    layer.bindPopup(popupContent).openPopup(event.latlng);
-  });
-};
-
-function App() {
+    layer.on('click', async () => {
+      const musicData = await fetchMusicStats(countryName);
+      setSelectedCountry({
+        countryName,
+        ...musicData
+      });
+    });
+  };
 
   return (
     <>
@@ -59,7 +62,20 @@ function App() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url={`https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=${RAPIDAPI_KEY}`}
           />
-          <GeoJSON data={worldGeoJSON as GeoJSON.GeoJsonObject} style={styleFeature} onEachFeature={onEachFeature} />
+          <GeoJSON
+            data={worldGeoJSON as GeoJSON.GeoJsonObject}
+            style={styleFeature}
+            onEachFeature={onEachFeature}
+          >
+            {selectedCountry && (
+              <Popup>
+                <strong>{selectedCountry.countryName}</strong><br />
+                Top Artist: {selectedCountry.topArtist}<br />
+                Genre: {selectedCountry.genre}<br />
+                Streams: {selectedCountry.streams}
+              </Popup>
+            )}
+          </GeoJSON>
           {worldGeoJSON && (
             <>
             </>
