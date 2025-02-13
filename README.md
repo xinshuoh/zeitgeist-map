@@ -1,5 +1,7 @@
 # zeitgeist-map
 
+Prototype: [https://github.com/robdancer/zeitgeist-prototype](https://github.com/robdancer/zeitgeist-prototype)
+
 ## Development
 
 Run the following:
@@ -9,8 +11,8 @@ npm install
 npm run dev
 ```
 
-To run the backend python server:
+To run the backend Flask server:
 ```
 cd backend
-flask --app endpoint run
+flask run
 ```
