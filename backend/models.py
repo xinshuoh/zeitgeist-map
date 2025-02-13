@@ -18,6 +18,8 @@ class Song(db.Model):
     artists: Mapped[List[Artist]] = relationship(secondary='credit', back_populates="songs")
     popularities: Mapped[List[SongHasPopularity]] = relationship(back_populates="song")
 
+    today_popularities: Mapped[List[SongHasPopularityToday]] = relationship(back_populates="song")
+
 
 class Artist(db.Model):
     __tablename__ = "artist"
@@ -63,6 +65,7 @@ class Country(db.Model):
     name: Mapped[str] = mapped_column(String(128))
 
     popularities: Mapped[List[SongHasPopularity]] = relationship(back_populates="country")
+    today_popularities: Mapped[List[SongHasPopularityToday]] = relationship(back_populates="country")
 
 
 class SongHasPopularity(db.Model):
@@ -77,4 +80,18 @@ class SongHasPopularity(db.Model):
 
     song: Mapped[Song] = relationship(back_populates="popularities")
     country: Mapped[Country] = relationship(back_populates="popularities")
+
+
+class SongHasPopularityToday(db.Model):
+    __tablename__ = "song_has_popularity_today"
+
+    song_id: Mapped[int] = mapped_column(ForeignKey("song.id"), primary_key=True)
+    country_id: Mapped[int] = mapped_column(ForeignKey("country.id"), primary_key=True)
+
+    date: Mapped[date] = mapped_column(Date) # not primary key here to enforce uniqueness
+
+
+    song: Mapped[Song] = relationship(back_populates="today_popularities")
+    country: Mapped[Country] = relationship(back_populates="today_popularities")
+
 
