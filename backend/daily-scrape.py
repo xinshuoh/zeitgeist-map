@@ -155,7 +155,8 @@ if __name__ == "__main__":
     cur = conn.cursor()
     countries = [country.alpha_2.lower() for country in pycountry.countries]
     get_num = lambda s : int(s.replace(',','')) if s else None
-    # fetch_top_tracks('gb')
+    # fetch_track_data('gb')
     # fetch_artist_data()
 
+    # Testing
     fetch_track_genre_info("Taylor Swift", "Cruel Summer")
