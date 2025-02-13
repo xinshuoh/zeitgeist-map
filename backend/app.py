@@ -12,6 +12,9 @@ from models import *
 import dbupdate
 
 app = Flask(__name__)
+
+import rest_api
+
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
@@ -56,27 +59,3 @@ def list_countries():
 @app.cli.command("force-update")
 def force_update():
     print(scheduler.get_job('kworb').func())
-
-# --- REST API ---
-
-# example
-@app.route("/ping")
-@cross_origin()
-def ping():
-    return "Hello from backend!"
-
-@app.route("/top_artists")
-def get_top_artists():
-    return jsonify({'UK': ["Coldplay", "Pink Floyd"]})
-
-@app.route("/track_popularity")
-def track_popularity():
-    if 'song_id' in request.args:
-        vals = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalars()
-    if 'name' in request.args:
-        vals = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalars()
-    res = []
-    for v in vals:
-        res.append({'artist': v.artists[0].name,
-        'popularity': {p.country.code: p.position for p in v.popularities}})
-    return res
