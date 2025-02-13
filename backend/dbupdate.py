@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy import insert
 
+import datetime as dt
+
 from models import *
 
 def setup(scheduler: APScheduler, db: SQLAlchemy):
@@ -41,17 +43,27 @@ def setup(scheduler: APScheduler, db: SQLAlchemy):
                     week_change = get_num(elems[9].text)
                     total = get_num(elems[10].text)
 
-                    a = Artist(name = artist, songs = [], genres = [])
-                    db.session.add(a)
+                    # multiple artists with same name?
+                    a = db.session.execute(db.select(Artist).where(Artist.name == artist)).scalar()
+                    if not a:
+                        a = Artist(name = artist, songs = [], genres = [])
+                        db.session.add(a)
 
-                    s = Song(name = track, artists = [a])
-                    db.session.add(s)
+                    # multiple songs with same name?
+                    s = db.session.execute(db.select(Song).where(Song.name == track)).scalar()
+                    if not s:
+                        s = Song(name = track, artists = [a])
+                        db.session.add(s)
 
-                    db.session.commit()
+                    c = db.session.execute(db.select(Country).where(Country.name == country)).scalar()
 
+                    s_pop = SongHasPopularity(song = s, country = c, position = pos, date = dt.datetime.now())
+                    db.session.add(s_pop)
+
+                db.session.commit()
                 print("Updated " + country)
+                
 
-            countries = ['ae']
-            #countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
+            countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
             for country in countries:
                 fetch_country(country)
