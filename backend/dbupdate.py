@@ -43,13 +43,11 @@ def setup(scheduler: APScheduler, db: SQLAlchemy):
                     week_change = get_num(elems[9].text)
                     total = get_num(elems[10].text)
 
-                    # multiple artists with same name?
                     a = db.session.execute(db.select(Artist).where(Artist.spotify_id == artist_link)).scalar()
                     if not a:
                         a = Artist(name = artist, songs = [], genres = [], spotify_id = artist_link)
                         db.session.add(a)
 
-                    # multiple songs with same name?
                     s = db.session.execute(db.select(Song).where(Song.spotify_id == track_link)).scalar()
                     if not s:
                         s = Song(name = track, artists = [a], spotify_id = track_link)
