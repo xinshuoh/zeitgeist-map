@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import worldGeoJSON from './assets/worldmap_small.json';
+import worldGeoJSON from './assets/worldmap_large.json';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { LatLngBounds, Layer, LeafletEvent, LeafletMouseEvent } from 'leaflet';
+import { GeoJSON as LeafletGeoJSON, LatLngBounds, Layer, LeafletEvent, LeafletMouseEvent } from 'leaflet';
 
 interface CountryData {
   countryName: string;
@@ -17,21 +17,22 @@ const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
 
 // Function to set color based on properties (modify as needed)
 const getColor = (population: number) => {
-  return population > 1000000000 ? '#800026' :
-    population > 500000000 ? '#BD0026' :
-      population > 200000000 ? '#E31A1C' :
-        population > 100000000 ? '#FC4E2A' :
-          population > 50000000 ? '#FD8D3C' :
-            population > 20000000 ? '#FEB24C' :
-              population > 10000000 ? '#FED976' :
-                '#FFEDA0';
+  // return population > 1000000000 ? '#800026' :
+  //   population > 500000000 ? '#BD0026' :
+  //     population > 200000000 ? '#E31A1C' :
+  //       population > 100000000 ? '#FC4E2A' :
+  //         population > 50000000 ? '#FD8D3C' :
+  //           population > 20000000 ? '#FEB24C' :
+  //             population > 10000000 ? '#FED976' :
+  //               '#FFEDA0';
+  return '#FFFFFF';
 };
 
 const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined) => ({
   fillColor: getColor(feature?.properties?.pop_est || 0),
   weight: 0,
   color: 'white',
-  fillOpacity: 0.5
+  fillOpacity: 0.0
 });
 
 const fetchMusicStats = async (countryName: string) => {
@@ -41,16 +42,40 @@ const fetchMusicStats = async (countryName: string) => {
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
 
-  const onEachFeature = async (feature: Feature<Geometry, GeoJsonProperties>, layer: Layer) => {
-    const countryName = feature.properties?.name;
+  const highlightFeature = (e: LeafletMouseEvent) => {
+    const layer = e.target;
+
+    layer.setStyle({
+      weight: 3,
+      color: '#666',
+      dashArray: '',
+      fillOpacity: 0.0
+    });
+
+    layer.bringToFront();
+  };
+
+  const resetHighlight = (e: LeafletMouseEvent) => {
+    const layer = e.target;
+    layer.setStyle(styleFeature(e.target.feature));
+  };
+
+  const displayCountryData = async (e: LeafletMouseEvent) => {
+    const countryName = e.target.feature?.properties?.name;
     if (!countryName) return;
 
-    layer.on('click', async () => {
-      const musicData = await fetchMusicStats(countryName);
-      setSelectedCountry({
-        countryName,
-        ...musicData
-      });
+    const musicData = await fetchMusicStats(countryName);
+    setSelectedCountry({
+      countryName,
+      ...musicData
+    });
+  };
+
+  const onEachFeature = async (feature: Feature<Geometry, GeoJsonProperties>, layer: Layer) => {
+    layer.on({
+      click: displayCountryData,
+      mouseover: highlightFeature,
+      mouseout: resetHighlight
     });
   };
 
