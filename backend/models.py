@@ -13,6 +13,8 @@ class Song(db.Model):
     __tablename__ = "song"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    spotify_id: Mapped[str] = mapped_column(String, unique=True)
     name: Mapped[str] = mapped_column(String(128))
 
     artists: Mapped[List[Artist]] = relationship(secondary='credit', back_populates="songs")
@@ -25,7 +27,10 @@ class Artist(db.Model):
     __tablename__ = "artist"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    spotify_id: Mapped[str] = mapped_column(String, unique=True)
     name: Mapped[str] = mapped_column(String(128))
+
 
     songs: Mapped[List[Song]] = relationship(secondary='credit', back_populates="artists")
 
@@ -45,7 +50,7 @@ class Genre(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     
-    name: Mapped[str] = mapped_column(String(128))
+    name: Mapped[str] = mapped_column(String(128), unique=True)
 
     artists: Mapped[List[Artist]] = relationship(secondary='has_genre', back_populates="genres")
 
@@ -61,8 +66,9 @@ class Country(db.Model):
     __tablename__ = "country"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    code: Mapped[str] = mapped_column(String, unique=True)
 
-    name: Mapped[str] = mapped_column(String(128))
+    name: Mapped[str] = mapped_column(String(128), nullable=True) # for now, until we have a mapping from codes to names
 
     popularities: Mapped[List[SongHasPopularity]] = relationship(back_populates="country")
     today_popularities: Mapped[List[SongHasPopularityToday]] = relationship(back_populates="country")
