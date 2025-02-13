@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing import List, Optional
+from typing import List, Optional, Dict
+from datetime import date
 
-from sqlalchemy import String, Integer, ForeignKey, Table, Column
+from sqlalchemy import String, Integer, ForeignKey, Table, Column, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from flask_sqlalchemy import SQLAlchemy
@@ -15,6 +16,9 @@ class Song(db.Model):
     name: Mapped[str] = mapped_column(String(128))
 
     artists: Mapped[List[Artist]] = relationship(secondary='credit', back_populates="songs")
+    popularities: Mapped[List[SongHasPopularity]] = relationship(back_populates="song")
+
+    today_popularities: Mapped[List[SongHasPopularityToday]] = relationship(back_populates="song")
 
 
 class Artist(db.Model):
@@ -52,3 +56,42 @@ has_genre = Table(
     Column("artist_id", ForeignKey("artist.id")),
     Column("genre_id", ForeignKey("genre.id"))
 )
+
+class Country(db.Model):
+    __tablename__ = "country"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    name: Mapped[str] = mapped_column(String(128))
+
+    popularities: Mapped[List[SongHasPopularity]] = relationship(back_populates="country")
+    today_popularities: Mapped[List[SongHasPopularityToday]] = relationship(back_populates="country")
+
+
+class SongHasPopularity(db.Model):
+    __tablename__ = "song_has_popularity"
+
+    song_id: Mapped[int] = mapped_column(ForeignKey("song.id"), primary_key=True)
+    country_id: Mapped[int] = mapped_column(ForeignKey("country.id"), primary_key=True)
+    date: Mapped[date] = mapped_column(Date, primary_key=True)
+
+    position: Mapped[int] = mapped_column(Integer)
+
+
+    song: Mapped[Song] = relationship(back_populates="popularities")
+    country: Mapped[Country] = relationship(back_populates="popularities")
+
+
+class SongHasPopularityToday(db.Model):
+    __tablename__ = "song_has_popularity_today"
+
+    song_id: Mapped[int] = mapped_column(ForeignKey("song.id"), primary_key=True)
+    country_id: Mapped[int] = mapped_column(ForeignKey("country.id"), primary_key=True)
+
+    date: Mapped[date] = mapped_column(Date) # not primary key here to enforce uniqueness
+
+
+    song: Mapped[Song] = relationship(back_populates="today_popularities")
+    country: Mapped[Country] = relationship(back_populates="today_popularities")
+
+
