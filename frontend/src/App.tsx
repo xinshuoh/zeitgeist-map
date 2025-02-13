@@ -26,6 +26,25 @@ const styleFeature = (feature: any) => ({
   fillOpacity: 0.5
 });
 
+const fetchMusicStats = async (countryName: string) => {
+  return {country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
+};
+
+const onEachFeature = (feature: any, layer: any) => {
+  layer.on('click', async (event: any) => {
+    const countryName = feature.properties.name;
+    const musicData = await fetchMusicStats(countryName);
+    
+    const popupContent = `
+      <strong>${countryName}</strong><br />
+      Top Artist: ${musicData.topArtist}<br />
+      Genre: ${musicData.genre}<br />
+      Streams: ${musicData.streams}
+    `;
+    
+    layer.bindPopup(popupContent).openPopup(event.latlng);
+  });
+};
 
 function App() {
 
@@ -37,7 +56,7 @@ function App() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url={`https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=${RAPIDAPI_KEY}`}
           />
-          <GeoJSON data={worldGeoJSON as GeoJSON.GeoJsonObject} style={styleFeature} />
+          <GeoJSON data={worldGeoJSON as GeoJSON.GeoJsonObject} style={styleFeature} onEachFeature={onEachFeature} />
           {worldGeoJSON && (
             <>
             </>
