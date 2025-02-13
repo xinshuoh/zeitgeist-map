@@ -3,7 +3,8 @@ import './App.css'
 import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import worldGeoJSON from './assets/worldmap_small.json'
-import L from 'leaflet'
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { Layer, LeafletEvent, LeafletMouseEvent } from 'leaflet';
 
 const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
 
@@ -19,29 +20,31 @@ const getColor = (population: number) => {
                 '#FFEDA0';
 }
 
-const styleFeature = (feature: any) => ({
-  fillColor: getColor(feature.properties.pop_est || 0), // Default to 0 if no density field
+const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined) => ({
+  fillColor: getColor(feature?.properties?.pop_est || 0),
   weight: 0,
   color: 'white',
   fillOpacity: 0.5
 });
 
 const fetchMusicStats = async (countryName: string) => {
-  return {country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
+  return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
 };
 
-const onEachFeature = (feature: any, layer: any) => {
-  layer.on('click', async (event: any) => {
-    const countryName = feature.properties.name;
+const onEachFeature = (feature: Feature<any, GeoJsonProperties>, layer: Layer) => {
+  layer.on('click', async (event: LeafletMouseEvent) => {
+    const countryName = feature.properties?.name;
+    if (!countryName) return;
+
     const musicData = await fetchMusicStats(countryName);
-    
+
     const popupContent = `
       <strong>${countryName}</strong><br />
       Top Artist: ${musicData.topArtist}<br />
       Genre: ${musicData.genre}<br />
       Streams: ${musicData.streams}
     `;
-    
+
     layer.bindPopup(popupContent).openPopup(event.latlng);
   });
 };
