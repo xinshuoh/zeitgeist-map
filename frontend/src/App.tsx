@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-l
 import 'leaflet/dist/leaflet.css';
 import worldGeoJSON from './assets/worldmap_small.json';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { Layer, LeafletEvent, LeafletMouseEvent } from 'leaflet';
+import { LatLngBounds, Layer, LeafletEvent, LeafletMouseEvent } from 'leaflet';
 
 interface CountryData {
   countryName: string;
@@ -38,7 +38,6 @@ const fetchMusicStats = async (countryName: string) => {
   return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
 };
 
-
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
 
@@ -58,10 +57,12 @@ function App() {
   return (
     <>
       <div id="map">
-        <MapContainer center={[51.505, -0.09]} zoom={3} className="fullscreen-map">
+        <MapContainer center={[51.505, -0.09]} zoom={3} className="fullscreen-map"
+          maxBounds={[[85, 180], [-85, -180]]} minZoom={3}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url={`https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=${RAPIDAPI_KEY}`}
+            noWrap={true}
           />
           <GeoJSON
             data={worldGeoJSON as GeoJSON.GeoJsonObject}
