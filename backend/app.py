@@ -36,7 +36,7 @@ def build_tables():
 
     countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
     for country in countries:
-        c = Country(name = country)
+        c = Country(code = country)
         db.session.add(c)
     db.session.commit()
 
@@ -45,7 +45,7 @@ def list_songs():
     scalars = db.session.execute(db.select(Song)).scalars()
     for s in scalars:
         print(s.name, "-", s.artists[0].name)
-        print(*map(lambda x : x.country.name + ": " + str(x.position), s.popularities))
+        print(*map(lambda x : x.country.code + ": " + str(x.position), s.popularities))
 
 @app.cli.command("list-countries")
 def list_countries():
@@ -78,5 +78,5 @@ def track_popularity():
     res = []
     for v in vals:
         res.append({'artist': v.artists[0].name,
-        'popularity': {p.country.name: p.position for p in v.popularities}})
+        'popularity': {p.country.code: p.position for p in v.popularities}})
     return res

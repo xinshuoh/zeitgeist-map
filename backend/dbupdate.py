@@ -44,18 +44,18 @@ def setup(scheduler: APScheduler, db: SQLAlchemy):
                     total = get_num(elems[10].text)
 
                     # multiple artists with same name?
-                    a = db.session.execute(db.select(Artist).where(Artist.name == artist)).scalar()
+                    a = db.session.execute(db.select(Artist).where(Artist.spotify_id == artist_link)).scalar()
                     if not a:
-                        a = Artist(name = artist, songs = [], genres = [])
+                        a = Artist(name = artist, songs = [], genres = [], spotify_id = artist_link)
                         db.session.add(a)
 
                     # multiple songs with same name?
-                    s = db.session.execute(db.select(Song).where(Song.name == track)).scalar()
+                    s = db.session.execute(db.select(Song).where(Song.spotify_id == track_link)).scalar()
                     if not s:
-                        s = Song(name = track, artists = [a])
+                        s = Song(name = track, artists = [a], spotify_id = track_link)
                         db.session.add(s)
 
-                    c = db.session.execute(db.select(Country).where(Country.name == country)).scalar()
+                    c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
 
                     s_pop = SongHasPopularity(song = s, country = c, position = pos, date = dt.datetime.now())
                     db.session.add(s_pop)
