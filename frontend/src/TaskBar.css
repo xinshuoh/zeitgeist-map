@@ -1,0 +1,52 @@
+.taskbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: rgb(54, 24, 54);
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    opacity: 90%;
+    box-sizing: border-box;
+  }
+  
+  .taskbar button {
+    background-color: #c12121;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .taskbar button:hover {
+    background-color: #555;
+  }
+
+  .taskbar .logo-button {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .taskbar .logo-image {
+    height: 40px;
+  }
+  
+  .taskbar .search-button {
+    background-color: #d0a4b4;
+    flex-grow: 1;
+    margin: 0 20%;
+    text-align: center;
+    /* text-decoration-color: black; */
+    color: black;
+  }
+
+  .taskbar .compare-button {
+    background-color: #ffa7c9;
+    padding: 4px;
+
+  }
