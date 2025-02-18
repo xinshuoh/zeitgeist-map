@@ -8,12 +8,21 @@ import { GeoJSON as LeafletGeoJSON, LatLngBounds, Layer, LeafletEvent, LeafletMo
 
 interface CountryData {
   countryName: string;
-  topArtist: string;
-  genre: string;
-  streams: string;
+  songlist: any;
 }
 
 const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
+const TILE_LAYERS = {
+  rapidApi: {
+    url: `https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=${RAPIDAPI_KEY}`,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  },
+  openStreetMap: {
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }
+};
+const CURRENT_TILE_LAYER = TILE_LAYERS.rapidApi; // modify this to switch between tile layers
 
 // Function to set color based on properties (modify as needed)
 const getColor = (population: number) => {
@@ -32,11 +41,22 @@ const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined)
   fillColor: getColor(feature?.properties?.pop_est || 0),
   weight: 0,
   color: 'white',
-  fillOpacity: 0.0
+  fillOpacity: 0.8
 });
 
-const fetchMusicStats = async (countryName: string) => {
-  return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
+const fetchMusicStats = async (countryCode: string) => {
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', `http://127.0.0.1:5000/country_top_tracks?country_code=${countryCode.toLowerCase()}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText)
+      resolve(data)
+      //resolve(data.map((song:any) => Object({song: song, genre: "todo", streams: "todo"})))
+    })
+  });
+  xhr.send()
+  return await res
+  //return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
 };
 
 function App() {
@@ -61,13 +81,13 @@ function App() {
   };
 
   const displayCountryData = async (e: LeafletMouseEvent) => {
-    const countryName = e.target.feature?.properties?.name;
-    if (!countryName) return;
+    const countryProp = e.target.feature?.properties;
+    if (!countryProp) return;
 
-    const musicData = await fetchMusicStats(countryName);
+    const songlist = await fetchMusicStats(countryProp.wb_a2);
     setSelectedCountry({
-      countryName,
-      ...musicData
+      countryName: countryProp.name,
+      songlist
     });
   };
 
@@ -79,21 +99,14 @@ function App() {
     });
   };
 
-  var xhr = new XMLHttpRequest()
-  xhr.addEventListener('load', () => {
-    alert(xhr.responseText)
-  })
-  xhr.open('GET', 'http://127.0.0.1:5000/ping')
-  xhr.send()
-
   return (
     <>
       <div id="map">
         <MapContainer center={[51.505, -0.09]} zoom={3} className="fullscreen-map"
           maxBounds={[[85, 180], [-85, -180]]} minZoom={3}>
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url={`https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=${RAPIDAPI_KEY}`}
+            attribution={CURRENT_TILE_LAYER.attribution}
+            url={CURRENT_TILE_LAYER.url}
             noWrap={true}
           />
           <GeoJSON
@@ -104,9 +117,9 @@ function App() {
             {selectedCountry && (
               <Popup>
                 <strong>{selectedCountry.countryName}</strong><br />
-                Top Artist: {selectedCountry.topArtist}<br />
-                Genre: {selectedCountry.genre}<br />
-                Streams: {selectedCountry.streams}
+                <ul>
+                {selectedCountry.songlist.slice(0, 5).map((song:any) => <li>{song.song_name}</li>)}
+                </ul>
               </Popup>
             )}
           </GeoJSON>
