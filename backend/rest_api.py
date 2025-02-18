@@ -15,10 +15,6 @@ from models import *
 def ping():
     return "Hello from backend!"
 
-@app.route("/top_artists")
-def get_top_artists():
-    return jsonify({'UK': ["Coldplay", "Pink Floyd"]})
-
 @app.route("/track_popularity")
 def track_popularity():
     if 'song_id' in request.args:
@@ -70,5 +66,3 @@ def song_country_history():
             'popularity': p.position
         })
     return res
-
-
