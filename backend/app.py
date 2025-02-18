@@ -7,6 +7,8 @@ from flask_apscheduler import APScheduler
 
 from urllib.parse import quote, unquote
 
+import country_converter as coco
+
 from models import *
 
 import dbupdate
@@ -38,8 +40,10 @@ def build_tables():
     db.create_all()
 
     countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
-    for country in countries:
-        c = Country(code = country)
+    names = coco.convert(names=countries, to='name_short')
+    for country, name in zip(countries, names):
+        
+        c = Country(code = country, name = name)
         db.session.add(c)
     db.session.commit()
 

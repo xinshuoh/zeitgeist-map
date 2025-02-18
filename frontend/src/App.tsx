@@ -12,6 +12,17 @@ interface CountryData {
 }
 
 const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
+const TILE_LAYERS = {
+  rapidApi: {
+    url: `https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=${RAPIDAPI_KEY}`,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  },
+  openStreetMap: {
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }
+};
+const CURRENT_TILE_LAYER = TILE_LAYERS.rapidApi; // modify this to switch between tile layers
 
 // Function to set color based on properties (modify as needed)
 const getColor = (population: number) => {
@@ -94,8 +105,8 @@ function App() {
         <MapContainer center={[51.505, -0.09]} zoom={3} className="fullscreen-map"
           maxBounds={[[85, 180], [-85, -180]]} minZoom={3}>
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url={`https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=${RAPIDAPI_KEY}`}
+            attribution={CURRENT_TILE_LAYER.attribution}
+            url={CURRENT_TILE_LAYER.url}
             noWrap={true}
           />
           <GeoJSON
