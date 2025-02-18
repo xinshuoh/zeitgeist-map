@@ -9,9 +9,7 @@ import TaskBar from './TaskBar';
 
 interface CountryData {
   countryName: string;
-  topArtist: string;
-  genre: string;
-  streams: string;
+  songlist: any;
 }
 
 const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
@@ -47,8 +45,19 @@ const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined)
   fillOpacity: 0.8
 });
 
-const fetchMusicStats = async (countryName: string) => {
-  return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
+const fetchMusicStats = async (countryCode: string) => {
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', `http://127.0.0.1:5000/country_top_tracks?country_code=${countryCode.toLowerCase()}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText)
+      resolve(data)
+      //resolve(data.map((song:any) => Object({song: song, genre: "todo", streams: "todo"})))
+    })
+  });
+  xhr.send()
+  return await res
+  //return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
 };
 
 function App() {
@@ -75,13 +84,13 @@ function App() {
   };
 
   const displayCountryData = async (e: LeafletMouseEvent) => {
-    const countryName = e.target.feature?.properties?.name;
-    if (!countryName) return;
+    const countryProp = e.target.feature?.properties;
+    if (!countryProp) return;
 
-    const musicData = await fetchMusicStats(countryName);
+    const songlist = await fetchMusicStats(countryProp.wb_a2);
     setSelectedCountry({
-      countryName,
-      ...musicData
+      countryName: countryProp.name,
+      songlist
     });
   };
   const handleSecondaryPopup = (type: string, value: string) => {
@@ -116,6 +125,9 @@ function App() {
             {selectedCountry && (
               <Popup>
                 <strong>{selectedCountry.countryName}</strong><br />
+                <ul>
+                {selectedCountry.songlist.slice(0, 5).map((song:any) => <li>{song.song_name}</li>)}
+                </ul>
                 Top Artist: {selectedCountry.topArtist}<br />
                 Genre: {selectedCountry.genre}<br />
                 
