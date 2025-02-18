@@ -4,18 +4,21 @@ from urllib.parse import quote, unquote
 from flask import request, jsonify
 from flask_cors import cross_origin
 
-
 from app import app
 from app import db
 from models import *
 
+from param_check import *
+
 # example
 @app.route("/ping")
-@cross_origin()
+#@cross_origin()
+@args(p.all)
 def ping():
     return "Hello from backend!"
 
 @app.route("/track_popularity")
+@args(p("song_id")|p("name"))
 def track_popularity():
     if 'song_id' in request.args:
         vals = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalars()
@@ -28,6 +31,7 @@ def track_popularity():
     return res
 
 @app.route("/country_top_tracks")
+@args(p("country_code"))
 def country_top_tracks():
     current_date = dt.datetime.now().date()
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
@@ -42,6 +46,7 @@ def country_top_tracks():
     return res
 
 @app.route("/song_country_history")
+@args(p("country_code")&(p("song_id")|p("song_name")))
 def song_country_history():
     # this might be really clunky
 
