@@ -5,6 +5,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import json
 from collections import defaultdict
+from models import *
 
 client_id = 'b0d6aef0a4f846d3afe4dc5ab695bc3b'
 client_secret = 'ed600a63a1be4d2f83fc69f2be3169fe'
@@ -16,8 +17,6 @@ def fetch_artist_id(name):
     items = results['artists']['items']
     if len(items) > 0:
         artist = items[0]
-        #print(artist)
-        #print(artist['name'], artist['id'])
         return artist['id']
     
 def fetch_track_id(name):
@@ -25,15 +24,9 @@ def fetch_track_id(name):
     items = results['tracks']['items']
     if len(items) > 0:
         track = items[0]
-        #print(artist)
-        #print(artist['name'], artist['id'])
         return track['id']
     
 
-
-#conn = sqlite3.connect("../zeitgeist.sqlite")
-
-#cur = conn.cursor()
 
 
 def fetch_historical():
@@ -41,28 +34,22 @@ def fetch_historical():
 
     soup = BeautifulSoup(contents, features="html.parser")
 
-    for row in soup.find_all('a')[1:2]: # first row is headings
+    for row in soup.find_all('a')[1:]: # first row is headings
 
         date = row.text
         contents_1 = urllib.request.urlopen(f"https://kworb.net/apple_songs/archive/{date}").read()
         soup_1 = BeautifulSoup(contents_1, features="html.parser")
 
-        #insert_stmt = ("INSERT INTO daily_charts" 
-        #    "(country,pos,pos_change,artist,title,artist_link,title_link,days,peak,peak_x,streams,streams_change,week,week_change,total)" 
-        #    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-
-        # clear previous entries
-        #cur.execute("DELETE FROM daily_charts WHERE country = ?", (country,))
         
         rows = soup_1.find_all('tr')
         popularity = {}
-        countries = ["US","UK","JP","DE","AU","CA","FR","IT","KR","MX","RU","TH","BE","BR","CH","CN","CO","ES","HK","ID","IE","IN","NL","NZ","TR","TW","ZA","AE","AR","AT","CL","CZ","DK","EC","EE","EG","FI","GR","HU","IL","KE","KZ","LB","LT","LU","MY","NG","NO","PE","PH","PL","PT","RO","SA","SE","SI","SG","SK","UA","VN"]
+        countries = ["us","uk","jp","de","au","ca","fr","it","kr","mx","ru","th","be","br","ch","cn","co","es","hk","id","ie","in","nl","nz","tr","tw","za","ae","ar","at","cl","cz","dk","ec","ee","eg","fi","gr","hu","il","ke","kz","lb","lt","lu","my","ng","no","pe","ph","pl","pt","ro","sa","se","si","sg","sk","ua","vn"]
         for row in rows[1:]: # first row is headings
             elems = row.find_all('td')
 
             #global stats
             pos = elems[0].text
-            pos_change = None if elems[1].text in ('NEW', 'RE') else 0 if elems[1].text == '=' else get_num(elems[1].text)
+            pos_change = None if elems[1].text in ('NEW', 'RE') else 0 if elems[1].text == '=' else elems[1].text
             temp = elems[2].text.split(" - ")
             artists = temp[0].replace(",", " &")
             artists = artists.split(" & ")
@@ -78,38 +65,49 @@ def fetch_historical():
         
 
             #country specific stats
-            for i in range(9, 69):
-                country_pos = elems[i].text
-                country = countries[i-9]
-                if artist_id in popularity:
-                    popularity[artist_id][country] += 1 / (1+(country_pos/20))
-                else:
-                    popularity[artist_id] = defaultdict(int)
-                    popularity[artist_id][country] += 1 / (1+(country_pos/20))
 
+            a_list = []
             for artist in artists:
-                artist_id = fetch_artist_id(artist)
-                #insert
+                #spotify artist id
+                artist_link = fetch_artist_id(artist)
 
-            #cur.execute(insert_stmt, 
-            #    (country, pos, pos_change, artist, track, artist_link, track_link, days, peak, peak_x, streams, streams_change, week, week_change, total)
-            #)
+                for i in range(9, 69):
+                    country_pos = elems[i].text
+                    country = countries[i-9]
+                    if artist_link in popularity:
+                        popularity[artist_link][country] += 1 / (1+(country_pos/20))
+                    else:
+                        popularity[artist_link] = defaultdict(int)
+                        popularity[artist_link][country] += 1 / (1+(country_pos/20))
 
+                a = db.session.execute(db.select(Artist).where(Artist.spotify_id == artist_link)).scalar()
+                if not a:
+                    a = Artist(name = artist, songs = [], genres = [], spotify_id = artist_link)
+                    db.session.add(a)
+                a_list.append(a)
+
+            #track spotify id
+            track_link = fetch_track_id(track)
+            s = db.session.execute(db.select(Song).where(Song.spotify_id == track_link)).scalar()
+            if not s:
+                s = Song(name = track, artists = a_list, spotify_id = track_link)
+                db.session.add(s)
+
+            c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
+
+            s_pop = SongHasPopularity(song = s, country = c, position = pos, date = date)
+
+                
         #artist popularity by country
         for artist_key in popularity.keys():
             for country in popularity[artist_key].keys():
-                #insert artist_key country popularity[artist_key][country]
-                continue
-        #conn.commit()
+
+                c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
+                a = db.session.execute(db.select(Artist).where(Artist.spotify_id == artist_key)).scalar()
+
+                a_pop = ArtistHasPopularity(artist = a, country = c, position = popularity[artist_key][country], date = date)
 
 
 
-# removed gl = greenland
-countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
-#for country in countries:
-    #fetch_country(country)
 
 #fetch_historical()
-
-#cur.close()
-#conn.close()
