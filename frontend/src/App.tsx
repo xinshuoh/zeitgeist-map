@@ -1,10 +1,83 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect, useCallback } from 'react';
+import './App.css';
+import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import worldGeoJSON from './assets/worldmap_large.json';
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { GeoJSON as LeafletGeoJSON, LatLngBounds, Layer, LeafletEvent, LeafletMouseEvent } from 'leaflet';
+
+interface CountryData {
+  countryName: string;
+  topArtist: string;
+  genre: string;
+  streams: string;
+}
+
+const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
+
+// Function to set color based on properties (modify as needed)
+const getColor = (population: number) => {
+  // return population > 1000000000 ? '#800026' :
+  //   population > 500000000 ? '#BD0026' :
+  //     population > 200000000 ? '#E31A1C' :
+  //       population > 100000000 ? '#FC4E2A' :
+  //         population > 50000000 ? '#FD8D3C' :
+  //           population > 20000000 ? '#FEB24C' :
+  //             population > 10000000 ? '#FED976' :
+  //               '#FFEDA0';
+  return '#FFFFFF';
+};
+
+const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined) => ({
+  fillColor: getColor(feature?.properties?.pop_est || 0),
+  weight: 0,
+  color: 'white',
+  fillOpacity: 0.0
+});
+
+const fetchMusicStats = async (countryName: string) => {
+  return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
+
+  const highlightFeature = (e: LeafletMouseEvent) => {
+    const layer = e.target;
+
+    layer.setStyle({
+      weight: 3,
+      color: '#666',
+      dashArray: '',
+      fillOpacity: 0.0
+    });
+
+    layer.bringToFront();
+  };
+
+  const resetHighlight = (e: LeafletMouseEvent) => {
+    const layer = e.target;
+    layer.setStyle(styleFeature(e.target.feature));
+  };
+
+  const displayCountryData = async (e: LeafletMouseEvent) => {
+    const countryName = e.target.feature?.properties?.name;
+    if (!countryName) return;
+
+    const musicData = await fetchMusicStats(countryName);
+    setSelectedCountry({
+      countryName,
+      ...musicData
+    });
+  };
+
+  const onEachFeature = async (feature: Feature<Geometry, GeoJsonProperties>, layer: Layer) => {
+    layer.on({
+      click: displayCountryData,
+      mouseover: highlightFeature,
+      mouseout: resetHighlight
+    });
+  };
 
   var xhr = new XMLHttpRequest()
   xhr.addEventListener('load', () => {
@@ -15,28 +88,42 @@ function App() {
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div id="map">
+        <MapContainer center={[51.505, -0.09]} zoom={3} className="fullscreen-map"
+          maxBounds={[[85, 180], [-85, -180]]} minZoom={3}>
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url={`https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=${RAPIDAPI_KEY}`}
+            noWrap={true}
+          />
+          <GeoJSON
+            data={worldGeoJSON as GeoJSON.GeoJsonObject}
+            style={styleFeature}
+            onEachFeature={onEachFeature}
+          >
+            {selectedCountry && (
+              <Popup>
+                <strong>{selectedCountry.countryName}</strong><br />
+                Top Artist: {selectedCountry.topArtist}<br />
+                Genre: {selectedCountry.genre}<br />
+                Streams: {selectedCountry.streams}
+              </Popup>
+            )}
+          </GeoJSON>
+          {worldGeoJSON && (
+            <>
+            </>
+          )}
+
+          <Marker position={[51.505, -0.09]}>
+            <Popup>
+              A pretty CSS3 popup. <br /> Easily customizable.
+            </Popup>
+          </Marker>
+        </MapContainer>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
