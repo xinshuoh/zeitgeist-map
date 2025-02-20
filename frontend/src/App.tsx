@@ -26,7 +26,7 @@ const TILE_LAYERS = {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }
 };
-const CURRENT_TILE_LAYER = TILE_LAYERS.rapidApi; // modify this to switch between tile layers
+const CURRENT_TILE_LAYER = TILE_LAYERS.openStreetMap; // modify this to switch between tile layers
 
 // Function to set color based on properties (modify as needed)
 const getColor = (population: number) => {
@@ -48,7 +48,36 @@ const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined)
   fillOpacity: 0.8
 });
 
+var serverResponsive = true;
+
+async function pingServer() {
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', `http://127.0.0.1:5000/ping`)
+  var res = new Promise<boolean>((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      resolve(true);
+    });
+    xhr.addEventListener('timeout', () => {
+      if (serverResponsive) {
+        alert("Timeout connecting to server")
+        serverResponsive = false;
+      }
+      resolve(false);
+    });
+    xhr.addEventListener('error', () => {
+      if (serverResponsive) {
+        alert("Error connecting to server");
+        serverResponsive = false;
+      }
+      resolve(false);
+    })
+  });
+  xhr.send()
+  return await res;
+}
+
 const fetchMusicStats = async (countryCode: string) => {
+  if (!serverResponsive) return [];
   var xhr = new XMLHttpRequest()
   xhr.open('GET', `http://127.0.0.1:5000/country_top_tracks?country_code=${countryCode.toLowerCase()}`)
   var res = new Promise((resolve, reject) => {
@@ -67,6 +96,7 @@ function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
   const [popupDetails, setPopupDetails] = useState<{ type: string; value: string} | null>(null);
 
+  pingServer();
 
   const highlightFeature = (e: LeafletMouseEvent) => {
     const layer = e.target;

@@ -43,5 +43,6 @@ def args(req):
             if not req.satisfied(request.args):
                 return "Missing parameters in query string", 400
             return fn()
+        f.__name__ = fn.__name__
         return f
     return dec
