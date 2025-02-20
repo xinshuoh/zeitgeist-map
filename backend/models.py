@@ -114,6 +114,7 @@ class ArtistHasPopularity(db.Model):
     date: Mapped[date] = mapped_column(Date)
 
     position: Mapped[int] = mapped_column(Integer)
+    popularity: Mapped[int] = mapped_column(Integer, nullable=True)
 
 
     artist: Mapped[Artist] = relationship(back_populates="popularities")
@@ -130,7 +131,7 @@ class GenreHasPopularity(db.Model):
     date: Mapped[date] = mapped_column(Date)
 
     position: Mapped[int] = mapped_column(Integer)
-
+    popularity: Mapped[int] = mapped_column(Integer, nullable=True)
 
     genre: Mapped[Genre] = relationship(back_populates="popularities")
     country: Mapped[Country] = relationship(back_populates="genre_popularities")
