@@ -6,6 +6,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import json
 from collections import defaultdict
 from models import *
+from app import app
 
 client_id = 'b0d6aef0a4f846d3afe4dc5ab695bc3b'
 client_secret = 'ed600a63a1be4d2f83fc69f2be3169fe'
@@ -26,9 +27,7 @@ def fetch_track_id(name):
         track = items[0]
         return track['id']
     
-
-
-
+@app.cli.command("fetch-historical")
 def fetch_historical():
     contents = urllib.request.urlopen(f"https://kworb.net/apple_songs/archive/").read()
 
@@ -61,41 +60,45 @@ def fetch_historical():
             pts = elems[6].text
             pts_plus = elems[7].text
             tpts = elems[8].text
-            track_id = fetch_track_id(track)
-        
+            track_link = fetch_track_id(track)
 
+            
             #country specific stats
 
             a_list = []
-            for artist in artists:
-                #spotify artist id
-                artist_link = fetch_artist_id(artist)
 
-                for i in range(9, 69):
-                    country_pos = elems[i].text
+            for i in range(9, 69):
+                country_pos = elems[i].text
+                if country_pos:
+                    country_pos = int(country_pos)
                     country = countries[i-9]
-                    if artist_link in popularity:
-                        popularity[artist_link][country] += 1 / (1+(country_pos/20))
-                    else:
-                        popularity[artist_link] = defaultdict(int)
-                        popularity[artist_link][country] += 1 / (1+(country_pos/20))
+                    for artist in artists:
+                        #spotify artist id
+                        artist_link = fetch_artist_id(artist)
+                        
+                        if artist_link in popularity:
+                            popularity[artist_link][country] += (1 / (1+(country_pos/20)))
+                        else:
+                            popularity[artist_link] = defaultdict(int)
+                            popularity[artist_link][country] += (1 / (1+(country_pos/20)))
 
+                    c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
+                    s_pop = SongHasPopularity(song = s, country = c, position = pos, date = date)
+                    db.session.add(s_pop)
+
+            for artist in artists:
                 a = db.session.execute(db.select(Artist).where(Artist.spotify_id == artist_link)).scalar()
                 if not a:
+                    #print("Insert")
                     a = Artist(name = artist, songs = [], genres = [], spotify_id = artist_link)
                     db.session.add(a)
                 a_list.append(a)
 
-            #track spotify id
-            track_link = fetch_track_id(track)
+
             s = db.session.execute(db.select(Song).where(Song.spotify_id == track_link)).scalar()
             if not s:
                 s = Song(name = track, artists = a_list, spotify_id = track_link)
                 db.session.add(s)
-
-            c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
-
-            s_pop = SongHasPopularity(song = s, country = c, position = pos, date = date)
 
                 
         #artist popularity by country
@@ -105,9 +108,13 @@ def fetch_historical():
                 c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
                 a = db.session.execute(db.select(Artist).where(Artist.spotify_id == artist_key)).scalar()
 
-                a_pop = ArtistHasPopularity(artist = a, country = c, position = popularity[artist_key][country], date = date)
+                a_pop = ArtistHasPopularity(artist = a, country = c, position = popularity[artist_key][country], date = date) 
+                db.session.add(a_pop)
+
+            
+        db.session.commit()
 
 
 
 
-#fetch_historical()
+fetch_historical()
