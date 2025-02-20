@@ -84,37 +84,47 @@ def get_today_track_names(country):
     return tracks
 
 
-def get_percentage_similarity(c1):
-    
-    c1_tracks = get_today_track_names(c1)
+def get_percentage_similarity(comparison_tracks, country_code=None):
+
     countries = db.session.execute(db.select(Country)).scalars()
     
-    max_similarity = 0
-    country_match = None
+    res = []
     for country in countries:
-        if country.code != c1.code:
+        if not country_code or (country.code != country_code):
             tracks = get_today_track_names(country)
-            similarity = len(set.intersection(tracks, c1_tracks)) / len(set.union(tracks, c1_tracks))
-            if similarity > max_similarity:
-                max_similarity = similarity
-                country_match = country
-    
-    return (country_match, max_similarity)
+            similarity = len(set.intersection(tracks, comparison_tracks)) / len(set.union(tracks, comparison_tracks))
+            res.append({
+                'name': country.name,
+                'country_code': country.code,
+                'similarity': similarity
+            })
+    res = sorted(res, key=lambda x: x['similarity'], reverse=True)
+    return res
 
 
 @app.route('/country_compare')
 def country_compare():
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
-    # TODO : deal with when there is no match better
-    country, similarity = get_percentage_similarity(c)
-    if not country:
-        return None
-    else:
-        return {
-            'name': country.name,
-            'country_code': country.code,
-            'similarity': similarity
-        }
+    tracks = get_today_track_names(c)
+    # TODO : deal better with when there is no match 
+    return get_percentage_similarity(tracks, c.code)
+    
+
+# @app.route('/spiritual_musical_home')
+# def spiritual_musical_home():
+#     tracks = set()
+
+#     # some way of getting list of tracks from a spotify playlist
+#     country, similarity = get_percentage_similarity(tracks)
+
+#     if not country:
+#         return None
+#     else:
+#         return {
+#             'name': country.name,
+#             'country_code': country.code,
+#             'similarity': similarity
+#         }
         
 
     
