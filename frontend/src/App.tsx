@@ -10,6 +10,9 @@ import TaskBar from './TaskBar';
 interface CountryData {
   countryName: string;
   songlist: any;
+  topArtist: string;
+  genre: string;
+  streams: string;
 }
 
 const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
@@ -90,7 +93,10 @@ function App() {
     const songlist = await fetchMusicStats(countryProp.wb_a2);
     setSelectedCountry({
       countryName: countryProp.name,
-      songlist
+      songlist,
+      topArtist: "todo",
+      genre: "todo",
+      streams: "todo"
     });
   };
   const handleSecondaryPopup = (type: string, value: string) => {
