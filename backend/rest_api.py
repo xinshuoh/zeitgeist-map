@@ -10,7 +10,6 @@ from models import *
 
 from param_check import *
 
-# example
 @app.route("/ping")
 #@cross_origin()
 @args(p.all)
