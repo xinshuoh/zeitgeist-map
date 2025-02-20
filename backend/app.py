@@ -16,6 +16,7 @@ import dbupdate
 app = Flask(__name__)
 
 import rest_api
+import scrape
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
