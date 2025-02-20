@@ -14,7 +14,7 @@ class Song(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    spotify_id: Mapped[str] = mapped_column(String, unique=True)
+    spotify_id: Mapped[str] = mapped_column(String, unique=True, nullable=True)
     name: Mapped[str] = mapped_column(String(128))
 
     artists: Mapped[List[Artist]] = relationship(secondary='credit', back_populates="songs")
@@ -28,7 +28,7 @@ class Artist(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    spotify_id: Mapped[str] = mapped_column(String, unique=True)
+    spotify_id: Mapped[str] = mapped_column(String, unique=True, nullable=True)
     name: Mapped[str] = mapped_column(String(128))
 
 
