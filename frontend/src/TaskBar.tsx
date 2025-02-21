@@ -3,7 +3,7 @@ import './TaskBar.css';
 
 const TaskBar: React.FC = () => {
   return (
-    <div className="taskbar">
+    <div id="taskbar" className="taskbar">
         <button className="logo-button" onClick={() => alert('logo clicked')}>
             <img src="/zeitgeistlogo.png" alt="Zeitgeist Map" className="logo-image" />
         </button>
