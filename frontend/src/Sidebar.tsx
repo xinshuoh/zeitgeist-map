@@ -35,7 +35,7 @@ const Sidebar = ({ isOpen, toggle, countryName }: SidebarProps) => {
                 </div>
             </div>
 
-            <div className="absolute top-1/2 -translate-y-[100%] bg-transparent h-[5%] rounded-lg flex">
+            <div className="absolute top-1/2 -translate-y-[160%] bg-transparent h-[5%] rounded-lg flex">
                 <div className={`bg-transparent h-full overflow-hidden transition-all ${isOpen ? "w-100" : "w-0"}`}></div>
                 <button className={`position: relative rounded-r-lg h-15 text-bold text-gray-500 bg-white border-l-[#e3e3e3] cursor-pointer p-1 transition-all 
              shadow-[0_1px_2px_rgba(60,64,67,0.3),0_2px_6px_2px_rgba(60,64,67,0.15)] z-[-1]`}
