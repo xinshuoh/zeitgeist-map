@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import './App.css';
-import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import worldGeoJSON from './assets/worldmap_large.json';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { GeoJSON as LeafletGeoJSON, LatLngBounds, Layer, LeafletEvent, LeafletMouseEvent } from 'leaflet';
+import { Layer, LeafletMouseEvent } from 'leaflet';
 import TaskBar from './TaskBar';
+import Sidebar from "./Sidebar";
 
 interface CountryData {
   countryName: string;
@@ -94,7 +95,12 @@ const fetchMusicStats = async (countryCode: string) => {
 
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
-  const [popupDetails, setPopupDetails] = useState<{ type: string; value: string} | null>(null);
+  const [popupDetails, setPopupDetails] = useState<{ type: string; value: string } | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const sidebarToggleHandler = () => {
+    setSidebarOpen(curr => !curr);
+  }
 
   pingServer();
 
@@ -121,6 +127,8 @@ function App() {
     if (!countryProp) return;
 
     const songlist = await fetchMusicStats(countryProp.wb_a2);
+    // const songlist = [{ key:1, song_name: "Example song 1"}];
+
     setSelectedCountry({
       countryName: countryProp.name,
       songlist,
@@ -128,10 +136,12 @@ function App() {
       genre: "todo",
       streams: "todo"
     });
+
+    setSidebarOpen(true);
   };
   const handleSecondaryPopup = (type: string, value: string) => {
     if (!selectedCountry) return;
-    setPopupDetails({ type, value});
+    setPopupDetails({ type, value });
   };
 
   const onEachFeature = async (feature: Feature<Geometry, GeoJsonProperties>, layer: Layer) => {
@@ -144,9 +154,12 @@ function App() {
 
   return (
     <>
-      <TaskBar />
-      <div id="map">
-        <MapContainer center={[51.505, -0.09]} zoom={3} className="fullscreen-map"
+      <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
+        <TaskBar />
+        <Sidebar isOpen={sidebarOpen} toggle={sidebarToggleHandler} countryName={selectedCountry?.countryName || "Select a country"} />
+      </div>
+      <div id="map-container" className="flex">
+        <MapContainer center={[51.505, -0.09]} zoom={3} style={{ position: "static", top: "0px", left: "0px", "zIndex": "0" }}
           maxBounds={[[85, 180], [-85, -180]]} minZoom={3} zoomControl={false}>
           <TileLayer
             attribution={CURRENT_TILE_LAYER.attribution}
@@ -162,14 +175,14 @@ function App() {
               <Popup>
                 <strong>{selectedCountry.countryName}</strong><br />
                 <ul>
-                {selectedCountry.songlist.slice(0, 5).map((song:any) => <li>{song.song_name}</li>)}
+                  {selectedCountry.songlist.slice(0, 5).map((song: any) => <li>{song.song_name}</li>)}
                 </ul>
                 Top Artist: {selectedCountry.topArtist}<br />
                 Genre: {selectedCountry.genre}<br />
-                
+
                 {/* Streams: {selectedCountry.streams} */}
                 <span style={{ fontWeight: "bold", cursor: "pointer", color: "blue", textDecoration: "underline" }}
-                onClick={(e) => handleSecondaryPopup("streams", selectedCountry.streams)}
+                  onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
                 >Streams: {selectedCountry.streams}
                 </span>
 

@@ -1,15 +1,15 @@
 .taskbar {
-    position: fixed;
+    position: static;
     top: 0;
-    width: 100%;
+    width: 100vw;
     background-color: rgb(54, 24, 54);
     color: white;
     padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000;
-    opacity: 90%;
+    z-index: 1;
+    opacity: 100%;
     box-sizing: border-box;
   }
   
