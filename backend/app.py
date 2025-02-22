@@ -16,7 +16,7 @@ import dbupdate
 app = Flask(__name__)
 
 import rest_api
-import scrape
+# import scrape
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -63,4 +63,5 @@ def list_countries():
 
 @app.cli.command("force-update")
 def force_update():
-    print(scheduler.get_job('kworb').func())
+    # print(scheduler.get_job('kworb').func())
+    print(scheduler.get_job('daily_scrape').func())
