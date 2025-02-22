@@ -206,50 +206,40 @@ class DailyScraper:
         normalised_popularity_measures = defaultdict(dict)
         for name in popularity_measures:
             for country_code in popularity_measures[name]:
-                normalised_popularity_measures[country_code][name] = popularity_measures[name][country_code] / norms[country_code]
+                normalised_popularity_measures[name][country_code] = popularity_measures[name][country_code] / norms[country_code]
 
         return normalised_popularity_measures
-        
-    def populate_database(self):
-        normalised_artist_popularity_measures = self.normalise_popularity_measures(self.artist_popularity_measures, self.get_artist_norms)
-
-        for normalised_artist_popularity_measure in normalised_artist_popularity_measures:
-            for country_code in normalised_artist_popularity_measure:
-                c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
-
-                artist_country_popularity_measure = sorted(normalised_artist_popularity_measure[country_code].items(), key=lambda item: item[1])
-                artist_popularity_measure_position_in_country = [(name, popularity_measure, position) for position, (name, popularity_measure) in enumerate(artist_country_popularity_measure)]
-
-                for artist_name, popularity_measure, position in artist_popularity_measure_position_in_country:
-                    # Add the artists to the database if not present
-                    a = self.db.session.execute(self.db.select(Artist).where(Artist.name == artist_name)).scalar()
-                    if not a:
-                        a = Artist(name = artist_name, songs = [], genres = [], spotify_id = None)
-                        self.db.session.add(a)
-
-                    # Add a relationship indicating the popularity of the artist in a particular country
-                    a_pop = ArtistHasPopularity(artist = a, country = c, position = position, date = dt.datetime.now())
-                    self.db.session.add(a_pop)
-
-        normalised_genre_popularity_measures = self.normalise_popularity_measures(self.genre_popularity_measures, self.get_genre_norms)
-
-        for normalised_genre_popularity_measure in normalised_genre_popularity_measures:
-            for country_code in normalised_genre_popularity_measure:
-                c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
-
-                genre_country_popularity_measure = sorted(normalised_genre_popularity_measure[country_code].items(), key=lambda item: item[1])
-                genre_popularity_measure_position_in_country = [(name, popularity_measure, position) for position, (name, popularity_measure) in enumerate(genre_country_popularity_measure)]
-                for genre_name, popularity_measure, position in genre_popularity_measure_position_in_country:
-                    # Add the genre to the database if not present 
-                    g = self.db.session.execute(self.db.select(Genre).where(Genre.name == genre_name)).scalar()
-                    if not g:
-                        g = Genre(name = genre_name, artists = [])
-                        self.db.session.add(g)
-
-                    # Add a relationship indicating the popularity of the artist in a particular country
-                    g_pop = GenreHasPopularity(genre = g, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
-                    self.db.session.add(g_pop)
     
+    def populate_database(self, popularity_measures, get_norms, table):
+        for normalised_popularity_measures in self.normalise_popularity_measures(popularity_measures, get_norms):
+            for country_code in normalised_popularity_measures:
+                c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
+
+                by_country_popularity_measures_sorted = sorted(normalised_popularity_measures[country_code].items(), key=lambda item: item[1])
+                by_country_popularity_measures_ranked = [(name, popularity_measure, position) for position, (name, popularity_measure) in enumerate(by_country_popularity_measures_sorted)]
+
+                for entity_name, popularity_measure, position in by_country_popularity_measures_ranked:
+                    if table == Artist:
+                        # Add the artist to the table if not already present
+                        a = self.db.session.execute(self.db.select(Artist).where(Artist.name == entity_name)).scalar()
+                        if not a:
+                            a = Artist(name = entity_name, songs = [], genres = [], spotify_id = None)
+                            self.db.session.add(a)
+
+                        # Add a relationship indicating the popularity of the artist in a particular country
+                        a_pop = ArtistHasPopularity(artist = a, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
+                        self.db.session.add(a_pop)
+                    elif table == Genre:
+                        # Add the genre to the table if not already present
+                        g = self.db.session.execute(self.db.select(Genre).where(Genre.name == entity_name)).scalar()
+                        if not g:
+                            g = Genre(name = entity_name, artists = [])
+                            self.db.session.add(g)
+
+                        # Add a relationship indicating the popularity of the genre in a particular country
+                        g_pop = GenreHasPopularity(genre = g, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
+                        self.db.session.add(g_pop)
+            
     def scrape(self):
         self.reset()
         
@@ -259,7 +249,8 @@ class DailyScraper:
         self.fetch_artist_data()
         pprint(self.artist_popularity_measures)
 
-        # self.populate_database()
+        # self.populate_database(self.artist_popularity_measures, self.get_artist_norms, Artist)
+        # self.populate_database(self.genre_popularity_measures, self.get_genre_norms, Genre)
 
         # self.db.session.commit()
 
