@@ -30,7 +30,7 @@ class DailyScraper:
 
     def reset(self):
         self.genre_popularity_measures = {country: defaultdict(int) for country in self.countries}
-        self.artist_popularity_measures = {}
+        self.artist_popularity_measures = {country: defaultdict(int) for country in self.countries}
         self.lastfmAPI_call_count = 0
 
     def fetch_track_spotify_info(self, track_spotify_id):
@@ -155,8 +155,6 @@ class DailyScraper:
             artist_page_contents = requests.get(f'https://kworb.net/itunes/{artist_page_link}').text
             artist_page_soup = BeautifulSoup(artist_page_contents, features="html.parser").find(id='songs')
 
-            artist_popularity_measure = defaultdict(int)
-
             services = ['spo', 'app', 'you', 'itu', 'sha', 'dee']
 
             for row in artist_page_soup.find_all('tr'):
@@ -170,12 +168,9 @@ class DailyScraper:
                                 position, country = position_in_country.split(' ', 1)  # Split on first whitespace
                                 try:
                                     country_code = pycountry.countries.lookup(country).alpha_2.lower()
-                                    artist_popularity_measure[country_code] += 1 / int(position[1:])
+                                    self.artist_popularity_measures[country_code][artist_name] += 1 / int(position[1:])
                                 except LookupError:  # The country is not recognised; skip
                                     print(f"Unknown country: {country}.")
-
-            # Use this data to calculate the top artists in each country
-            self.artist_popularity_measures[artist_name] = artist_popularity_measure
 
     def get_artist_norms(self):
         # The popularity measure of the most popular artist in each country
@@ -207,16 +202,8 @@ class DailyScraper:
 
         return normalised_popularity_measures
     
-    def flip(self, popularity_measures):
-        flipped_popularity_measures = defaultdict(dict)
-        for name in popularity_measures:
-            for country_code in popularity_measures[name]:
-                flipped_popularity_measures[country_code][name] = popularity_measures[name][country_code]
-
-        return flipped_popularity_measures
-    
     def populate_database(self, popularity_measures, get_norms, table):
-        popularity_measures = self.flip(self.normalise_popularity_measures(popularity_measures, get_norms))
+        popularity_measures = self.normalise_popularity_measures(popularity_measures, get_norms)
 
         for country_code in popularity_measures:
             c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
