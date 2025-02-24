@@ -13,9 +13,9 @@ from models import *
 
 class DailyScraper:
     def __init__(self, db):
-        # A list of all countries
-        self.countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
-
+        # A list of all countries 
+        self.countries = [country.alpha_2.lower() for country in pycountry.countries]
+        
         # A list of all recognised genres
         with open('genres.txt', mode='r', encoding="utf-8") as f:
             self.genres = {line.rstrip() for line in f}
@@ -78,6 +78,8 @@ class DailyScraper:
     def fetch_track_data(self):
         get_num = lambda s : int(s.replace(',','')) if s else None
 
+        kworb_countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
+
         for country in ['gb']:  # ['gb'] for now for testing purposes
             response = requests.get(f'https://kworb.net/spotify/country/{country}_daily.html')
             # Check the page exists
@@ -126,11 +128,6 @@ class DailyScraper:
 
                         artist_instances.append(a)
 
-                    print("##################################################")
-                    print(artist_instances)
-                    print(artists)
-                    print("##################################################\n")
-
                     # Add the song to the database if not present
                     s = self.db.session.execute(self.db.select(Song).where(Song.spotify_id == track_spotify_id)).scalar()
                     if not s:
@@ -147,7 +144,7 @@ class DailyScraper:
     def fetch_artist_data(self):
         contents = requests.get(f'https://kworb.net/itunes/extended.html').text
         soup = BeautifulSoup(contents, features="html.parser")
-        for row in soup.find_all('tr')[1:4]:
+        for row in soup.find_all('tr')[1:11]:
             elems = row.find_all('td')
 
             # position = elems[0].text  # Worldwide position 
@@ -210,35 +207,44 @@ class DailyScraper:
 
         return normalised_popularity_measures
     
+    def flip(self, popularity_measures):
+        flipped_popularity_measures = defaultdict(dict)
+        for name in popularity_measures:
+            for country_code in popularity_measures[name]:
+                flipped_popularity_measures[country_code][name] = popularity_measures[name][country_code]
+
+        return flipped_popularity_measures
+    
     def populate_database(self, popularity_measures, get_norms, table):
-        for normalised_popularity_measures in self.normalise_popularity_measures(popularity_measures, get_norms):
-            for country_code in normalised_popularity_measures:
-                c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
+        popularity_measures = self.flip(self.normalise_popularity_measures(popularity_measures, get_norms))
 
-                by_country_popularity_measures_sorted = sorted(normalised_popularity_measures[country_code].items(), key=lambda item: item[1])
-                by_country_popularity_measures_ranked = [(name, popularity_measure, position) for position, (name, popularity_measure) in enumerate(by_country_popularity_measures_sorted)]
+        for country_code in popularity_measures:
+            c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
 
-                for entity_name, popularity_measure, position in by_country_popularity_measures_ranked:
-                    if table == Artist:
-                        # Add the artist to the table if not already present
-                        a = self.db.session.execute(self.db.select(Artist).where(Artist.name == entity_name)).scalar()
-                        if not a:
-                            a = Artist(name = entity_name, songs = [], genres = [], spotify_id = None)
-                            self.db.session.add(a)
+            by_country_popularity_measures_sorted = sorted(popularity_measures[country_code].items(), key=lambda item: item[1])
+            by_country_popularity_measures_ranked = [(name, popularity_measure, position) for position, (name, popularity_measure) in enumerate(by_country_popularity_measures_sorted)]
 
-                        # Add a relationship indicating the popularity of the artist in a particular country
-                        a_pop = ArtistHasPopularity(artist = a, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
-                        self.db.session.add(a_pop)
-                    elif table == Genre:
-                        # Add the genre to the table if not already present
-                        g = self.db.session.execute(self.db.select(Genre).where(Genre.name == entity_name)).scalar()
-                        if not g:
-                            g = Genre(name = entity_name, artists = [])
-                            self.db.session.add(g)
+            for name, popularity_measure, position in by_country_popularity_measures_ranked:
+                if table == Artist:
+                    # Add the artist to the table if not already present
+                    a = self.db.session.execute(self.db.select(Artist).where(Artist.name == name)).scalar()
+                    if not a:
+                        a = Artist(name = name, songs = [], genres = [], spotify_id = None)
+                        self.db.session.add(a)
 
-                        # Add a relationship indicating the popularity of the genre in a particular country
-                        g_pop = GenreHasPopularity(genre = g, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
-                        self.db.session.add(g_pop)
+                    # Add a relationship indicating the popularity of the artist in a particular country
+                    a_pop = ArtistHasPopularity(artist = a, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
+                    self.db.session.add(a_pop)
+                elif table == Genre:
+                    # Add the genre to the table if not already present
+                    g = self.db.session.execute(self.db.select(Genre).where(Genre.name == name)).scalar()
+                    if not g:
+                        g = Genre(name = name, artists = [])
+                        self.db.session.add(g)
+
+                    # Add a relationship indicating the popularity of the genre in a particular country
+                    g_pop = GenreHasPopularity(genre = g, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
+                    self.db.session.add(g_pop)
             
     def scrape(self):
         self.reset()
@@ -247,12 +253,12 @@ class DailyScraper:
         # print(self.genre_popularity_measures)
         
         self.fetch_artist_data()
-        pprint(self.artist_popularity_measures)
+        # pprint(self.artist_popularity_measures)
 
-        # self.populate_database(self.artist_popularity_measures, self.get_artist_norms, Artist)
+        self.populate_database(self.artist_popularity_measures, self.get_artist_norms, Artist)
         # self.populate_database(self.genre_popularity_measures, self.get_genre_norms, Genre)
 
-        # self.db.session.commit()
+        self.db.session.commit()
 
 
 if __name__ == "__main__":

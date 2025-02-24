@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Optional, Dict
 from datetime import date
+import pycountry
 
 from sqlalchemy import String, Integer, ForeignKey, Table, Column, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
