@@ -31,6 +31,7 @@ class DailyScraper:
     def reset(self):
         self.genre_popularity_measures = {country: defaultdict(int) for country in self.countries}
         self.artist_popularity_measures = {country: defaultdict(int) for country in self.countries}
+
         self.lastfmAPI_call_count = 0
 
     def fetch_track_spotify_info(self, track_spotify_id):
@@ -64,7 +65,7 @@ class DailyScraper:
             print("Error:", response.status_code)
             return None
 
-    def calculate_genre_data(self, country, track_information):
+    def calculate_genre_data(self, country_code, track_information):
         for main_artist_name, track_name, position in track_information:
             tag_info = self.fetch_track_tag_info(main_artist_name, track_name)
             print(f"Fetching data: {main_artist_name}, {track_name}...")
@@ -73,15 +74,15 @@ class DailyScraper:
                 for tag in tags:
                     genre = tag['name'].lower()
                     if genre in self.genres:
-                        self.genre_popularity_measures[country][genre] += (tag['count'] / 100) / position
+                        self.genre_popularity_measures[country_code][genre] += (tag['count'] / 100) / position
 
     def fetch_track_data(self):
         get_num = lambda s : int(s.replace(',','')) if s else None
 
         kworb_countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
 
-        for country in ['gb']:  # ['gb'] for now for testing purposes
-            response = requests.get(f'https://kworb.net/spotify/country/{country}_daily.html')
+        for country_code in ['gb']:  # ['gb'] for now for testing purposes
+            response = requests.get(f'https://kworb.net/spotify/country/{country_code}_daily.html')
             # Check the page exists
             if response.status_code == 200:
                 contents = response.content
@@ -135,11 +136,11 @@ class DailyScraper:
                         self.db.session.add(s)
 
                     # Add a relationship indicating the popularity of the song in a particular country
-                    c = self.db.session.execute(self.db.select(Country).where(Country.code == country)).scalar()
+                    c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
                     s_pop = SongHasPopularity(song = s, country = c, position = position, date = dt.datetime.now())
                     self.db.session.add(s_pop)
 
-                self.calculate_genre_data(country, track_information)
+                self.calculate_genre_data(country_code, track_information)
 
     def fetch_artist_data(self):
         contents = requests.get(f'https://kworb.net/itunes/extended.html').text
@@ -172,43 +173,23 @@ class DailyScraper:
                                 except LookupError:  # The country is not recognised; skip
                                     print(f"Unknown country: {country}.")
 
-    def get_artist_norms(self):
-        # The popularity measure of the most popular artist in each country
+    def populate_database(self, popularity_measures, table):
+        # Normalise the popularity measures
         normalising_constants = defaultdict(int)
-        for artist in self.artist_popularity_measures:
-            for country_code in self.artist_popularity_measures[artist]:
-                normalising_constants[country_code] = max(
-                    normalising_constants[country_code], 
-                    self.artist_popularity_measures[artist][country_code]
-                )
-
-        return normalising_constants
-
-    def get_genre_norms(self):
-        # The popularity measure of the most popular genre in each country
-        normalising_constants = defaultdict(int)
-        for country_code in self.genre_popularity_measures:
-            normalising_constants[country_code] = max(self.genre_popularity_measures[country_code].values())
-        
-        return normalising_constants
-    
-    def normalise_popularity_measures(self, popularity_measures, get_norms):
-        norms = get_norms()
+        for country_code in popularity_measures:
+            normalising_constants[country_code] = max(popularity_measures[country_code].values(), default=0)
 
         normalised_popularity_measures = defaultdict(dict)
-        for name in popularity_measures:
-            for country_code in popularity_measures[name]:
-                normalised_popularity_measures[name][country_code] = popularity_measures[name][country_code] / norms[country_code]
+        for country_code in popularity_measures:
+            for name in popularity_measures[country_code]:
+                normalised_popularity_measures[country_code][name] = popularity_measures[country_code][name] / normalising_constants[country_code]
 
-        return normalised_popularity_measures
-    
-    def populate_database(self, popularity_measures, get_norms, table):
-        popularity_measures = self.normalise_popularity_measures(popularity_measures, get_norms)
+        popularity_measures = normalised_popularity_measures
 
         for country_code in popularity_measures:
             c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
 
-            by_country_popularity_measures_sorted = sorted(popularity_measures[country_code].items(), key=lambda item: item[1])
+            by_country_popularity_measures_sorted = sorted(popularity_measures[country_code].items(), key=lambda item: -item[1])
             by_country_popularity_measures_ranked = [(name, popularity_measure, position) for position, (name, popularity_measure) in enumerate(by_country_popularity_measures_sorted)]
 
             for name, popularity_measure, position in by_country_popularity_measures_ranked:
@@ -236,14 +217,14 @@ class DailyScraper:
     def scrape(self):
         self.reset()
         
-        # self.fetch_track_data()
-        # print(self.genre_popularity_measures)
+        self.fetch_track_data()
+        # pprint(self.genre_popularity_measures)
         
-        self.fetch_artist_data()
+        # self.fetch_artist_data()
         # pprint(self.artist_popularity_measures)
 
-        self.populate_database(self.artist_popularity_measures, self.get_artist_norms, Artist)
-        # self.populate_database(self.genre_popularity_measures, self.get_genre_norms, Genre)
+        # self.populate_database(self.artist_popularity_measures, Artist)
+        self.populate_database(self.genre_popularity_measures, Genre)
 
         self.db.session.commit()
 

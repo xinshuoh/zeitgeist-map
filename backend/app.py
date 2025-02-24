@@ -61,14 +61,15 @@ def list_songs():
 def list_artists():
     scalars = db.session.execute(db.select(Artist)).scalars()
     for s in scalars:
-        print(s.name, "-", *s.songs)  # Print the artist's name and all of their songs
+        print(s.name)
         print(*map(lambda x : x.country.code + ": " + str(x.position) + ", " + str(x.popularity) + "\n", s.popularities))
 
 @app.cli.command("list-genres")
 def list_genres():
     scalars = db.session.execute(db.select(Genre)).scalars()
     for s in scalars:
-        pass
+        print(s.name)
+        print(*map(lambda x : x.country.code + ": " + str(x.position) + ", " + str(x.popularity) + "\n", s.popularities))
 
 @app.cli.command("list-countries")
 def list_countries():
