@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import './App.css';
-import { MapContainer, TileLayer, Marker, Popup, useMap, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import worldGeoJSON from './assets/worldmap_large.json';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { GeoJSON as LeafletGeoJSON, LatLngBounds, Layer, LeafletEvent, LeafletMouseEvent } from 'leaflet';
+import { Layer, LeafletMouseEvent } from 'leaflet';
 import TaskBar from './TaskBar';
+import Sidebar from "./Sidebar";
 
 interface CountryData {
   countryName: string;
@@ -26,7 +27,7 @@ const TILE_LAYERS = {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }
 };
-const CURRENT_TILE_LAYER = TILE_LAYERS.openStreetMap; // modify this to switch between tile layers
+const CURRENT_TILE_LAYER = TILE_LAYERS.rapidApi; // modify this to switch between tile layers
 
 // Function to set color based on properties (modify as needed)
 const getColor = (population: number) => {
@@ -44,6 +45,7 @@ const getColor = (population: number) => {
 const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined) => ({
   fillColor: getColor(feature?.properties?.pop_est || 0),
   weight: 0.1,
+  // color: '#d0d0d0',
   color: 'white',
   fillOpacity: 0.8
 });
@@ -94,7 +96,14 @@ const fetchMusicStats = async (countryCode: string) => {
 
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
-  const [popupDetails, setPopupDetails] = useState<{ type: string; value: string} | null>(null);
+  const [popupDetails, setPopupDetails] = useState<{ type: string; value: string } | null>(null);
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // const [sidebarData, setSidebarData] = useState<{ type: string; value: string } | null>(null); //change this to zacks sidebar set up
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const sidebarToggleHandler = () => {
+    setSidebarOpen(curr => !curr);
+  }
 
   pingServer();
 
@@ -111,7 +120,7 @@ function App() {
     layer.bringToFront();
   };
 
-  const resetHighlight = (e: LeafletMouseEvent) => { //country back to default colour
+  const resetHighlight = (e: LeafletMouseEvent) => { 
     const layer = e.target;
     layer.setStyle(styleFeature(e.target.feature));
   };
@@ -121,6 +130,8 @@ function App() {
     if (!countryProp) return;
 
     const songlist = await fetchMusicStats(countryProp.wb_a2);
+    // const songlist = [{ key:1, song_name: "Example song 1"}];
+
     setSelectedCountry({
       countryName: countryProp.name,
       songlist,
@@ -128,10 +139,15 @@ function App() {
       genre: "todo",
       streams: "todo"
     });
+
+    setSidebarOpen(true);
   };
   const handleSecondaryPopup = (type: string, value: string) => {
     if (!selectedCountry) return;
+    setPopupDetails({ type, value });
     setPopupDetails({ type, value});
+    // setSidebarData({ type, value });
+
   };
 
   const onEachFeature = async (feature: Feature<Geometry, GeoJsonProperties>, layer: Layer) => {
@@ -144,9 +160,13 @@ function App() {
 
   return (
     <>
-      <TaskBar />
-      <div id="map">
-        <MapContainer center={[51.505, -0.09]} zoom={3} className="fullscreen-map"
+      <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
+        <TaskBar />
+      {/* <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} content={sidebarContent} /> change to Zack */}
+        <Sidebar isOpen={sidebarOpen} toggle={sidebarToggleHandler} countryName={selectedCountry?.countryName || "Select a country"} />
+      </div>
+      <div id="map-container" className="flex">
+        <MapContainer center={[51.505, -0.09]} zoom={3} style={{ position: "static", top: "0px", left: "0px", "zIndex": "0" }}
           maxBounds={[[85, 180], [-85, -180]]} minZoom={3} zoomControl={false}>
           <TileLayer
             attribution={CURRENT_TILE_LAYER.attribution}
@@ -161,17 +181,36 @@ function App() {
             {selectedCountry && (
               <Popup>
                 <strong>{selectedCountry.countryName}</strong><br />
-                <ul>
-                {selectedCountry.songlist.slice(0, 5).map((song:any) => <li>{song.song_name}</li>)}
-                </ul>
-                Top Artist: {selectedCountry.topArtist}<br />
-                Genre: {selectedCountry.genre}<br />
                 
+                <ul>
+                  {selectedCountry.songlist.slice(0, 5).map((song: any) => <li>{song.song_name}</li>)}
+                {/* {selectedCountry.songlist.slice(0, 5).map((song: any) => ( //for zack changes
+                    <li key={song.song_name} 
+                        style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
+                        onClick={() => handleSidebarOpen("Song", song.song_name)}>
+                      {song.song_name}
+                    </li>
+                  ))} */}
+                </ul>
+
+                {/* Top Artist: {selectedCountry.topArtist}<br />
+                Genre: {selectedCountry.genre}<br />
+
                 {/* Streams: {selectedCountry.streams} */}
                 <span style={{ fontWeight: "bold", cursor: "pointer", color: "blue", textDecoration: "underline" }}
-                onClick={(e) => handleSecondaryPopup("streams", selectedCountry.streams)}
+                  onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
                 >Streams: {selectedCountry.streams}
                 </span>
+                Streams: {selectedCountry.streams} */
+                <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
+                onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
+                >Top Artist
+                </span>: {selectedCountry.topArtist} <br />
+
+                <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
+                onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
+                >Genre
+                </span>: {selectedCountry.genre} <br />
 
               </Popup>
             )}
@@ -191,11 +230,6 @@ function App() {
             </>
           )}
 
-          <Marker position={[51.505, -0.09]}>
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
-          </Marker>
         </MapContainer>
       </div>
     </>

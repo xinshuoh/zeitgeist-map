@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Optional, Dict
 from datetime import date
+import pycountry
 
 from sqlalchemy import String, Integer, ForeignKey, Table, Column, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -114,6 +115,7 @@ class ArtistHasPopularity(db.Model):
     date: Mapped[date] = mapped_column(Date)
 
     position: Mapped[int] = mapped_column(Integer)
+    popularity: Mapped[int] = mapped_column(Integer, nullable=True)
 
 
     artist: Mapped[Artist] = relationship(back_populates="popularities")
@@ -130,7 +132,7 @@ class GenreHasPopularity(db.Model):
     date: Mapped[date] = mapped_column(Date)
 
     position: Mapped[int] = mapped_column(Integer)
-
+    popularity: Mapped[int] = mapped_column(Integer, nullable=True)
 
     genre: Mapped[Genre] = relationship(back_populates="popularities")
     country: Mapped[Country] = relationship(back_populates="genre_popularities")
