@@ -7,6 +7,7 @@ import json
 from collections import defaultdict
 from models import *
 from app import app
+from datetime import datetime
 
 client_id = 'b0d6aef0a4f846d3afe4dc5ab695bc3b'
 client_secret = 'ed600a63a1be4d2f83fc69f2be3169fe'
@@ -33,18 +34,21 @@ def fetch_historical():
 
     soup = BeautifulSoup(contents, features="html.parser")
 
-    for row in soup.find_all('a')[1:]: # first row is headings
+    for row in soup.find_all('a')[1:2]: # first row is headings
 
-        date = row.text
-        contents_1 = urllib.request.urlopen(f"https://kworb.net/apple_songs/archive/{date}").read()
+        date_ = row.text
+        contents_1 = urllib.request.urlopen(f"https://kworb.net/apple_songs/archive/{date_}").read()
         soup_1 = BeautifulSoup(contents_1, features="html.parser")
 
+        j = 0
         
         rows = soup_1.find_all('tr')
         popularity = {}
         countries = ["us","uk","jp","de","au","ca","fr","it","kr","mx","ru","th","be","br","ch","cn","co","es","hk","id","ie","in","nl","nz","tr","tw","za","ae","ar","at","cl","cz","dk","ec","ee","eg","fi","gr","hu","il","ke","kz","lb","lt","lu","my","ng","no","pe","ph","pl","pt","ro","sa","se","si","sg","sk","ua","vn"]
-        for row in rows[1:]: # first row is headings
+        for row in rows[1:11]: # first row is headings
             elems = row.find_all('td')
+
+            j += 1
 
             #global stats
             pos = elems[0].text
@@ -61,11 +65,19 @@ def fetch_historical():
             pts_plus = elems[7].text
             tpts = elems[8].text
             track_link = fetch_track_id(track)
+            print(date_, j)
+            date_time = datetime.strptime(date_[2:8], '%y%m%d')
 
             
             #country specific stats
 
             a_list = []
+
+            s = db.session.execute(db.select(Song).where(Song.spotify_id == track_link)).scalar()
+            if not s:
+                s = Song(name = track, artists = a_list, spotify_id = track_link)
+                db.session.add(s)
+
 
             for i in range(9, 69):
                 country_pos = elems[i].text
@@ -83,7 +95,7 @@ def fetch_historical():
                             popularity[artist_link][country] += (1 / (1+(country_pos/20)))
 
                     c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
-                    s_pop = SongHasPopularity(song = s, country = c, position = pos, date = date)
+                    s_pop = SongHasPopularity(song = s, country = c, position = pos, date = date_time)
                     db.session.add(s_pop)
 
             for artist in artists:
@@ -95,20 +107,16 @@ def fetch_historical():
                 a_list.append(a)
 
 
-            s = db.session.execute(db.select(Song).where(Song.spotify_id == track_link)).scalar()
-            if not s:
-                s = Song(name = track, artists = a_list, spotify_id = track_link)
-                db.session.add(s)
-
                 
         #artist popularity by country
+        print(date)
         for artist_key in popularity.keys():
             for country in popularity[artist_key].keys():
 
                 c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
                 a = db.session.execute(db.select(Artist).where(Artist.spotify_id == artist_key)).scalar()
 
-                a_pop = ArtistHasPopularity(artist = a, country = c, position = popularity[artist_key][country], date = date) 
+                a_pop = ArtistHasPopularity(artist = a, country = c, position = popularity[artist_key][country], date = date_time) 
                 db.session.add(a_pop)
 
             
@@ -117,4 +125,4 @@ def fetch_historical():
 
 
 
-fetch_historical()
+#fetch_historical()
