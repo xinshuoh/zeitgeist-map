@@ -156,8 +156,10 @@ function App() {
     <>
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
         <TaskBar />
-        <Sidebar isOpen={sidebarOpen} toggle={sidebarToggleHandler} countryName={selectedCountry?.countryName || "Select a country"} />
+        <Sidebar isOpen={sidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry}/>
+
       </div>
+      
       <div id="map-container" className="flex">
         <MapContainer center={[51.505, -0.09]} zoom={3} style={{ position: "static", top: "0px", left: "0px", "zIndex": "0" }}
           maxBounds={[[85, 180], [-85, -180]]} minZoom={3} zoomControl={false}>

@@ -115,6 +115,3 @@ def fetch_historical():
         db.session.commit()
 
 
-
-
-fetch_historical()

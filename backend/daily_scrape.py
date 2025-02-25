@@ -217,14 +217,14 @@ class DailyScraper:
     def scrape(self):
         self.reset()
         
-        self.fetch_track_data()
+        # self.fetch_track_data()
         # pprint(self.genre_popularity_measures)
         
-        # self.fetch_artist_data()
+        self.fetch_artist_data()
         # pprint(self.artist_popularity_measures)
 
-        # self.populate_database(self.artist_popularity_measures, Artist)
-        self.populate_database(self.genre_popularity_measures, Genre)
+        self.populate_database(self.artist_popularity_measures, Artist)
+        # self.populate_database(self.genre_popularity_measures, Genre)
 
         self.db.session.commit()
 
