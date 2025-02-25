@@ -97,9 +97,7 @@ const fetchMusicStats = async (countryCode: string) => {
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
   const [popupDetails, setPopupDetails] = useState<{ type: string; value: string } | null>(null);
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  // const [sidebarData, setSidebarData] = useState<{ type: string; value: string } | null>(null); //change this to zacks sidebar set up
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const sidebarToggleHandler = () => {
     setSidebarOpen(curr => !curr);
@@ -161,17 +159,17 @@ function App() {
     <>
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
         <TaskBar />
-      {/* <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} content={sidebarContent} /> change to Zack */}
-        <Sidebar isOpen={sidebarOpen} toggle={sidebarToggleHandler} countryName={selectedCountry?.countryName || "Select a country"} />
+        <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} countryName={selectedCountry?.countryName || "Select a country"} />
       </div>
       <div id="map-container" className="flex">
         <MapContainer center={[51.505, -0.09]} zoom={3} style={{ position: "static", top: "0px", left: "0px", "zIndex": "0" }}
           maxBounds={[[85, 180], [-85, -180]]} minZoom={3} zoomControl={false}>
-          <TileLayer
+          {/* <TileLayer
             attribution={CURRENT_TILE_LAYER.attribution}
             url={CURRENT_TILE_LAYER.url}
             noWrap={true}
-          />
+          /> 
+          tile layer not needed anymore */ }
           <GeoJSON
             data={worldGeoJSON as GeoJSON.GeoJsonObject}
             style={styleFeature} //sets unclicked default style
