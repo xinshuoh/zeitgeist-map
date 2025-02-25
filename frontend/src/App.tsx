@@ -147,7 +147,6 @@ function App() {
   const handleSecondaryPopup = (type: string, value: string) => {
     if (!selectedCountry) return;
     setPopupDetails({ type, value });
-    setPopupDetails({ type, value});
     // setSidebarData({ type, value });
 
   };
@@ -195,15 +194,6 @@ function App() {
                   ))} */}
                 </ul>
 
-                {/* Top Artist: {selectedCountry.topArtist}<br />
-                Genre: {selectedCountry.genre}<br />
-
-                {/* Streams: {selectedCountry.streams} */}
-                <span style={{ fontWeight: "bold", cursor: "pointer", color: "blue", textDecoration: "underline" }}
-                  onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
-                >Streams: {selectedCountry.streams}
-                </span>
-                Streams: {selectedCountry.streams} */}
                 <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
                 onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
                 >Top Artist
