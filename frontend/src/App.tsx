@@ -159,7 +159,7 @@ function App() {
     <>
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
         <TaskBar />
-        <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} countryName={selectedCountry?.countryName || "Select a country"} />
+        <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} />
       </div>
       
       <div id="map-container" className="flex">
