@@ -19,69 +19,34 @@
     border: none;
     padding: 10px 20px;
     cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-sizing: border-box;
   }
   
   .taskbar button:hover {
     background-color: #555;
   }
 
-.taskbar button {
-  background-color: #c12121;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-sizing: border-box;
-}
+  .taskbar .logo-button {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .taskbar .logo-image {
+    height: 40px;
+  }
+  
+  .taskbar .search-button {
+    background-color: #d0a4b4;
+    flex-grow: 1;
+    margin: 0 20%;
+    text-align: center;
+    /* text-decoration-color: black; */
+    color: black;
+  }
 
-.taskbar button:hover {
-  background-color: #555;
-}
+  .taskbar .compare-button {
+    background-color: #ffa7c9;
+    padding: 4px;
 
-.taskbar .logo-button {
-  background-color: transparent;
-  padding: 0;
-  border: none;
-  cursor: pointer;
-}
-
-.taskbar .logo-image {
-  height: 40px;
-}
-.taskbar .button-image {
-  height: 40px;
-  /* width: 65px; */
-}
-
-.taskbar .search-button {
-  background-color: #d0a4b4;
-  flex-grow: 1;
-  margin: 0 20%;
-  text-align: center;
-  /* text-decoration-color: black; */
-  color: black;
-  border-radius: 20px;
-  height: 40px;
-  border: 1px solid #ffa7c9;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-/*stops the search bar turning blue on search*/
-.taskbar .search-button:focus { 
-  outline: none;
-  border-color: #ffa7c9;
-}
-
-.taskbar .search-button:hover{
-  background-color: #ffa7c9;
-}
-
-
-
+  }

@@ -6,8 +6,6 @@ import worldGeoJSON from './assets/worldmap_large.json';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { Layer, LeafletMouseEvent } from 'leaflet';
 import TaskBar from './TaskBar';
-// import Sidebar from './Sidebar'; // change to Zacks
-
 import Sidebar from "./Sidebar";
 
 interface CountryData {
@@ -203,11 +201,6 @@ function App() {
                 onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
                 >Genre
                 </span>: {selectedCountry.genre} <br />
-
-                <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
-                onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
-                >Streams
-                </span>: {selectedCountry.streams}
 
               </Popup>
             )}
