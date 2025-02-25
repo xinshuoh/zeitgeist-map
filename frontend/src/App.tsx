@@ -78,6 +78,20 @@ async function pingServer() {
   return await res;
 }
 
+const fetchSearchComplete = async (prefix: string) => {
+  if (!serverResponsive) return [];
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', `http://127.0.0.1:5000/search_complete?prefix=${prefix}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText)
+      resolve(data)
+    })
+  });
+  xhr.send()
+  return await res
+}
+
 const fetchMusicStats = async (countryCode: string) => {
   if (!serverResponsive) return [];
   var xhr = new XMLHttpRequest()
@@ -158,7 +172,7 @@ function App() {
   return (
     <>
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
-        <TaskBar />
+        <TaskBar autocomplete={fetchSearchComplete} />
         <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} />
       </div>
       
