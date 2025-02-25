@@ -44,9 +44,9 @@ const getColor = (population: number) => {
 
 const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined) => ({
   fillColor: getColor(feature?.properties?.pop_est || 0),
-  weight: 0.1,
-  // color: '#d0d0d0',
-  color: 'white',
+  weight: 1,
+  color: '#d0d0d0',
+  // color: 'white',
   fillOpacity: 0.8
 });
 
