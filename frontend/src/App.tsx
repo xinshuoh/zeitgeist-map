@@ -16,6 +16,12 @@ interface CountryData {
   streams: string;
 }
 
+type CountrySimilarityData = {
+  country_code: string;
+  name: string
+  similarity: number;
+}
+
 const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
 const TILE_LAYERS = {
   rapidApi: {
@@ -94,6 +100,20 @@ const fetchMusicStats = async (countryCode: string) => {
   //return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
 };
 
+const fetchCountryCompareData = async (countryCode: string) => {
+  if (!serverResponsive) return [];
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', `http://127.0.0.1:5000/country_compare?country_code=${countryCode.toLowerCase()}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText)
+      resolve(data)
+    })
+  });
+  xhr.send()
+  return await res
+};
+
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
   const [popupDetails, setPopupDetails] = useState<{ type: string; value: string } | null>(null);
@@ -155,10 +175,16 @@ function App() {
     });
   };
 
+  const doHeatMap = async () => {
+    const countrySimilarities: CountrySimilarityData[] = (await fetchCountryCompareData("gb")) as CountrySimilarityData[];
+    
+    alert(countrySimilarities)
+  };
+
   return (
     <>
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
-        <TaskBar />
+        <TaskBar onCountryCompare={doHeatMap}/>
         <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} countryName={selectedCountry?.countryName || "Select a country"} />
       </div>
       <div id="map-container" className="flex">

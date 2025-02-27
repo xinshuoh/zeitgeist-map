@@ -1,7 +1,11 @@
 import React from 'react';
 import './TaskBar.css';
 
-const TaskBar: React.FC = () => {
+interface TaskbarProps {
+  onCountryCompare: () => void
+}
+
+const TaskBar: React.FC<TaskbarProps> = ({ onCountryCompare }) => {
   return (
     <div id="taskbar" className="taskbar">
       <button className="logo-button" onClick={() => alert('logo clicked')}>
@@ -13,7 +17,7 @@ const TaskBar: React.FC = () => {
           }
         }} 
       />
-      <button className="compare-button" onClick={() => alert('Button 3 clicked')}>
+      <button className="compare-button" onClick={onCountryCompare}>
       <img src="/countrycomparelogo2.png" alt="Zeitgeist Map" className="logo-image" />
       </button>
     </div>
