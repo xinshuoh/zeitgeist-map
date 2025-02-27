@@ -189,8 +189,8 @@ class DailyScraper:
         for country_code in popularity_measures:
             c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
 
-            by_country_popularity_measures_sorted = sorted(popularity_measures[country_code].items(), key=lambda item: -item[1])
-            by_country_popularity_measures_ranked = [(name, popularity_measure, position) for position, (name, popularity_measure) in enumerate(by_country_popularity_measures_sorted)]
+            by_country_popularity_measures_sorted = sorted(popularity_measures[country_code].items(), key=lambda item: item[1], reverse=True)
+            by_country_popularity_measures_ranked = [(name, popularity_measure, position + 1) for position, (name, popularity_measure) in enumerate(by_country_popularity_measures_sorted)]
 
             for name, popularity_measure, position in by_country_popularity_measures_ranked:
                 if table == Artist:
@@ -217,14 +217,14 @@ class DailyScraper:
     def scrape(self):
         self.reset()
         
-        self.fetch_track_data()
+        # self.fetch_track_data()
         # pprint(self.genre_popularity_measures)
         
-        # self.fetch_artist_data()
+        self.fetch_artist_data()
         # pprint(self.artist_popularity_measures)
 
-        # self.populate_database(self.artist_popularity_measures, Artist)
-        self.populate_database(self.genre_popularity_measures, Genre)
+        self.populate_database(self.artist_popularity_measures, Artist)
+        # self.populate_database(self.genre_popularity_measures, Genre)
 
         self.db.session.commit()
 
