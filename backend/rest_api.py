@@ -152,4 +152,8 @@ def country_compare():
 #         }
         
 
-    
+@app.route('/search_complete')
+@args(p('prefix'))
+def search_complete():
+    c = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
+    return list(map(lambda song : song.name, c))
