@@ -12,11 +12,6 @@ interface SidebarProps {
     selectedCountry: any;
 }
 
-interface PlayerProps {
-    IFrameAPI: any;
-    selectedCountry: any;
-}
-
 // window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
 //     const element = document.getElementById('embed-iframe');
 //     const options = {
