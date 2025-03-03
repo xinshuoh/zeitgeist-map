@@ -75,7 +75,7 @@ def list_genres():
 def list_countries():
     scalars = db.session.execute(db.select(Country)).scalars()
     for s in scalars:
-        print(s.name)
+        print(s.name, ":", s.code)
 
 @app.cli.command("force-update")
 def force_update():

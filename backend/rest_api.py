@@ -45,6 +45,7 @@ def get_top_tracks(country, date):
     for v in vals:
         res.append({
             'song_name': v.song.name,
+            'spotify_id': v.song.spotify_id,
             'artist': v.song.artists[0].name,
             'position': v.position,
         })

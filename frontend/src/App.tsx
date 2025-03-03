@@ -193,15 +193,20 @@ function App() {
     if (previousLayer) {
       (previousLayer as L.Path).setStyle(styleFeature((previousLayer as any).feature));
     }
-    setSelectedCountry({
-      countryName: countryProp.name,
-      countryCode: layer.feature?.properties?.wb_a2,
-      songlist,
-      topArtist: "todo",
-      genre: "todo",
-      streams: "todo"
-    });
-    console.log(selectedCountry?.countryCode);
+
+    // only fires if you select a new country (avoids constantly replaying the same song - don't know if this feature is desireable)
+    if (countryCode != selectedCountry?.countryCode) {
+      setSelectedCountry({
+        countryName: countryProp.name,
+        countryCode: layer.feature?.properties?.wb_a2,
+        songlist,
+        topArtist: "todo",
+        genre: "todo",
+        streams: "todo"
+      });
+      console.log(selectedCountry?.countryCode);
+    }
+    
 
     layer.setStyle({
       weight: 5.5,
