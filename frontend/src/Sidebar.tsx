@@ -1,6 +1,8 @@
 import { ChevronFirst, ChevronLast } from "lucide-react";
 
 import ChartBox from "./ChartBox";
+import { useEffect, useRef } from 'react';
+
 
 const data = [{popularity: 100}, {popularity: 150}, {popularity: 125}, {popularity: 110}];
 
@@ -10,7 +12,64 @@ interface SidebarProps {
     selectedCountry: any;
 }
 
+interface PlayerProps {
+    IFrameAPI: any;
+    selectedCountry: any;
+}
+
+// window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
+//     const element = document.getElementById('embed-iframe');
+//     const options = {
+//         uri: 'spotify:track:11dFghVXANMlKmJXsNCbNl'
+//       };
+//     const callback = (EmbedController : any) => {
+//         controller = EmbedController
+       
+//     };
+    
+//     IFrameAPI.createController(element, options, callback);
+//   };
+
 const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
+    const controllerRef = useRef<any>(null);
+
+    useEffect(() => {
+        window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
+            const element = document.getElementById('embed-iframe');
+            // const options = {
+            //     uri: 'spotify:track:11dFghVXANMlKmJXsNCbNl' // Default song
+            // };
+
+            const callback = (EmbedController: any) => {
+                controllerRef.current = EmbedController;
+                if (selectedCountry?.songlist?.length) {
+                    updateSong();
+                }
+            };
+
+            IFrameAPI.createController(element, {}, callback);
+        };
+    }, []);
+    
+    const updateSong = () => {
+        if (!controllerRef.current)  {
+            return;
+        } else if (!selectedCountry?.songlist?.length) {
+            return;
+        }
+
+        const songToPlay = selectedCountry.songlist[0];
+        if (songToPlay) {
+            controllerRef.current.loadUri(`spotify:track:${songToPlay.spotify_id}`);
+            controllerRef.current.play();
+        }
+    };
+
+    useEffect(() => {
+        if (controllerRef.current && selectedCountry?.songlist?.length) {
+            updateSong();
+        }
+    }, [selectedCountry]);
 
     if (selectedCountry == null) return (        <div className="relative w-full h-screen flex">
         <div className={`h-full transition-all ${isOpen ? "w-100" : "w-0"} z-1`}>
@@ -61,10 +120,14 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
                         </div>
                     </div>
 
+                    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+                    <div id="embed-iframe"></div>
+                    
                   {selectedCountry.songlist.slice(0, 5).map((song: any) => 
+                
                 <ChartBox isOpen={isOpen} song={song}></ChartBox>
                   )}
-
+                
                 </div>
             </div>
 

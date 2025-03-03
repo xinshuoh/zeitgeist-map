@@ -82,7 +82,7 @@ class DailyScraper:
 
         kworb_countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
 
-        for country_code in ['gb']:  # ['gb'] for now for testing purposes
+        for country_code in ['gb', 'fr', 'de', 'es']:  # ['gb'] for now for testing purposes
             response = requests.get(f'https://kworb.net/spotify/country/{country_code}_daily.html')
             # Check the page exists
             if response.status_code == 200:
