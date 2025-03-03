@@ -19,7 +19,8 @@ const TaskBar: React.FC<TaskBarProps> = ({autocomplete, onCountryCompare}) => {
       <button className="logo-button" onClick={() => alert('logo clicked')}>
           <img src="/zeitgeistlogo.png" alt="Zeitgeist Map" className="logo-image" />
       </button>
-      <input type="text" list="search-autocomplete" className="search-button" placeholder="Search through songs/artists/genres here..." 
+
+      <input type="text" list="search-autocomplete" className="search-button p-2 rounded-lg" placeholder="Search through songs/artists/genres here..." 
         onKeyDown={(event) => { 
           if (event.key === 'Enter') {
             alert(`Searching for: ${event.currentTarget.value}`); //add api integration
@@ -34,6 +35,7 @@ const TaskBar: React.FC<TaskBarProps> = ({autocomplete, onCountryCompare}) => {
 
         }}
       />
+      
       <datalist id="search-autocomplete">
         {autocompleteOptions}
       </datalist>

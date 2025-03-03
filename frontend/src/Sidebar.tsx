@@ -115,12 +115,21 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
                         </div>
                     </div>
 
-                    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
-                    <div id="embed-iframe"></div>
+                    <div className="w-full flex justify-center p-4">
+                        <div className="w-[300px] bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
+                            <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+                            <div id="embed-iframe"></div>
+                        </div>
+                    </div>
+                    
                     
                   {selectedCountry.songlist.slice(0, 5).map((song: any) => 
-                
-                <ChartBox isOpen={isOpen} song={song}></ChartBox>
+                    <div className="w-full flex justify-center p-4">
+                        
+                        <ChartBox isOpen={isOpen} song={song}></ChartBox>
+                        
+                    </div>
+                    
                   )}
                 
                 </div>
