@@ -122,7 +122,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
 
                     <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
                     <div id="embed-iframe"></div>
-
+                    
                   {selectedCountry.songlist.slice(0, 5).map((song: any) => 
                 
                 <ChartBox isOpen={isOpen} song={song}></ChartBox>
