@@ -11,9 +11,9 @@ import useStableCallback from './useStableCallback';
 interface CountryData {
   countryName: string;
   countryCode: string;
-  songlist: any;
-  topArtist: string;
-  genre: string;
+  songList: any;
+  artistList: any;
+  genreList: any;
   streams: string;
 }
 
@@ -99,20 +99,18 @@ const fetchSearchComplete = async (prefix: string) => {
   return await res
 }
 
-const fetchMusicStats = async (countryCode: string) => {
+const fetchMusicStats = async (countryCode: string, stat: string) => {
   if (!serverResponsive) return [];
   var xhr = new XMLHttpRequest()
-  xhr.open('GET', `http://127.0.0.1:5000/country_top_tracks?country_code=${countryCode.toLowerCase()}`)
+  xhr.open('GET', `http://127.0.0.1:5000/${stat}?country_code=${countryCode.toLowerCase()}`)
   var res = new Promise((resolve, reject) => {
     xhr.addEventListener('load', () => {
       var data = JSON.parse(xhr.responseText)
       resolve(data)
-      //resolve(data.map((song:any) => Object({song: song, genre: "todo", streams: "todo"})))
     })
   });
   xhr.send()
   return await res
-  //return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
 };
 
 const fetchCountryCompareData = async (countryCode: string) => {
@@ -193,8 +191,9 @@ function App() {
     if (!countryProp) return;
 
     const countryCode = layer.feature?.properties?.wb_a2;
-    const songlist = await fetchMusicStats(countryProp.wb_a2);
-    // const songlist = [{ key:1, song_name: "Example song 1"}];
+    const songList = await fetchMusicStats(countryProp.wb_a2, "country_top_tracks");
+    const artistList = await fetchMusicStats(countryProp.wb_a2, "country_top_artists");
+    const genreList = await fetchMusicStats(countryProp.wb_a2, "country_top_genres");
     setSelectedCountryCode(countryCode);
 
     if (previousLayer) {
@@ -206,9 +205,9 @@ function App() {
       setSelectedCountry({
         countryName: countryProp.name,
         countryCode: layer.feature?.properties?.wb_a2,
-        songlist,
-        topArtist: "todo",
-        genre: "todo",
+        songList,
+        artistList,
+        genreList,
         streams: "todo"
       });
       console.log(selectedCountry?.countryCode);
@@ -283,8 +282,8 @@ function App() {
                 <strong>{selectedCountry.countryName}</strong><br />
 
                 <ul>
-                  {selectedCountry.songlist.slice(0, 5).map((song: any) => <li>{song.song_name}</li>)}
-                  {/* {selectedCountry.songlist.slice(0, 5).map((song: any) => ( //for zack changes
+                  {selectedCountry.songList.slice(0, 5).map((song: any) => <li>{song.song_name}</li>)}
+                  {/* {selectedCountry.songList.slice(0, 5).map((song: any) => ( //for zack changes
                     <li key={song.song_name} 
                         style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
                         onClick={() => handleSidebarOpen("Song", song.song_name)}>
@@ -296,12 +295,12 @@ function App() {
                 <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
                   onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
                 >Top Artist
-                </span>: {selectedCountry.topArtist} <br />
+                </span>: {selectedCountry.artistList?.[0]?.artist_name || "N/A"} <br />
 
                 <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
                   onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
-                >Genre
-                </span>: {selectedCountry.genre} <br />
+                >Top Genre
+                </span>: {selectedCountry.genreList?.[0]?.genre_name || "N/A"} <br />
 
               </Popup>
             )}

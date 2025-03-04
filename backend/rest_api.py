@@ -39,6 +39,22 @@ def country_top_tracks():
     return get_top_tracks(c, current_date)
 
 
+@app.route("/country_top_artists")
+# @args(p("country_code"))
+def country_top_artists():
+    current_date = dt.datetime.now().date()
+    c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
+    return get_top_artists(c, current_date)
+
+
+@app.route("/country_top_genres")
+# @args(p("country_code"))
+def country_top_genres():
+    current_date = dt.datetime.now().date()
+    c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
+    return get_top_genres(c, current_date)
+
+
 def get_top_tracks(country, date):
     vals = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.country == country, SongHasPopularity.date == date).order_by(SongHasPopularity.position)).scalars()
     res = []

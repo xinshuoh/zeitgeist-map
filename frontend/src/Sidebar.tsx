@@ -26,7 +26,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
 
             const callback = (EmbedController: any) => {
                 controllerRef.current = EmbedController;
-                if (selectedCountry?.songlist?.length) {
+                if (selectedCountry?.songList?.length) {
                     updateSong();
                 }
             };
@@ -38,11 +38,11 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
     const updateSong = () => {
         if (!controllerRef.current)  {
             return;
-        } else if (!selectedCountry?.songlist?.length) {
+        } else if (!selectedCountry?.songList?.length) {
             return;
         }
 
-        const songToPlay = selectedCountry.songlist[0];
+        const songToPlay = selectedCountry.songList[0];
         if (songToPlay) {
             controllerRef.current.loadUri(`spotify:track:${songToPlay.spotify_id}`);
             controllerRef.current.play();
@@ -50,7 +50,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
     };
 
     useEffect(() => {
-        if (controllerRef.current && selectedCountry?.songlist?.length) {
+        if (controllerRef.current && selectedCountry?.songList?.length) {
             updateSong();
         }
     }, [selectedCountry]);
@@ -92,7 +92,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
         </div>
     </div>)
 
-    if (!selectedCountry.songlist.length) {
+    if (!selectedCountry.songList.length) {
         return (
             
             <div className="relative w-full h-screen flex">
@@ -158,7 +158,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
                     </div>
                     
                     
-                  {selectedCountry.songlist.slice(0, 5).map((song: any) => 
+                  {selectedCountry.songList.slice(0, 5).map((song: any) => 
                     <div className="w-full flex justify-center p-4">
                         
                         <ChartBox isOpen={isOpen} song={song}></ChartBox>
