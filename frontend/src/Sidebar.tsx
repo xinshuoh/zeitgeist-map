@@ -160,11 +160,9 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                     
                     
                   {selectedCountry.songlist.slice(0, 5).map((song: any) => 
-                    <div className="w-full flex justify-center p-4">
+                    <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => {setFocusOptions({isOpen: true, song: song})}}>
                         
                         <ChartBox isOpen={isOpen} song={song}></ChartBox>
-
-                        <button onClick={() => {setFocusOptions({isOpen: true, song: song})}}>Open</button>
                         
                     </div>
                     
