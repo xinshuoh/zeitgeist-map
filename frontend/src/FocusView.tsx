@@ -9,19 +9,21 @@ import { useState } from 'react';
 var data = [{popularity: 100}, {popularity: 150}, {popularity: 125}, {popularity: 110}];
 
 interface FocusViewProps {
-    trigger: any;
-    song: any;
-}
+    focusOptions: any;
+    setFocusOptions: any;
+  }
 
-const FocusView = ({trigger,song,}: FocusViewProps) => {
+const FocusView = ({focusOptions, setFocusOptions}: FocusViewProps) => {
 
     const [viewReady, setViewReady] = useState<boolean>(false);
     const [lineData, setLineData] = useState<any>([]);
 
+    let song = focusOptions.song;
+
     return (      
         <div className="w-[300px] bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
         <PopupComponent 
-        trigger={trigger} 
+        open={focusOptions.isOpen}
         position="top left"
         contentStyle={{
             maxWidth: '600px',
@@ -29,22 +31,28 @@ const FocusView = ({trigger,song,}: FocusViewProps) => {
             height: '80%'
             }} modal 
         onOpen={() => {
+            console.log(song);
             const res = fetch(`http://127.0.0.1:5000/song_country_history?country_code=${'gb'}&song_name=${song.song_name}`)
             res.then((v) => {
                 v.json().then((d) => {
                     setLineData(d);
                     setViewReady(true);
                 });
-            })
-        }}>
+            }
+        )}}
+        onClose={() => {
+            console.log("Closing")
+            setFocusOptions({song: undefined, isOpen: false})
+        }}
+        >
 { close => {
         return (
 <>{viewReady ? <div>
-    <a className="close" onClick={close}>          
+    <a className="close" onClick={() => {setFocusOptions({song: undefined, isOpen: false})}}>          
     &times;        
   </a> 
-    <h2 className="viewHeading">{song.song_name}</h2>
-    <p className="viewSubheading">By <span className="viewLink" onClick={() => close()}>{song.artist}</span></p>
+    <h2 className="viewHeading">{song? song.song_name : "UNDEF"}</h2>
+    <p className="viewSubheading">By <span className="viewLink" onClick={() => close()}>{song? song.artist : "UNDEF"}</span></p>
   <div style={{margin: '10px'}}>
   <LineChart width={500} height={200} data={lineData}>
     <Line type="monotone" dataKey="popularity" stroke="#8884d8" strokeWidth={3} dot={false}/>

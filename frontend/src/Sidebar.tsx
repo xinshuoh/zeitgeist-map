@@ -10,10 +10,11 @@ interface SidebarProps {
     isOpen: boolean;
     toggle: any;
     selectedCountry: any;
+    setFocusOptions: any;
 }
 
 
-const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
+const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarProps) => {
     const controllerRef = useRef<any>(null);
 
     useEffect(() => {
@@ -159,7 +160,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
                     
                     
                   {selectedCountry.songList.slice(0, 5).map((song: any) => 
-                    <div className="w-full flex justify-center p-4">
+                    <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => {setFocusOptions({isOpen: true, song: song})}}>
                         
                         <ChartBox isOpen={isOpen} song={song}></ChartBox>
                         

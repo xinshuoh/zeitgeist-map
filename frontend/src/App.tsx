@@ -7,6 +7,7 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { LatLng, Layer, LeafletMouseEvent } from 'leaflet';
 import TaskBar from './TaskBar';
 import Sidebar from "./Sidebar";
+import FocusView from './FocusView';
 import useStableCallback from './useStableCallback';
 interface CountryData {
   countryName: string;
@@ -21,6 +22,11 @@ type CountrySimilarityData = {
   country_code: string;
   name: string
   similarity: number;
+}
+
+interface FocusOptions {
+  isOpen: boolean;
+  song: any;
 }
 
 const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
@@ -135,6 +141,8 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
+
+  const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, isOpen: false});
 
   const sidebarToggleHandler = () => {
     setSidebarOpen(curr => !curr);
@@ -260,7 +268,7 @@ function App() {
     <>
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
         <TaskBar onCountryCompare={doHeatMap}autocomplete={fetchSearchComplete} />
-        <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} />
+        <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} setFocusOptions={setFocusOptions}/>
       </div>
 
       <div id="map-container" className="flex">
@@ -324,6 +332,8 @@ function App() {
 
         </MapContainer>
       </div>
+
+      <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions}></FocusView>
     </>
   );
 }
