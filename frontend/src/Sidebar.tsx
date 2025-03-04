@@ -116,7 +116,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
                         </div>
                         
                         <div className="w-full flex justify-center p-4">
-                            <div className="w-[300px] bg-gray-200 rounded-lg shadow-md flex items-center justify-center p-4">
+                            <div className="w-[300px] bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
                                 <h2>Unfortunately we don't have data for {selectedCountry.countryName} right now</h2>
                             </div>
                         </div>
