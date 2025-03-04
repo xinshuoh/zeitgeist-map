@@ -41,7 +41,8 @@ def build_tables():
     db.drop_all()
     db.create_all()
 
-    countries = [country.alpha_2.lower() for country in pycountry.countries]
+    #countries = [country.alpha_2.lower() for country in pycountry.countries]
+    countries = ["us","uk","jp","de","au","ca","fr","it","kr","mx","ru","th","be","br","ch","cn","co","es","hk","id","ie","in","nl","nz","tr","tw","za","ae","ar","at","cl","cz","dk","ec","ee","eg","fi","gr","hu","il","ke","kz","lb","lt","lu","my","ng","no","pe","ph","pl","pt","ro","sa","se","si","sg","sk","ua","vn"]
 
     names = coco.convert(names=countries, to='name_short')
     for country, name in zip(countries, names):
@@ -75,7 +76,7 @@ def list_genres():
 def list_countries():
     scalars = db.session.execute(db.select(Country)).scalars()
     for s in scalars:
-        print(s.name)
+        print(s.name, ":", s.code)
 
 @app.cli.command("force-update")
 def force_update():

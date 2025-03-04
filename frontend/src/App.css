@@ -93,3 +93,20 @@
 [data-popup='tooltip'].popup-overlay {
   background: transparent;
 }
+
+/* styling for the popups - feel free to adjust as wanted */
+
+.leaflet-popup-content-wrapper {
+  background: #d6b8c3 !important;
+  color: #333;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+  border: 2.5px solid #361836;
+}
+
+.leaflet-popup-tip {
+  background: #361836 !important;
+}
+
+.leaflet-popup-close-button {
+  color: #333 !important;
+}

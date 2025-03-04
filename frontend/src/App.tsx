@@ -17,6 +17,12 @@ interface CountryData {
   streams: string;
 }
 
+type CountrySimilarityData = {
+  country_code: string;
+  name: string
+  similarity: number;
+}
+
 const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
 const TILE_LAYERS = {
   rapidApi: {
@@ -109,6 +115,20 @@ const fetchMusicStats = async (countryCode: string) => {
   //return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
 };
 
+const fetchCountryCompareData = async (countryCode: string) => {
+  if (!serverResponsive) return [];
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', `http://127.0.0.1:5000/country_compare?country_code=${countryCode.toLowerCase()}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText)
+      resolve(data)
+    })
+  });
+  xhr.send()
+  return await res
+};
+
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
   const [selectedCountryCode, setSelectedCountryCode] = useState<string | null>(null);
@@ -180,15 +200,20 @@ function App() {
     if (previousLayer) {
       (previousLayer as L.Path).setStyle(styleFeature((previousLayer as any).feature));
     }
-    setSelectedCountry({
-      countryName: countryProp.name,
-      countryCode: layer.feature?.properties?.wb_a2,
-      songlist,
-      topArtist: "todo",
-      genre: "todo",
-      streams: "todo"
-    });
-    console.log(selectedCountry?.countryCode);
+
+    // only fires if you select a new country (avoids constantly replaying the same song - don't know if this feature is desireable)
+    if (countryCode != selectedCountry?.countryCode) {
+      setSelectedCountry({
+        countryName: countryProp.name,
+        countryCode: layer.feature?.properties?.wb_a2,
+        songlist,
+        topArtist: "todo",
+        genre: "todo",
+        streams: "todo"
+      });
+      console.log(selectedCountry?.countryCode);
+    }
+    
 
     layer.setStyle({
       weight: 1,
@@ -226,10 +251,16 @@ function App() {
     map.openTooltip(mouseoverCountry as string, mouseoverCountryTooltipPosition as LatLng, { permanent: true });
   };
 
+  const doHeatMap = async () => {
+    const countrySimilarities: CountrySimilarityData[] = (await fetchCountryCompareData("gb")) as CountrySimilarityData[];
+    
+    alert(countrySimilarities)
+  };
+
   return (
     <>
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
-        <TaskBar autocomplete={fetchSearchComplete} />
+        <TaskBar onCountryCompare={doHeatMap}autocomplete={fetchSearchComplete} />
         <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} />
       </div>
 

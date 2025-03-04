@@ -2,10 +2,16 @@ import React from 'react';
 import './TaskBar.css';
 
 interface TaskBarProps {
+  onCountryCompare: () => void
   autocomplete: any;
 }
 
-const TaskBar: React.FC = ({autocomplete,}: TaskBarProps) => {
+// const TaskBar: React.FC<TaskbarProps> = ({ onCountryCompare }) => {
+// interface TaskBarProps {
+//   autocomplete: any;
+// }
+
+const TaskBar: React.FC<TaskBarProps> = ({autocomplete, onCountryCompare}) => {
   const [autocompleteOptions, setAutocompleteOptions] = React.useState<any>([]);
 
   return (
@@ -13,7 +19,8 @@ const TaskBar: React.FC = ({autocomplete,}: TaskBarProps) => {
       <button className="logo-button" onClick={() => alert('logo clicked')}>
           <img src="/zeitgeistlogo.png" alt="Zeitgeist Map" className="logo-image" />
       </button>
-      <input type="text" list="search-autocomplete" className="search-button" placeholder="Search through songs/artists/genres here..." 
+
+      <input type="text" list="search-autocomplete" className="search-button p-2 rounded-lg" placeholder="Search through songs/artists/genres here..." 
         onKeyDown={(event) => { 
           if (event.key === 'Enter') {
             alert(`Searching for: ${event.currentTarget.value}`); //add api integration
@@ -28,10 +35,11 @@ const TaskBar: React.FC = ({autocomplete,}: TaskBarProps) => {
 
         }}
       />
+      
       <datalist id="search-autocomplete">
         {autocompleteOptions}
       </datalist>
-      <button className="compare-button" onClick={() => alert('Button 3 clicked')}>
+      <button className="compare-button" onClick={onCountryCompare}>
       <img src="/countrycomparelogo2.png" alt="Zeitgeist Map" className="logo-image" />
       </button>
     </div>
