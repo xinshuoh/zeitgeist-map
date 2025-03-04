@@ -10,6 +10,7 @@ interface SidebarProps {
     isOpen: boolean;
     toggle: any;
     selectedCountry: any;
+    setFocusOptions: any;
 }
 
 // window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
@@ -25,7 +26,7 @@ interface SidebarProps {
 //     IFrameAPI.createController(element, options, callback);
 //   };
 
-const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
+const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarProps) => {
     const controllerRef = useRef<any>(null);
 
     useEffect(() => {
@@ -127,6 +128,8 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
                     <div className="w-full flex justify-center p-4">
                         
                         <ChartBox isOpen={isOpen} song={song}></ChartBox>
+
+                        <button onClick={() => {setFocusOptions({isOpen: true, song: song})}}>Open</button>
                         
                     </div>
                     
