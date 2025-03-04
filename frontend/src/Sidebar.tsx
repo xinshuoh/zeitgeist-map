@@ -140,7 +140,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry }: SidebarProps) => {
     return (
         <div className="relative w-full h-screen flex">
             <div className={`h-full transition-all ${isOpen ? "w-100" : "w-0"} z-1`}>
-                <div className={`h-full flex-col bg-white border-r border-gray-300 shadow-lg overflow-y-scroll`}
+                <div className={`h-full flex-col bg-white border-r border-gray-300 shadow-lg overflow-y-scroll min-h-[calc(100%+40px)]`}
                     style={{ scrollbarWidth: "thin" }}>
 
                     <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
