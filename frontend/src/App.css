@@ -43,7 +43,7 @@
 
 .read-the-docs {
   color: #888;
-} 
+}
 
 
 .leaflet-container {
@@ -55,12 +55,17 @@
 
   .leaflet-tooltip {
     position: absolute;
+    width: 200px;
     padding: 0;
     background-color: transparent;
     border: none;
     border-radius: 0;
     white-space: pre-wrap;
     box-shadow: none;
+    font-size: 10pt;
+  }
+  .leaflet-tooltip-bottom:before {
+    opacity: 0;
   }
 }
 
@@ -71,9 +76,11 @@
   width: 50%;
   padding: 5px;
 }
+
 .popup-arrow {
   color: rgb(255, 255, 255);
 }
+
 [role='tooltip'].popup-content {
   width: 200px;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
@@ -82,6 +89,7 @@
 .popup-overlay {
   background: rgba(0, 0, 0, 0.5);
 }
+
 [data-popup='tooltip'].popup-overlay {
   background: transparent;
 }
