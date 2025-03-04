@@ -9,6 +9,7 @@ import TaskBar from './TaskBar';
 import Sidebar from "./Sidebar";
 import FocusView from './FocusView';
 import useStableCallback from './useStableCallback';
+
 interface CountryData {
   countryName: string;
   countryCode: string;
@@ -59,7 +60,6 @@ const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined)
   fillColor: getColor(feature?.properties?.pop_est || 0),
   weight: 2,
   color: '#d0d0d0',
-  // color: 'white',
   fillOpacity: 0.8
 });
 
@@ -265,9 +265,9 @@ function App() {
   };
 
   return (
-    <>
+    <div id="global">
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
-        <TaskBar onCountryCompare={doHeatMap}autocomplete={fetchSearchComplete} />
+        <TaskBar onCountryCompare={doHeatMap} autocomplete={fetchSearchComplete} />
         <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} setFocusOptions={setFocusOptions}/>
       </div>
 
@@ -287,10 +287,13 @@ function App() {
           >
             {selectedCountry && (
               <Popup>
-                <strong>{selectedCountry.countryName}</strong><br />
+                <strong style={{ fontSize: 14 }}>{selectedCountry.countryName}</strong>
+                
+                <br/>
+                <br/>
 
                 <ul>
-                  {selectedCountry.songList.slice(0, 5).map((song: any) => <li>{song.song_name}</li>)}
+                  {selectedCountry.songList.slice(0, 5).map((song: any) => <li style={{ fontSize: 14 }}>{song.song_name}</li>)}
                   {/* {selectedCountry.songList.slice(0, 5).map((song: any) => ( //for zack changes
                     <li key={song.song_name} 
                         style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
@@ -300,15 +303,18 @@ function App() {
                   ))} */}
                 </ul>
 
-                <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
-                  onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
-                >Top Artist
-                </span>: {selectedCountry.artistList?.[0]?.artist_name || "N/A"} <br />
+                <br/>
 
-                <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
-                  onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
-                >Top Genre
-                </span>: {selectedCountry.genreList?.[0]?.genre_name || "N/A"} <br />
+                <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
+                  Top Artist: {selectedCountry.artistList?.[0]?.artist_name || "N/A"} 
+                </span>
+                
+                <br/>
+                <br/>
+
+                <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
+                  Top Genre: {selectedCountry.genreList?.[0]?.genre_name || "N/A"}
+                </span>
 
               </Popup>
             )}
@@ -334,7 +340,7 @@ function App() {
       </div>
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions}></FocusView>
-    </>
+    </div>
   );
 }
 
