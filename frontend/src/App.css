@@ -63,3 +63,42 @@
     box-shadow: none;
   }
 }
+
+
+.popup-content {
+  margin: auto;
+  background: rgb(255, 255, 255);
+  width: 50%;
+  padding: 5px;
+}
+.popup-arrow {
+  color: rgb(255, 255, 255);
+}
+[role='tooltip'].popup-content {
+  width: 200px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
+}
+
+.popup-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+[data-popup='tooltip'].popup-overlay {
+  background: transparent;
+}
+
+/* styling for the popups - feel free to adjust as wanted */
+
+.leaflet-popup-content-wrapper {
+  background: #d6b8c3 !important;
+  color: #333;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+  border: 2.5px solid #361836;
+}
+
+.leaflet-popup-tip {
+  background: #361836 !important;
+}
+
+.leaflet-popup-close-button {
+  color: #333 !important;
+}

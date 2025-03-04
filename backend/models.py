@@ -93,7 +93,6 @@ class SongHasPopularity(db.Model):
 
     position: Mapped[int] = mapped_column(Integer)
 
-
     song: Mapped[Song] = relationship(back_populates="popularities")
     country: Mapped[Country] = relationship(back_populates="song_popularities")
 
@@ -116,7 +115,6 @@ class ArtistHasPopularity(db.Model):
 
     position: Mapped[int] = mapped_column(Integer)
     popularity: Mapped[int] = mapped_column(Integer, nullable=True)
-
 
     artist: Mapped[Artist] = relationship(back_populates="popularities")
     country: Mapped[Country] = relationship(back_populates="artist_popularities")

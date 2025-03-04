@@ -123,3 +123,5 @@ def fetch_historical():
             
         db.session.commit()
         
+
+

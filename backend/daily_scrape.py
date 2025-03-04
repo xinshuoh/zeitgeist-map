@@ -27,6 +27,7 @@ class DailyScraper:
         self.lastfm_API_KEY = '0cd9002543dae02f694ba01ca8e3f7bd'
 
         self.db = db
+        self.get_popularity_measure = lambda position: 1 / (position + 47.45) ** 1.11
 
     def reset(self):
         self.genre_popularity_measures = {country: defaultdict(int) for country in self.countries}
@@ -74,14 +75,14 @@ class DailyScraper:
                 for tag in tags:
                     genre = tag['name'].lower()
                     if genre in self.genres:
-                        self.genre_popularity_measures[country_code][genre] += (tag['count'] / 100) / position
+                        self.genre_popularity_measures[country_code][genre] += (tag['count'] / 100) * self.get_popularity_measure(position)
 
     def fetch_track_data(self):
         get_num = lambda s : int(s.replace(',','')) if s else None
 
         kworb_countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
 
-        for country_code in ['gb']:  # ['gb'] for now for testing purposes
+        for country_code in ['gb', 'fr', 'de', 'es']:  # ['gb'] for now for testing purposes
             response = requests.get(f'https://kworb.net/spotify/country/{country_code}_daily.html')
             # Check the page exists
             if response.status_code == 200:
@@ -169,7 +170,7 @@ class DailyScraper:
                                 position, country = position_in_country.split(' ', 1)  # Split on first whitespace
                                 try:
                                     country_code = pycountry.countries.lookup(country).alpha_2.lower()
-                                    self.artist_popularity_measures[country_code][artist_name] += 1 / int(position[1:])
+                                    self.artist_popularity_measures[country_code][artist_name] += self.get_popularity_measure(int(position[1:]))
                                 except LookupError:  # The country is not recognised; skip
                                     print(f"Unknown country: {country}.")
 
@@ -189,8 +190,8 @@ class DailyScraper:
         for country_code in popularity_measures:
             c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
 
-            by_country_popularity_measures_sorted = sorted(popularity_measures[country_code].items(), key=lambda item: -item[1])
-            by_country_popularity_measures_ranked = [(name, popularity_measure, position) for position, (name, popularity_measure) in enumerate(by_country_popularity_measures_sorted)]
+            by_country_popularity_measures_sorted = sorted(popularity_measures[country_code].items(), key=lambda item: item[1], reverse=True)
+            by_country_popularity_measures_ranked = [(name, popularity_measure, position + 1) for position, (name, popularity_measure) in enumerate(by_country_popularity_measures_sorted)]
 
             for name, popularity_measure, position in by_country_popularity_measures_ranked:
                 if table == Artist:
@@ -220,10 +221,10 @@ class DailyScraper:
         self.fetch_track_data()
         # pprint(self.genre_popularity_measures)
         
-        # self.fetch_artist_data()
+        self.fetch_artist_data()
         # pprint(self.artist_popularity_measures)
 
-        # self.populate_database(self.artist_popularity_measures, Artist)
+        self.populate_database(self.artist_popularity_measures, Artist)
         self.populate_database(self.genre_popularity_measures, Genre)
 
         self.db.session.commit()

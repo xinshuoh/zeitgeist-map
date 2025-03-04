@@ -16,6 +16,7 @@ from param_check import *
 def ping():
     return "Hello from backend!"
 
+
 @app.route("/track_popularity")
 # @args(p("song_id")|p("name"))
 def track_popularity():
@@ -28,6 +29,7 @@ def track_popularity():
         res.append({'artist': v.artists[0].name,
         'popularity': {p.country.code: p.position for p in v.popularities}})
     return res
+
 
 @app.route("/country_top_tracks")
 # @args(p("country_code"))
@@ -43,10 +45,34 @@ def get_top_tracks(country, date):
     for v in vals:
         res.append({
             'song_name': v.song.name,
+            'spotify_id': v.song.spotify_id,
             'artist': v.song.artists[0].name,
-            'popularity': v.position,
+            'position': v.position,
         })
     return res
+
+def get_top_artists(country, date):
+    vals = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.country == country, ArtistHasPopularity.date == date).order_by(ArtistHasPopularity.position)).scalars()
+    res = []
+    for v in vals:
+        res.append({
+            'artist_name': v.artist.name,
+            'position': v.position,
+            'popularity_measure': v.popularity
+        })
+    return res
+
+def get_top_genres(country, date):
+    vals = db.session.execute(db.select(GenreHasPopularity).where(GenreHasPopularity.country == country, GenreHasPopularity.date == date).order_by(GenreHasPopularity.position)).scalars()
+    res = []
+    for v in vals:
+        res.append({
+            'genre_name': v.genre.name,
+            'position': v.position,
+            'popularity_measure': v.popularity
+        })
+    return res
+
 
 @app.route("/song_country_history")
 # @args(p("country_code")&(p("song_id")|p("song_name")))
@@ -75,6 +101,7 @@ def song_country_history():
         })
     return res
 
+
 def get_today_track_names(country):
     current_date = dt.datetime.now().date()
     country_top_tracks = get_top_tracks(country, current_date)
@@ -85,8 +112,7 @@ def get_today_track_names(country):
 
 
 def get_percentage_similarity(comparison_tracks, country_code=None):
-
-    countries = db.session.execute(db.select(Country)).scalars()
+    countries = db.session.execute(db.select(Country)).scalars()  # Get all countries
     
     res = []
     for country in countries:
@@ -127,4 +153,8 @@ def country_compare():
 #         }
         
 
-    
+@app.route('/search_complete')
+@args(p('prefix'))
+def search_complete():
+    c = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
+    return list(map(lambda song : song.name, c))
