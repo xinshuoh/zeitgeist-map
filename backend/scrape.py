@@ -38,7 +38,9 @@ def fetch_historical():
 
     soup = BeautifulSoup(contents, features="html.parser")
 
-    for row in soup.find_all('a')[1:11]: # first row is headings
+    countries = ["us","gb","jp","de","au","ca","fr","it","kr","mx","ru","th","be","br","ch","cn","co","es","hk","id","ie","in","nl","nz","tr","tw","za","ae","ar","at","cl","cz","dk","ec","ee","eg","fi","gr","hu","il","ke","kz","lb","lt","lu","my","ng","no","pe","ph","pl","pt","ro","sa","se","si","sg","sk","ua","vn"]
+
+    for row in soup.find_all('a')[1:]: # first row is headings
 
         date_ = row.text
         contents_1 = urllib.request.urlopen(f"https://kworb.net/apple_songs/archive/{date_}").read()
@@ -47,9 +49,9 @@ def fetch_historical():
         
         rows = soup_1.find_all('tr')
         popularity = {}
-        countries = ["us","uk","jp","de","au","ca","fr","it","kr","mx","ru","th","be","br","ch","cn","co","es","hk","id","ie","in","nl","nz","tr","tw","za","ae","ar","at","cl","cz","dk","ec","ee","eg","fi","gr","hu","il","ke","kz","lb","lt","lu","my","ng","no","pe","ph","pl","pt","ro","sa","se","si","sg","sk","ua","vn"]
-        for row in rows[1:]: # first row is headings
-            elems = row.find_all('td')
+        
+        for row_ in rows[1:]: # first row is headings
+            elems = row_.find_all('td')
 
         
             #global stats

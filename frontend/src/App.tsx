@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import './App.css';
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
+import { MapContainer, Marker, Popup, GeoJSON, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import worldGeoJSON from './assets/worldmap_large.json';
+import worldGeoJSON from './assets/worldmap_large_centered_names.json';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { Layer, LeafletMouseEvent } from 'leaflet';
+import { LatLng, Layer, LeafletMouseEvent } from 'leaflet';
 import TaskBar from './TaskBar';
 import Sidebar from "./Sidebar";
 import FocusView from './FocusView';
@@ -141,6 +141,8 @@ function App() {
   const [popupDetails, setPopupDetails] = useState<{ type: string; value: string } | null>(null);
   const [previousLayer, setPreviousLayer] = useState<Layer | null>(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
+  const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
 
   const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, isOpen: false});
 
@@ -154,6 +156,8 @@ function App() {
     const layer = e.target;
     const countryCode = layer.feature?.properties?.wb_a2;
 
+    setMouseoverCountryTooltipPosition(new LatLng(layer.feature?.properties?.centre_lat, layer.feature?.properties?.centre_lng));
+    setMouseoverCountry(layer.feature?.properties?.name);
 
     layer.setStyle({
       weight: 2.5,
@@ -163,26 +167,29 @@ function App() {
     });
 
     layer.bringToFront();
-    if (selectedCountry?.countryName != e.target.feature?.properties.name){
+    if (selectedCountry?.countryName != e.target.feature?.properties.name) {
       layer.setStyle({
-        weight: 5.5,
+        weight: 1,
         color: '#361836',
         dashArray: '',
         fillOpacity: 0.7,
       });
-  
-      layer.bringToFront(); 
+
+      layer.bringToFront();
     }
   };
 
-  const resetHighlight = (e: LeafletMouseEvent) => { 
+  const resetHighlight = (e: LeafletMouseEvent) => {
     const layer = e.target;
     const countryCode = layer.feature?.properties?.wb_a2;
 
-    if (selectedCountry?.countryName === e.target.feature?.properties.name){
+    setMouseoverCountry(null);
+    setMouseoverCountryTooltipPosition(undefined);
+
+    if (selectedCountry?.countryName === e.target.feature?.properties.name) {
       return;
     }
-    if (selectedCountry?.countryName != e.target.feature?.properties.name){
+    if (selectedCountry?.countryName != e.target.feature?.properties.name) {
       layer.setStyle(styleFeature(e.target.feature));
     }
     layer.setStyle(styleFeature(e.target.feature));
@@ -197,7 +204,7 @@ function App() {
     const songlist = await fetchMusicStats(countryProp.wb_a2);
     // const songlist = [{ key:1, song_name: "Example song 1"}];
     setSelectedCountryCode(countryCode);
-    
+
     if (previousLayer) {
       (previousLayer as L.Path).setStyle(styleFeature((previousLayer as any).feature));
     }
@@ -217,15 +224,15 @@ function App() {
     
 
     layer.setStyle({
-      weight: 5.5,
+      weight: 1,
       color: '#361836',
       fillColor: '#361836',
       dashArray: '',
       fillOpacity: 0.5,
-      opacity:1
+      opacity: 1
     });
-  
-    layer.bringToFront();    
+
+    layer.bringToFront();
     setSidebarOpen(true);
     setPreviousLayer(layer);
 
@@ -233,6 +240,7 @@ function App() {
   const stableDisplayCountryData = useStableCallback(displayCountryData);
   const stableResetHighlight = useStableCallback(resetHighlight);
   const stableHighlightFeature = useStableCallback(highlightFeature);
+
   const handleSecondaryPopup = (type: string, value: string) => {
     if (!selectedCountry) return;
     setPopupDetails({ type, value });
@@ -244,8 +252,11 @@ function App() {
     layer.on({
       click: stableDisplayCountryData,
       mouseover: stableHighlightFeature,
-      mouseout: stableResetHighlight
+      mouseout: stableResetHighlight,
     });
+
+    const map = useMap();
+    map.openTooltip(mouseoverCountry as string, mouseoverCountryTooltipPosition as LatLng, { permanent: true });
   };
 
   const doHeatMap = async () => {
@@ -260,7 +271,7 @@ function App() {
         <TaskBar onCountryCompare={doHeatMap}autocomplete={fetchSearchComplete} />
         <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} setFocusOptions={setFocusOptions}/>
       </div>
-      
+
       <div id="map-container" className="flex">
         <MapContainer center={[51.505, -0.09]} zoom={3} style={{ position: "static", top: "0px", left: "0px", "zIndex": "0" }}
           maxBounds={[[85, 180], [-85, -180]]} minZoom={3} zoomControl={false}>
@@ -278,10 +289,10 @@ function App() {
             {selectedCountry && (
               <Popup>
                 <strong>{selectedCountry.countryName}</strong><br />
-                
+
                 <ul>
                   {selectedCountry.songlist.slice(0, 5).map((song: any) => <li>{song.song_name}</li>)}
-                {/* {selectedCountry.songlist.slice(0, 5).map((song: any) => ( //for zack changes
+                  {/* {selectedCountry.songlist.slice(0, 5).map((song: any) => ( //for zack changes
                     <li key={song.song_name} 
                         style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
                         onClick={() => handleSidebarOpen("Song", song.song_name)}>
@@ -291,12 +302,12 @@ function App() {
                 </ul>
 
                 <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
-                onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
+                  onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
                 >Top Artist
                 </span>: {selectedCountry.topArtist} <br />
 
                 <span style={{ fontWeight: "bold", cursor: "pointer", color: "#361836", textDecoration: "underline" }}
-                onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
+                  onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}
                 >Genre
                 </span>: {selectedCountry.genre} <br />
 
@@ -313,10 +324,12 @@ function App() {
             )}
 
           </GeoJSON>
-          {worldGeoJSON && (
-            <>
-            </>
-          )}
+
+          {mouseoverCountry && mouseoverCountryTooltipPosition &&
+            (<Marker opacity={0} interactive={false} draggable={false} position={mouseoverCountryTooltipPosition}>
+              <Tooltip className='bg-blue-500' direction="bottom" offset={[-15, 17]} permanent>{mouseoverCountry}</Tooltip>
+            </Marker> // shows country name on mouseover
+            )}
 
         </MapContainer>
       </div>
