@@ -273,7 +273,7 @@ function App() {
 
       <div id="map-container" className="flex">
         <MapContainer center={[51.505, -0.09]} zoom={3} style={{ position: "static", top: "0px", left: "0px", "zIndex": "0" }}
-          maxBounds={[[85, 180], [-85, -180]]} minZoom={3} zoomControl={false}>
+          maxBounds={[[85, 180], [-85, -180]]} minZoom={3} maxZoom={5} zoomControl={false}>
           {/* <TileLayer
             attribution={CURRENT_TILE_LAYER.attribution}
             url={CURRENT_TILE_LAYER.url}
