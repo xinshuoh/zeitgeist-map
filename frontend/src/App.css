@@ -107,5 +107,15 @@ button {
   background-color: rgb(252, 233, 233);
   color: gray;
   border: none;
+  padding: 0px;
   cursor: pointer;
+}
+button.country-compare {
+  background-color: rgb(252, 233, 233);
+  color: gray;
+  border: none;
+  padding: 50px;
+  cursor: pointer;
+  z-index: 1000; 
+  position: relative;
 }
