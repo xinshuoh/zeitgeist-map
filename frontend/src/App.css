@@ -104,18 +104,18 @@
 }
 
 button {
-  background-color: rgb(252, 233, 233);
-  color: gray;
+  background-color: white;
+  color: white;
   border: none;
   padding: 0px;
   cursor: pointer;
 }
 button.country-compare {
-  background-color: rgb(252, 233, 233);
+  background-color: white;
   color: gray;
   border: none;
-  padding: 50px;
+  padding: 50px 0;
   cursor: pointer;
   z-index: 1000; 
-  position: relative;
+
 }

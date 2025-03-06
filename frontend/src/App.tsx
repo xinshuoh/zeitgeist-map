@@ -425,7 +425,7 @@ function App() {
           >
           <HeatmapLayer data={countrySimilarityData || undefined} />
 
-            {selectedCountry && (
+            {selectedCountry && !isCountryCompareMode &&(
               <Popup>
                 <strong>{selectedCountry.countryName}</strong><br />
                 
@@ -483,7 +483,7 @@ function App() {
                 setIsCountryCompareMode((prev) => !prev);
                 alert("Click a country to view its music similarity heatmap.");
               }} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
-              HELLOOOO
+              country compare
               </button>          
               {worldGeoJSON && (
               <>
