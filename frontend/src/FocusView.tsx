@@ -56,7 +56,7 @@ const FocusView = ({focusOptions, setFocusOptions}: FocusViewProps) => {
     <p className="viewSubheading">By <span className="viewLink" onClick={() => close()}>{song? song.artist : "UNDEF"}</span></p>
   <div style={{margin: '10px'}}>
   <LineChart width={500} height={200} data={lineData}>
-    <Line type="monotone" dataKey="popularity" stroke="#8884d8" strokeWidth={3} dot={false}/>
+    <Line type="monotone" dataKey="popularity" stroke="#8884d8" strokeWidth={3} dot={false} isAnimationActive={false}/>
     <CartesianGrid stroke="#ccc" />
     <YAxis />
   </LineChart>

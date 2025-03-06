@@ -267,7 +267,7 @@ function App() {
   const doHeatMap = async () => {
     const countrySimilarities: CountrySimilarityData[] = (await fetchCountryCompareData("gb")) as CountrySimilarityData[];
     
-    alert(countrySimilarities)
+    alert(countrySimilarities);
   };
 
   return (
