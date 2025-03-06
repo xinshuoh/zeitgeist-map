@@ -6,6 +6,8 @@ import { LineChart, Line, CartesianGrid, YAxis } from 'recharts';
 
 import { useState } from 'react';
 
+import {songCountryHistory} from './Api';
+
 var data = [{popularity: 100}, {popularity: 150}, {popularity: 125}, {popularity: 110}];
 
 interface FocusViewProps {
@@ -32,8 +34,7 @@ const FocusView = ({focusOptions, setFocusOptions}: FocusViewProps) => {
             }} modal 
         onOpen={() => {
             console.log(song);
-            const res = fetch(`http://127.0.0.1:5000/song_country_history?country_code=${'gb'}&song_name=${song.song_name}`)
-            res.then((v) => {
+            songCountryHistory(song.song_name).then((v) => {
                 v.json().then((d) => {
                     setLineData(d);
                     setViewReady(true);
