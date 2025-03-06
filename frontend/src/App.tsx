@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import { MapContainer, Marker, Popup, GeoJSON, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -21,7 +21,7 @@ interface CountryData {
 
 type CountrySimilarityData = {
   country_code: string;
-  name: string
+  name: string;
   similarity: number;
 }
 
@@ -66,15 +66,15 @@ const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined)
 var serverResponsive = true;
 
 async function pingServer() {
-  var xhr = new XMLHttpRequest()
-  xhr.open('GET', `http://127.0.0.1:5000/ping`)
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', `http://127.0.0.1:5000/ping`);
   var res = new Promise<boolean>((resolve, reject) => {
     xhr.addEventListener('load', () => {
       resolve(true);
     });
     xhr.addEventListener('timeout', () => {
       if (serverResponsive) {
-        alert("Timeout connecting to server")
+        alert("Timeout connecting to server");
         serverResponsive = false;
       }
       resolve(false);
@@ -87,50 +87,50 @@ async function pingServer() {
       resolve(false);
     })
   });
-  xhr.send()
+  xhr.send();
   return await res;
 }
 
 const fetchSearchComplete = async (prefix: string) => {
   if (!serverResponsive) return [];
-  var xhr = new XMLHttpRequest()
+  var xhr = new XMLHttpRequest();
   xhr.open('GET', `http://127.0.0.1:5000/search_complete?prefix=${prefix}`)
   var res = new Promise((resolve, reject) => {
     xhr.addEventListener('load', () => {
-      var data = JSON.parse(xhr.responseText)
-      resolve(data)
-    })
+      var data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
   });
-  xhr.send()
-  return await res
+  xhr.send();
+  return await res;
 }
 
 const fetchMusicStats = async (countryCode: string, stat: string) => {
   if (!serverResponsive) return [];
-  var xhr = new XMLHttpRequest()
+  var xhr = new XMLHttpRequest();
   xhr.open('GET', `http://127.0.0.1:5000/${stat}?country_code=${countryCode.toLowerCase()}`)
   var res = new Promise((resolve, reject) => {
     xhr.addEventListener('load', () => {
-      var data = JSON.parse(xhr.responseText)
-      resolve(data)
-    })
+      var data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
   });
-  xhr.send()
-  return await res
+  xhr.send();
+  return await res;
 };
 
 const fetchCountryCompareData = async (countryCode: string) => {
   if (!serverResponsive) return [];
-  var xhr = new XMLHttpRequest()
-  xhr.open('GET', `http://127.0.0.1:5000/country_compare?country_code=${countryCode.toLowerCase()}`)
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', `http://127.0.0.1:5000/country_compare?country_code=${countryCode.toLowerCase()}`);
   var res = new Promise((resolve, reject) => {
     xhr.addEventListener('load', () => {
-      var data = JSON.parse(xhr.responseText)
-      resolve(data)
-    })
+      var data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
   });
-  xhr.send()
-  return await res
+  xhr.send();
+  return await res;
 };
 
 function App() {
@@ -148,7 +148,10 @@ function App() {
     setSidebarOpen(curr => !curr);
   }
 
-  pingServer();
+  // Ensures pingServer() is only called once when the app starts
+  useEffect(() => {
+    pingServer();
+  }, []);
 
   const highlightFeature = (e: LeafletMouseEvent) => {
     const layer = e.target;
@@ -195,24 +198,24 @@ function App() {
 
   const displayCountryData = async (e: LeafletMouseEvent) => {
     const layer = e.target;
-    const countryProp = e.target.feature?.properties;
+    const countryProp = layer.feature?.properties;
     if (!countryProp) return;
 
-    const countryCode = layer.feature?.properties?.wb_a2;
-    const songList = await fetchMusicStats(countryProp.wb_a2, "country_top_tracks");
-    const artistList = await fetchMusicStats(countryProp.wb_a2, "country_top_artists");
-    const genreList = await fetchMusicStats(countryProp.wb_a2, "country_top_genres");
+    const countryCode = countryProp.wb_a2;
+    const songList = await fetchMusicStats(countryCode, "country_top_tracks");
+    const artistList = await fetchMusicStats(countryCode, "country_top_artists");
+    const genreList = await fetchMusicStats(countryCode, "country_top_genres");
     setSelectedCountryCode(countryCode);
 
     if (previousLayer) {
       (previousLayer as L.Path).setStyle(styleFeature((previousLayer as any).feature));
     }
 
-    // only fires if you select a new country (avoids constantly replaying the same song - don't know if this feature is desireable)
+    // only fires if you select a new country (avoids constantly replaying the same song - don't know if this feature is desirable)
     if (countryCode != selectedCountry?.countryCode) {
       setSelectedCountry({
         countryName: countryProp.name,
-        countryCode: layer.feature?.properties?.wb_a2,
+        countryCode: countryCode,
         songList,
         artistList,
         genreList,
@@ -319,7 +322,7 @@ function App() {
               </Popup>
             )}
 
-            {popupDetails && ( //for the secondary pop up 
+            {popupDetails && ( // for the secondary pop up 
               <Popup>
                 <strong>{popupDetails.type.toUpperCase()}</strong><br />
                 {popupDetails.value}<br />
