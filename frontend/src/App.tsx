@@ -160,24 +160,26 @@ function App() {
     setMouseoverCountryTooltipPosition(new LatLng(layer.feature?.properties?.centre_lat, layer.feature?.properties?.centre_lng));
     setMouseoverCountry(layer.feature?.properties?.name);
 
-    layer.setStyle({
-      weight: 2.5,
-      color: '#666',
-      dashArray: '',
-      fillOpacity: 0.5
-    });
+    // layer.setStyle({
+    //   weight: 2.5,
+    //   color: '#666',
+    //   dashArray: '',
+    //   fillOpacity: 0.5
+    // });
 
-    layer.bringToFront();
-    if (selectedCountry?.countryName != e.target.feature?.properties.name) {
+    // layer.bringToFront();
+
+    // if (selectedCountry?.countryName != e.target.feature?.properties.name) {
+      
       layer.setStyle({
         weight: 1,
         color: '#361836',
         dashArray: '',
-        fillOpacity: 0.7,
+        fillOpacity: 0.5,
       });
 
       layer.bringToFront();
-    }
+    // }
   };
 
   const resetHighlight = (e: LeafletMouseEvent) => {
@@ -194,6 +196,7 @@ function App() {
       layer.setStyle(styleFeature(e.target.feature));
     }
     layer.setStyle(styleFeature(e.target.feature));
+    layer.bringToBack();
   };
 
   const displayCountryData = async (e: LeafletMouseEvent) => {
