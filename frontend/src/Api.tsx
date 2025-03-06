@@ -51,3 +51,8 @@ export function songCountryHistory(song_name: string) {
     const res = fetch(serverUrl+`/song_country_history?country_code=${'gb'}&song_name=${song_name}`)
     return res;
 }
+
+
+export function searchComplete(prefix: string) {
+
+}

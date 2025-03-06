@@ -32,9 +32,16 @@ const TaskBar: React.FC<TaskBarProps> = ({autocomplete, onCountryCompare}) => {
             
             var res = await autocomplete(event.currentTarget.value);
             setAutocompleteOptions(res.map((x:any) => <option value={x}></option>));
-            console.log(autocompleteOptions);
 
           }}
+
+          onInput={ev => {
+            if (ev.nativeEvent.inputType == 'insertReplacementText') {
+              console.log("Selecting");
+              console.log(ev.nativeEvent.data);
+            }
+          }
+        }
         />
         
         <datalist id="search-autocomplete">
