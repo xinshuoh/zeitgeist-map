@@ -148,10 +148,10 @@ function App() {
     setSidebarOpen(curr => !curr);
   }
 
-  // Ensures pingServer() is only called once when the app starts
-  useEffect(() => {
+  // this would run it on first render, but means server crash isnt detected until page is reloaded
+  //useEffect(() => {
     pingServer();
-  }, []);
+  //}, []);
 
   const highlightFeature = (e: LeafletMouseEvent) => {
     const layer = e.target;
@@ -160,24 +160,26 @@ function App() {
     setMouseoverCountryTooltipPosition(new LatLng(layer.feature?.properties?.centre_lat, layer.feature?.properties?.centre_lng));
     setMouseoverCountry(layer.feature?.properties?.name);
 
-    layer.setStyle({
-      weight: 2.5,
-      color: '#666',
-      dashArray: '',
-      fillOpacity: 0.5
-    });
+    // layer.setStyle({
+    //   weight: 2.5,
+    //   color: '#666',
+    //   dashArray: '',
+    //   fillOpacity: 0.5
+    // });
 
-    layer.bringToFront();
-    if (selectedCountry?.countryName != e.target.feature?.properties.name) {
+    // layer.bringToFront();
+
+    // if (selectedCountry?.countryName != e.target.feature?.properties.name) {
+      
       layer.setStyle({
         weight: 1,
         color: '#361836',
         dashArray: '',
-        fillOpacity: 0.7,
+        fillOpacity: 0.5,
       });
 
       layer.bringToFront();
-    }
+    // }
   };
 
   const resetHighlight = (e: LeafletMouseEvent) => {
@@ -194,6 +196,7 @@ function App() {
       layer.setStyle(styleFeature(e.target.feature));
     }
     layer.setStyle(styleFeature(e.target.feature));
+    layer.bringToBack();
   };
 
   const displayCountryData = async (e: LeafletMouseEvent) => {
@@ -290,22 +293,29 @@ function App() {
           >
             {selectedCountry && (
               <Popup>
-                <strong style={{ fontSize: 14 }}>{selectedCountry.countryName}</strong>
+                <strong style={{ fontSize: 20 }}>{selectedCountry.countryName}</strong>
                 
                 <br/>
                 <br/>
 
-                <ul>
-                  {selectedCountry.songList.slice(0, 5).map((song: any) => <li style={{ fontSize: 14 }}>{song.song_name}</li>)}
-                  {/* {selectedCountry.songList.slice(0, 5).map((song: any) => ( //for zack changes
-                    <li key={song.song_name} 
-                        style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
-                        onClick={() => handleSidebarOpen("Song", song.song_name)}>
-                      {song.song_name}
-                    </li>
-                  ))} */}
-                </ul>
-
+                <div className="flex justify-centre">
+                  <div>
+                    <ul>
+                      {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
+                        <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>{index + 1}. {song.song_name} </li>
+                      )}
+                    </ul>
+                  </div>
+                  <div>
+                    <ul>
+                      {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
+                        <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>&nbsp;- {song.artist}</li>
+                      )}
+                    </ul>
+                  </div>
+                  
+                
+                </div>
                 <br/>
 
                 <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
