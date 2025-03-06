@@ -253,7 +253,7 @@ function App() {
 
     if(!isCountryCompareMode){
     layer.setStyle({
-      weight: 5.5,
+      weight: 1,
       color: '#361836',
       fillColor: '#361836',
       dashArray: '',
