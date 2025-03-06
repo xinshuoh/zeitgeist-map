@@ -1,8 +1,18 @@
 import React from 'react';
 import './TaskBar.css';
+// import isCountryCompareMode from './App';
+// import setIsCountryCompareMode from './App';
+// import type { countrySimilarityData } from './App';
+// import { isCountryCompareMode, setIsCountryCompareMode } from './App';
+
+interface CountrySimilarityData {
+  country1: string;
+  country2: string;
+  similarity: number;
+}
 
 interface TaskBarProps {
-  onCountryCompare: () => void
+  onCountryCompare?: () => void;
   autocomplete: any;
 }
 
@@ -39,9 +49,13 @@ const TaskBar: React.FC<TaskBarProps> = ({autocomplete, onCountryCompare}) => {
       <datalist id="search-autocomplete">
         {autocompleteOptions}
       </datalist>
-      <button className="compare-button" onClick={onCountryCompare}>
+      {/* <button className="compare-button" onClick={() => {
+        //  setIsCountryCompareMode(!isCountryCompareMode);
+        setIsCountryCompareMode((prev) => !prev);
+         alert("Click a country to view its music similarity heatmap.");
+      }}>
       <img src="/countrycomparelogo2.png" alt="Zeitgeist Map" className="logo-image" />
-      </button>
+      </button> */}
     </div>
   );
 };

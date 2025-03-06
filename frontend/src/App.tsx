@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import worldGeoJSON from './assets/worldmap_large.json';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { Layer, LeafletMouseEvent } from 'leaflet';
+import L from 'leaflet';
 import TaskBar from './TaskBar';
 import Sidebar from "./Sidebar";
 import useStableCallback from './useStableCallback';
+// export const [isCountryCompareMode, setIsCountryCompareMode] = useState(false);
+// export const [countrySimilarityData, setCountrySimilarityData] = useState<CountrySimilarityData[] | null>(null);
+
 interface CountryData {
   countryName: string;
   countryCode: string;
@@ -129,16 +133,30 @@ const fetchCountryCompareData = async (countryCode: string) => {
   return await res
 };
 
+// const heatmapLayerRef = useRef<L.GeoJSON | null>(null);
+
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
   const [selectedCountryCode, setSelectedCountryCode] = useState<string | null>(null);
   const [popupDetails, setPopupDetails] = useState<{ type: string; value: string } | null>(null);
   const [previousLayer, setPreviousLayer] = useState<Layer | null>(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isCountryCompareMode, setIsCountryCompareMode] = useState(false);
+  const [countrySimilarityData, setCountrySimilarityData] = useState<CountrySimilarityData[] | null>(null);
+  const [heatmapLayer, setHeatmapLayer] = useState<Layer | null>(null);
+
 
   const sidebarToggleHandler = () => {
     setSidebarOpen(curr => !curr);
   }
+  // const onCountryClick = async (e: LeafletMouseEvent, countryCode: string) => {
+  //   if (!isCountryCompareMode) return;
+    
+  //   const data = await fetchCountryCompareData(countryCode);
+  //   setCountrySimilarityData(data as CountrySimilarityData[]);
+  //   doHeatmap(data as CountrySimilarityData[]);
+  // };
+  
 
   pingServer();
 
@@ -190,9 +208,28 @@ function App() {
     // const songlist = [{ key:1, song_name: "Example song 1"}];
     setSelectedCountryCode(countryCode);
     
+    if (isCountryCompareMode) {
+      const data = await fetchCountryCompareData(countryCode);
+      setCountrySimilarityData(data as CountrySimilarityData[]);
+      // console.log("Fetching similarity data for:", selectedCountryCode);
+      // console.log("Fetched data:", data);
+      console.log("comparemode toggled, entering heatmap");
+      layer.setStyle({
+        weight: 10.5,
+        color: '#a6a832',
+        fillColor: '#a6a832',
+        dashArray: '',
+        fillOpacity: 0.5,
+        opacity:1
+      });
+      layer.bringToFront(); 
+      // doHeatmap(data as CountrySimilarityData[]);
+    }
+
     if (previousLayer) {
       (previousLayer as L.Path).setStyle(styleFeature((previousLayer as any).feature));
     }
+
 
     // only fires if you select a new country (avoids constantly replaying the same song - don't know if this feature is desireable)
     if (countryCode != selectedCountry?.countryCode) {
@@ -204,10 +241,10 @@ function App() {
         genre: "todo",
         streams: "todo"
       });
-      console.log(selectedCountry?.countryCode);
+      // console.log(selectedCountry?.countryCode);
     }
     
-
+    if(!isCountryCompareMode){
     layer.setStyle({
       weight: 5.5,
       color: '#361836',
@@ -215,16 +252,22 @@ function App() {
       dashArray: '',
       fillOpacity: 0.5,
       opacity:1
-    });
+    });}
   
     layer.bringToFront();    
     setSidebarOpen(true);
     setPreviousLayer(layer);
 
   };
+  // const heatmapLayerRef = useRef<L.GeoJSON | null>(null);
+
+
+  
   const stableDisplayCountryData = useStableCallback(displayCountryData);
   const stableResetHighlight = useStableCallback(resetHighlight);
   const stableHighlightFeature = useStableCallback(highlightFeature);
+
+
   const handleSecondaryPopup = (type: string, value: string) => {
     if (!selectedCountry) return;
     setPopupDetails({ type, value });
@@ -240,16 +283,119 @@ function App() {
     });
   };
 
-  const doHeatMap = async () => {
-    const countrySimilarities: CountrySimilarityData[] = (await fetchCountryCompareData("gb")) as CountrySimilarityData[];
+  // const doHeatMap = async () => {
+  //   const countrySimilarities: CountrySimilarityData[] = (await fetchCountryCompareData("gb")) as CountrySimilarityData[];
+  //   alert(JSON.stringify(countrySimilarities));
+  // };
+
+  const HeatmapLayer = ({ data }: { data?: CountrySimilarityData[] }) => {
+    const map = useMap(); 
+    const [heatmapLayer, setHeatmapLayer] = useState<L.GeoJSON | null>(null);
+    const heatmapLayerRef = useRef<L.GeoJSON | null>(null);
+
+    useEffect(() => {
+      if (!map || !data) return;
+      if (heatmapLayerRef.current) { 
+        map.removeLayer(heatmapLayerRef.current);
+        console.log("heatmap layer in if remove block", heatmapLayerRef.current);
+        heatmapLayerRef.current = null;
+      }
+      const newLayer = L.geoJSON(worldGeoJSON as GeoJSON.GeoJsonObject, {
+        style: (feature) => {
+          const similarity = data?.find(c => c.country_code === feature?.properties?.wb_a2)?.similarity ?? 0;
+          // console.log("Heatmap Data:", data); //gets array okay
+          console.log("Feature WB_A2:", feature?.properties?.wb_a2); //gets PREVIOUS country code ok
+          console.log("heatmap layer inside new layer", heatmapLayerRef.current);
+            const color = `rgba(255, 0, 0)`;
+          console.log("map made?")
+          return { fillColor: color, fillOpacity: 1-similarity, weight: 1 };
+        }
+      });
+  
+      newLayer.addTo(map);
+      newLayer.bringToFront();
+      setHeatmapLayer(newLayer);
+      heatmapLayerRef.current = newLayer;
+      console.log("hml2",heatmapLayer);
+      console.log("Heatmap layer set");
+
+      return () => {
+        if (heatmapLayerRef.current) {
+          setIsCountryCompareMode(false);
+          map.removeLayer(heatmapLayerRef.current);
+          heatmapLayerRef.current = null;
+          console.log("Heatmap removed on unmount");
+        }};
+    }, [map, data]); // Runs when map or data changes
     
-    alert(countrySimilarities)
+    const exitCompareMode = () => {
+      console.log("Exiting compare mode");
+    
+      if (heatmapLayerRef.current) {
+        console.log("Removing heatmap layer:", heatmapLayerRef.current);
+        heatmapLayerRef.current.remove(); // Remove the heatmap layer immediately
+        heatmapLayerRef.current = null;
+        console.log("Heatmap layer removed");
+      } else {
+        console.log("No heatmap layer found when exiting compare mode");
+      }
+    
+      setIsCountryCompareMode(false);
+    };
+    return null;
   };
+
+  // const exitCompareMode = () => {
+  //   console.log("exit entered");
+  //   console.log(heatmapLayer);
+  //   if (heatmapLayer) {
+  //     heatmapLayer.remove(); // Remove the heatmap layer immediately
+  //     setHeatmapLayer(null); // Clear the reference
+  //     console.log("Heatmap layer removed thru button");
+  //   }
+  //   setIsCountryCompareMode(false); // Exit compare mode
+  //   console.log(setIsCountryCompareMode);
+  // };
+  
+
+  // const doHeatmap = (data?: CountrySimilarityData[]) => {
+  //   const map2 = useMap();
+  //   if (heatmapLayer) {
+  //     heatmapLayer.remove(); 
+  //   }
+  //   const newLayer = L.geoJSON(worldGeoJSON as GeoJSON.GeoJsonObject, {
+  //     style: (feature) => {
+  //       const similarity = data?.find(c => c.country_code === feature?.properties?.wb_a2)?.similarity ?? 0;
+  //       // console.log("Heatmap Data:", data); //gets array okay
+  //       console.log("Feature WB_A2:", feature?.properties?.wb_a2); //gets PREVIOUS country code ok
+  //       console.log("Similarity:", similarity);
+  //       // const color = `rgba(255, 0, 0, ${similarity})`;
+  //       const color = `rgba(255, 0, 0)`;
+  //       console.log("map made?")
+  //       // newLayer.setStyle({
+  //       //   weight: 10.5,
+  //       //   color: '#eb4034',
+  //       //   fillColor: '#eb4034',
+  //       //   dashArray: '',
+  //       //   fillOpacity: 0.5,
+  //       //   opacity:1
+  //       // });
+  //       return { fillColor: '#eb4034', fillOpacity: 0.8, color: "#32a852", weight: 1 };
+  //     }
+  //   });
+  //   newLayer.bringToFront(); 
+  //   setHeatmapLayer(newLayer);
+  //   console.log("allegedly set")
+  //   newLayer.addTo(map2); 
+  //   newLayer.bringToFront(); 
+  // };
+
+
 
   return (
     <>
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
-        <TaskBar onCountryCompare={doHeatMap}autocomplete={fetchSearchComplete} />
+        <TaskBar autocomplete={fetchSearchComplete} />
         <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} />
       </div>
       
@@ -267,6 +413,8 @@ function App() {
             style={styleFeature} //sets unclicked default style
             onEachFeature={onEachFeature}
           >
+          <HeatmapLayer data={countrySimilarityData || undefined} />
+
             {selectedCountry && (
               <Popup>
                 <strong>{selectedCountry.countryName}</strong><br />
@@ -304,11 +452,33 @@ function App() {
               </Popup>
             )}
 
-          </GeoJSON>
-          {worldGeoJSON && (
-            <>
-            </>
-          )}
+              </GeoJSON>
+                <HeatmapLayer data={countrySimilarityData || undefined} />
+
+                <button onClick={() => {
+                  exitCompareMode();
+                }} style={{ position: 'absolute', top: '120px', right: '10px', zIndex: 1000 }}>
+                Exit Compare Mode
+                </button>
+                {/* <button onClick={() => {
+                const heatmapLayerInstance = heatmapLayerRef.current;
+                if (heatmapLayerInstance) {
+                  heatmapLayerInstance.exitCompareMode();
+                }
+                }} style={{ position: 'absolute', top: '120px', right: '10px', zIndex: 1000 }}>
+                Exit Compare Mode
+                </button> */}
+
+              <button onClick={() => {
+                setIsCountryCompareMode((prev) => !prev);
+                alert("Click a country to view its music similarity heatmap.");
+              }} style={{ position: 'absolute', top: '100px', right: '10px', zIndex: 1000 }}>
+              HELLOOOO
+              </button>          
+              {worldGeoJSON && (
+              <>
+              </>
+              )}
 
         </MapContainer>
       </div>

@@ -102,3 +102,10 @@
 .leaflet-popup-close-button {
   color: #333 !important;
 }
+
+button {
+  background-color: rgb(252, 233, 233);
+  color: gray;
+  border: none;
+  cursor: pointer;
+}
