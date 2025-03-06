@@ -2,7 +2,7 @@ import React from 'react';
 import './TaskBar.css';
 
 interface TaskBarProps {
-  onCountryCompare: () => void
+  // onCountryCompare: () => void
   autocomplete: any;
 }
 
@@ -11,7 +11,7 @@ interface TaskBarProps {
 //   autocomplete: any;
 // }
 
-const TaskBar: React.FC<TaskBarProps> = ({autocomplete, onCountryCompare}) => {
+const TaskBar: React.FC<TaskBarProps> = ({autocomplete}) => {
   const [autocompleteOptions, setAutocompleteOptions] = React.useState<any>([]);
 
   return (
@@ -47,9 +47,8 @@ const TaskBar: React.FC<TaskBarProps> = ({autocomplete, onCountryCompare}) => {
         <datalist id="search-autocomplete">
           {autocompleteOptions}
         </datalist>
-        <button className="compare-button" onClick={onCountryCompare}>
+        {/* <button className="compare-button" onClick={onCountryCompare}> */}
         <img src="/countrycomparelogo2.png" alt="Zeitgeist Map" className="logo-image" />
-        </button>
       </div>
     </div>
   );

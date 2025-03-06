@@ -116,3 +116,12 @@
 .leaflet-popup-close-button {
   color: #333 !important;
 }
+button.country-compare {
+  background-color: white;
+  color: gray;
+  border: none;
+  padding-top: 50px;
+  cursor: pointer;
+  z-index: 1000; 
+
+}

@@ -170,6 +170,7 @@ def get_percentage_similarity(comparison_tracks, country_code=None):
     return res
 
 
+
 @app.route('/country_compare')
 def country_compare():
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
