@@ -43,6 +43,7 @@ def fetch_historical():
     for row in soup.find_all('a')[1:]: # first row is headings
 
         date_ = row.text
+        print(date_)
         contents_1 = urllib.request.urlopen(f"https://kworb.net/apple_songs/archive/{date_}").read()
         soup_1 = BeautifulSoup(contents_1, features="html.parser")
 
@@ -54,20 +55,20 @@ def fetch_historical():
             elems = row_.find_all('td')
 
         
-            #global stats
+            ###global stats
             pos = elems[0].text
-            pos_change = None if elems[1].text in ('NEW', 'RE') else 0 if elems[1].text == '=' else elems[1].text
+            #pos_change = None if elems[1].text in ('NEW', 'RE') else 0 if elems[1].text == '=' else elems[1].text
             temp = elems[2].text.split(" - ")
             artists = temp[0].replace(",", " &")
             artists = artists.split(" & ")
 
             track = temp[1]
-            days = elems[3].text
-            pk = elems[4].text
-            pk_change = elems[5].text
-            pts = elems[6].text
-            pts_plus = elems[7].text
-            tpts = elems[8].text
+            #days = elems[3].text
+            #pk = elems[4].text
+            #pk_change = elems[5].text
+            #pts = elems[6].text
+            #pts_plus = elems[7].text
+            #tpts = elems[8].text
             
             date_time = datetime.strptime(date_[2:8], '%y%m%d')
 
@@ -87,6 +88,13 @@ def fetch_historical():
             if not s:
                 s = Song(name = track, artists = a_list)
                 db.session.add(s)
+
+            ###global popularity
+
+
+            #c = db.session.execute(db.select(Country).where(Country.code == "world")).scalar()
+            #s_pop = SongHasPopularity(song = s, country = c, position = pos, date = date_time)
+            #db.session.add(s_pop)
 
 
             #country specific stats
