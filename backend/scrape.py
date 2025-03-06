@@ -40,10 +40,10 @@ def fetch_historical():
 
     countries = ["us","gb","jp","de","au","ca","fr","it","kr","mx","ru","th","be","br","ch","cn","co","es","hk","id","ie","in","nl","nz","tr","tw","za","ae","ar","at","cl","cz","dk","ec","ee","eg","fi","gr","hu","il","ke","kz","lb","lt","lu","my","ng","no","pe","ph","pl","pt","ro","sa","se","si","sg","sk","ua","vn"]
 
-    for row in soup.find_all('a')[1:]: # first row is headings
+    for row in soup.find_all('a')[:1:-1]: # first row is headings
 
         date_ = row.text
-        print(date_)
+        #print(date_)
         contents_1 = urllib.request.urlopen(f"https://kworb.net/apple_songs/archive/{date_}").read()
         soup_1 = BeautifulSoup(contents_1, features="html.parser")
 
@@ -92,9 +92,9 @@ def fetch_historical():
             ###global popularity
 
 
-            #c = db.session.execute(db.select(Country).where(Country.code == "world")).scalar()
-            #s_pop = SongHasPopularity(song = s, country = c, position = pos, date = date_time)
-            #db.session.add(s_pop)
+            c = db.session.execute(db.select(Country).where(Country.code == "glb")).scalar()
+            s_pop = SongHasPopularity(song = s, country = c, position = pos, date = date_time)
+            db.session.add(s_pop)
 
 
             #country specific stats
@@ -106,10 +106,10 @@ def fetch_historical():
                     for artist in artists:
                         
                         if artist in popularity:
-                            popularity[artist][country] += (1 / (1+(country_pos/20)))
+                            popularity[artist][country] += (1 / (country_pos + 47.45) ** 1.11)
                         else:
                             popularity[artist] = defaultdict(int)
-                            popularity[artist][country] += (1 / (1+(country_pos/20)))
+                            popularity[artist][country] += (1 / (country_pos + 47.45) ** 1.11)
 
                     c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
 
