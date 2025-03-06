@@ -293,22 +293,29 @@ function App() {
           >
             {selectedCountry && (
               <Popup>
-                <strong style={{ fontSize: 14 }}>{selectedCountry.countryName}</strong>
+                <strong style={{ fontSize: 20 }}>{selectedCountry.countryName}</strong>
                 
                 <br/>
                 <br/>
 
-                <ul>
-                  {selectedCountry.songList.slice(0, 5).map((song: any) => <li style={{ fontSize: 14 }}>{song.song_name}</li>)}
-                  {/* {selectedCountry.songList.slice(0, 5).map((song: any) => ( //for zack changes
-                    <li key={song.song_name} 
-                        style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
-                        onClick={() => handleSidebarOpen("Song", song.song_name)}>
-                      {song.song_name}
-                    </li>
-                  ))} */}
-                </ul>
-
+                <div className="flex justify-centre">
+                  <div>
+                    <ul>
+                      {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
+                        <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>{index + 1}. {song.song_name} </li>
+                      )}
+                    </ul>
+                  </div>
+                  <div>
+                    <ul>
+                      {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
+                        <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>&nbsp;- {song.artist}</li>
+                      )}
+                    </ul>
+                  </div>
+                  
+                
+                </div>
                 <br/>
 
                 <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
