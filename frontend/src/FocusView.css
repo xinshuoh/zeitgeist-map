@@ -1,0 +1,35 @@
+.viewHeading {
+    font-size: 26px;
+    text-align: center;
+}
+
+.viewSubheading {
+    text-align: center;
+}
+
+.close {
+    font-size: 40px;
+    position: absolute;
+    top: -10px;
+}
+
+.close:hover {
+    cursor:pointer
+}
+
+.heatmapButton {
+    cursor:pointer;
+    padding: 5px;
+    background-color: #eaeadd;
+    margin: 10px;
+}
+
+.heatmapButton:hover {
+    background-color: #cfcfc2;
+}
+
+.viewLink {
+    color: purple;
+    text-decoration: underline;
+    cursor: pointer;
+}
