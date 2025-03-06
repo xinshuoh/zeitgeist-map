@@ -29,10 +29,11 @@ def heat_map_popularity():
     
     #for country in countries:
     pops = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.date == date_time, SongHasPopularity.song == val)).scalars()
+    songs = db.session.execute(db.select())
     #print(pops[0].date)
     print("success")
-    for pop in pops:
-        print(pop.date)
+    #for pop in pops:
+    #    print(pop.song.name)
     print("success2")
     return pops
 

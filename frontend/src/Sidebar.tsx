@@ -61,7 +61,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
             <div className="relative w-full h-screen flex">
                 <div className={`h-full transition-all ${isOpen ? "w-100" : "w-0"} z-1`}>
                     <div className={`h-full flex-col border-r border-gray-300 shadow-lg overflow-y-scroll`}
-                        style={{ scrollbarWidth: "thin", backgroundColor: '#FFFFFF' }}>
+                        style={{ scrollbarWidth: "thin", backgroundColor: '#330033' }}>
 
                         <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
                             <div className={`
@@ -101,24 +101,24 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                 
                 <div className={`h-full transition-all ${isOpen ? "w-100" : "w-0"} z-1`}>
                     <div className={`h-full flex-col border-r border-gray-300 shadow-lg overflow-y-scroll`}
-                        style={{ scrollbarWidth: "thin", backgroundColor: '#FFFFFF' }}>
+                        style={{ scrollbarWidth: "thin", backgroundColor: '#330033' }}>
     
                         <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
                             <div className={`
                         flex justify-center p-4 items-center overflow-hidden transition-all ${isOpen ? "w-100 ml-3" : "w-0"}`}>
-                                <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#361836' }}>{selectedCountry.countryName}</span>
+                                <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#FFFFFF' }}>{selectedCountry.countryName}</span>
                             </div>
                         </div>
 
                         <div className="w-full flex justify-center p-4">
-                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center" style={{ backgroundColor: '#d6b8c3' }}>
+                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white" style={{ backgroundColor: '#d6b8c3' }}>
                                 <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
                                 <div id="embed-iframe"></div>
                             </div>
                         </div>
                         
                         <div className="w-full flex justify-center p-4">
-                            <div className="w-[300px] bg-gray-200 rounded-lg shadow-md flex items-center justify-center p-4" style={{ backgroundColor: '#d6b8c3' }}>
+                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center" style={{ backgroundColor: '#d6b8c3' }}>
                                 <h2 style={{ color: '#361836' }}>Unfortunately we don't have data for {selectedCountry.countryName} right now</h2>
                             </div>
                         </div>
@@ -143,17 +143,17 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
         <div className="relative w-full h-screen flex">
             <div className={`h-full transition-all ${isOpen ? "w-100" : "w-0"} z-1`}>
                 <div className={`h-full flex-col border-r border-gray-300 shadow-lg overflow-y-scroll min-h-[calc(100%+40px)]`}
-                    style={{ scrollbarWidth: "thin", backgroundColor: '#FFFFFF' }}>
+                    style={{ scrollbarWidth: "thin", backgroundColor: '#330033' }}>
 
                     <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
                         <div className={`
                     flex justify-center p-4 items-center overflow-hidden transition-all ${isOpen ? "w-100 ml-3" : "w-0"}`}>
-                            <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#361836' }}>{selectedCountry.countryName}</span>
+                            <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#FFFFFF' }}>{selectedCountry.countryName}</span>
                         </div>
                     </div>
 
                     <div className="w-full flex justify-center p-4">
-                        <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center" style={{ backgroundColor: '#d6b8c3' }}>
+                        <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white" style={{ backgroundColor: '#d6b8c3' }}>
                             <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
                             <div id="embed-iframe"></div>
                         </div>
