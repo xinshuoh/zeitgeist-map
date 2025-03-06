@@ -111,14 +111,14 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                         </div>
 
                         <div className="w-full flex justify-center p-4">
-                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center" style={{ backgroundColor: '#d6b8c3' }}>
+                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white" style={{ backgroundColor: '#d6b8c3' }}>
                                 <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
                                 <div id="embed-iframe"></div>
                             </div>
                         </div>
                         
                         <div className="w-full flex justify-center p-4">
-                            <div className="w-[300px] bg-gray-200 rounded-lg shadow-md flex items-center justify-center p-4" style={{ backgroundColor: '#d6b8c3' }}>
+                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center" style={{ backgroundColor: '#d6b8c3' }}>
                                 <h2 style={{ color: '#361836' }}>Unfortunately we don't have data for {selectedCountry.countryName} right now</h2>
                             </div>
                         </div>
@@ -153,7 +153,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                     </div>
 
                     <div className="w-full flex justify-center p-4">
-                        <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center" style={{ backgroundColor: '#d6b8c3' }}>
+                        <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white" style={{ backgroundColor: '#d6b8c3' }}>
                             <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
                             <div id="embed-iframe"></div>
                         </div>
