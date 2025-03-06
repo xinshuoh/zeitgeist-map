@@ -16,6 +16,28 @@ from param_check import *
 def ping():
     return "Hello from backend!"
 
+@app.route("/heat_map_popularity")
+# @args(p("date")&(p("song_id")|p("name")))
+def heat_map_popularity():
+    #170629 date format
+    date_time = dt.datetime.strptime(request.args['date'], '%y%m%d')
+    if 'song_id' in request.args:
+        val = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalar()
+    if 'name' in request.args:
+        val = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalar()
+    print(val.name)
+    
+    #for country in countries:
+    pops = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.date == date_time, SongHasPopularity.song == val)).scalars()
+    #print(pops[0].date)
+    print("success")
+    for pop in pops:
+        print(pop.date)
+    print("success2")
+    return pops
+
+
+
 
 @app.route("/track_popularity")
 # @args(p("song_id")|p("name"))
@@ -37,6 +59,22 @@ def country_top_tracks():
     current_date = dt.datetime.now().date()
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
     return get_top_tracks(c, current_date)
+
+
+@app.route("/country_top_artists")
+# @args(p("country_code"))
+def country_top_artists():
+    current_date = dt.datetime.now().date()
+    c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
+    return get_top_artists(c, current_date)
+
+
+@app.route("/country_top_genres")
+# @args(p("country_code"))
+def country_top_genres():
+    current_date = dt.datetime.now().date()
+    c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
+    return get_top_genres(c, current_date)
 
 
 def get_top_tracks(country, date):
@@ -88,7 +126,7 @@ def song_country_history():
         ).order_by(SongHasPopularity.date)).scalars()
     elif 'song_name' in request.args:
         s = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['song_name']))).scalars().first() # pick the first song with matching name
-        print(s)
+        #print(s)
         pops = db.session.execute(db.select(SongHasPopularity).where(
             SongHasPopularity.country == c, 
             SongHasPopularity.song_id == s.id
