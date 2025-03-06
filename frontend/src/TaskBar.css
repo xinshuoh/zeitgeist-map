@@ -2,7 +2,8 @@
     position: static;
     top: 0;
     width: 100vw;
-    background-color: rgb(54, 24, 54);
+    background-color: #330033;
+    fill-opacity: 0.7;
     color: white;
     padding: 10px;
     display: flex;
