@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import { MapContainer, Marker, Popup, GeoJSON, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -148,7 +148,10 @@ function App() {
     setSidebarOpen(curr => !curr);
   }
 
-  pingServer();
+  // this would run it on first render, but means server crash isnt detected until page is reloaded
+  //useEffect(() => {
+    pingServer();
+  //}, []);
 
   const highlightFeature = (e: LeafletMouseEvent) => {
     const layer = e.target;
