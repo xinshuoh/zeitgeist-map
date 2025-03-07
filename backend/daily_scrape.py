@@ -103,7 +103,7 @@ class DailyScraper:
 
         kworb_countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
 
-        for country_code in ['gb']:  # ['gb', 'fr', 'de', 'es', 'us'] for now for testing purposes
+        for country_code in ['gb', 'fr', 'de', 'es', 'us']:  # ['gb', 'fr', 'de', 'es', 'us'] for now for testing purposes
             response = requests.get(f'https://kworb.net/spotify/country/{country_code}_daily.html')
             # Check the page exists
             if response.status_code == 200:
@@ -169,7 +169,7 @@ class DailyScraper:
     def fetch_artist_data(self):
         contents = requests.get(f'https://kworb.net/itunes/extended.html').text
         soup = BeautifulSoup(contents, features="html.parser")
-        for row in soup.find_all('tr')[1:3]:
+        for row in soup.find_all('tr')[1:200]:
             elems = row.find_all('td')
 
             # position = elems[0].text  # Worldwide position 
