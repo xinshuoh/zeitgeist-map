@@ -46,6 +46,7 @@ class DailyScraper:
         print(json.dumps(artist_results, indent=4))
 
     def fetch_track_tag_info(self, artist_name, track_name):
+        # Make Last.fm API calls
         self.lastfmAPI_call_count += 1
         if self.lastfmAPI_call_count % 20 == 0:
             sleep(5)
@@ -67,6 +68,7 @@ class DailyScraper:
             return None
 
     def calculate_genre_data(self, country_code, track_information):
+        # Make Last.fm API calls to get genre data
         for main_artist_name, track_name, position in track_information:
             tag_info = self.fetch_track_tag_info(main_artist_name, track_name)
             print(f"Fetching data: {main_artist_name}, {track_name}...")
@@ -82,7 +84,7 @@ class DailyScraper:
 
         kworb_countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
 
-        for country_code in ['gb', 'fr', 'de', 'es']:  # ['gb', 'fr', 'de', 'es'] for now for testing purposes
+        for country_code in ['gb', 'fr', 'de', 'es', 'us']:  # ['gb', 'fr', 'de', 'es', 'us'] for now for testing purposes
             response = requests.get(f'https://kworb.net/spotify/country/{country_code}_daily.html')
             # Check the page exists
             if response.status_code == 200:
