@@ -49,15 +49,20 @@ const FocusView = ({focusOptions, setFocusOptions}: FocusViewProps) => {
 { close => {
         return (
 <>{viewReady ? <div>
-    <a className="close" onClick={() => {setFocusOptions({song: undefined, isOpen: false})}}>          
-    &times;        
-  </a> 
-    <h2 className="viewHeading">{song? song.song_name : "UNDEF"}</h2>
-    <p className="viewSubheading">By <span className="viewLink" onClick={() => close()}>{song? song.artist : "UNDEF"}</span></p>
-  <div style={{margin: '10px'}}>
+  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
+    <div>
+      <strong className="viewHeading">{song? song.song_name : ""}</strong>
+      <p className="viewSubheading"><span className="viewLink" onClick={() => close()}>{song? song.artist : ""}</span></p> 
+    </div>
+    <div className="close" style={{color: "#333"}} onClick={() => {setFocusOptions({song: undefined, isOpen: false})}}>       
+      &times;         
+    </div>
+    
+  </div>
+  <div className="graph-container">
   <LineChart width={500} height={200} data={lineData}>
-    <Line type="monotone" dataKey="popularity" stroke="#8884d8" strokeWidth={3} dot={false}/>
-    <CartesianGrid stroke="#ccc" />
+    <Line type="monotone" dataKey="popularity" stroke="#8884d8" strokeWidth={3} dot={false} isAnimationActive={false}/>
+    <CartesianGrid style={{backgroundColor: "#d6b8c3"}} stroke="#ccc" />
     <YAxis />
   </LineChart>
   </div>   

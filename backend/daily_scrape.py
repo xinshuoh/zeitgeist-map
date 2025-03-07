@@ -70,14 +70,24 @@ class DailyScraper:
     def calculate_genre_data(self, country_code, track_information):
         # Make Last.fm API calls to get genre data
         for main_artist_name, track_name, position in track_information:
-            tag_info = self.fetch_track_tag_info(main_artist_name, track_name)
-            print(f"Fetching data: {main_artist_name}, {track_name}...")
-            if tag_info is not None and 'toptags' in tag_info:
-                tags = tag_info['toptags']['tag']
-                for tag in tags:
-                    genre = tag['name'].lower()
-                    if genre in self.genres:
-                        self.genre_popularity_measures[country_code][genre] += (tag['count'] / 100) * self.get_popularity_measure(position)
+            s = self.db.session.execute(self.db.select(Song).where(Song.name == track_name)).scalar()
+            if not s.genres:
+                genres_list = []
+                tag_info = self.fetch_track_tag_info(main_artist_name, track_name)
+                print(f"Fetching data: {main_artist_name}, {track_name}...")
+                if tag_info is not None and 'toptags' in tag_info:
+                    tags = tag_info['toptags']['tag']
+                    for tag in tags:
+                        genre = tag['name'].lower()
+                        if genre in self.genres:
+                            genres_list.append(genre)
+                            self.genre_popularity_measures[country_code][genre] += self.get_popularity_measure(position)
+                s.genres = genres_list
+            else:
+                for genre in s.genres:
+                    self.genre_popularity_measures[country_code][genre] += self.get_popularity_measure(position)
+
+
 
     def fetch_track_data(self):
         get_num = lambda s : int(s.replace(',','')) if s else None
