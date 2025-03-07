@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 class Song(db.Model):
     __tablename__ = "song"
 
@@ -20,13 +21,7 @@ class Song(db.Model):
 
     artists: Mapped[List[Artist]] = relationship(secondary='credit', back_populates="songs")
 
-    genres: Mapped[List[Genre]] = relationship(secondary='has_genre', back_populates="songs")
-
     popularities: Mapped[List[SongHasPopularity]] = relationship(back_populates="song")
-
-    #popularities: Mapped[List[SongHasGenre]] = relationship(back_populates="song")
-
-#    today_popularities: Mapped[List[SongHasPopularityToday]] = relationship(back_populates="song")
 
 
 class Artist(db.Model):
@@ -40,10 +35,9 @@ class Artist(db.Model):
 
     songs: Mapped[List[Song]] = relationship(secondary='credit', back_populates="artists")
 
-    #genres: Mapped[List[Genre]] = relationship(secondary='has_genre', back_populates="artists")
+    genres: Mapped[List[Genre]] = relationship(secondary='has_genre', back_populates="artists")
 
     popularities: Mapped[List[ArtistHasPopularity]] = relationship(back_populates="artist")
-
 
 
 credit = Table(
@@ -53,14 +47,15 @@ credit = Table(
     Column("artist_id", ForeignKey("artist.id"))
 )
 
+
 class Genre(db.Model):
     __tablename__ = "genre"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    
+
     name: Mapped[str] = mapped_column(String(128), unique=True)
 
-    songs: Mapped[List[Song]] = relationship(secondary='has_genre', back_populates="genres")
+    artists: Mapped[List[Artist]] = relationship(secondary='has_genre', back_populates="genres")
 
     popularities: Mapped[List[GenreHasPopularity]] = relationship(back_populates="genre")
 
@@ -68,9 +63,10 @@ class Genre(db.Model):
 has_genre = Table(
     "has_genre",
     db.Model.metadata,
-    Column("song_id", ForeignKey("song.id")),
+    Column("artist_id", ForeignKey("artist.id")),
     Column("genre_id", ForeignKey("genre.id"))
 )
+
 
 class Country(db.Model):
     __tablename__ = "country"
@@ -138,6 +134,3 @@ class GenreHasPopularity(db.Model):
 
     genre: Mapped[Genre] = relationship(back_populates="popularities")
     country: Mapped[Country] = relationship(back_populates="genre_popularities")
-
-#class SongHasGenre(db.Model):
-
