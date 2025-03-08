@@ -3,6 +3,7 @@ from urllib.parse import quote, unquote
 
 from flask import request, jsonify
 from flask_cors import cross_origin
+from sqlalchemy import or_
 
 from app import app
 from app import db
@@ -173,10 +174,29 @@ def get_percentage_similarity(comparison_tracks, country_code=None):
 
 @app.route('/country_compare')
 def country_compare():
-    c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
-    tracks = get_today_track_names(c)
-    # TODO : deal better with when there is no match 
-    return get_percentage_similarity(tracks, c.code)
+    # get the country
+    country = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
+
+    # get it's similarities
+    similarities = list(db.session.execute(db.select(CountrySimilarity).where(or_(CountrySimilarity.country1==country, CountrySimilarity.country2==country))).scalars())
+    
+    res = []
+    for sim in similarities:
+        if sim.country1 == country:
+            name = sim.country2.name
+            code = sim.country2.code
+        else:
+            name = sim.country1.name
+            code = sim.country1.code
+        
+        res.append({
+                'name': name,
+                'country_code': code,
+                'similarity': sim.similarity
+            })
+    
+    return res
+
     
 
 # @app.route('/spiritual_musical_home')
