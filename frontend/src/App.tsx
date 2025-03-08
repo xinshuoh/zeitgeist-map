@@ -28,6 +28,7 @@ type CountrySimilarityData = {
 interface FocusOptions {
   isOpen: boolean;
   song: any;
+  artist: any;
 }
 
 const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
@@ -144,7 +145,7 @@ function App() {
   const [isCountryCompareMode, setIsCountryCompareMode] = useState(false);
   const [countrySimilarityData, setCountrySimilarityData] = useState<CountrySimilarityData[] | null>(null);
   const [heatmapLayer, setHeatmapLayer] = useState<Layer | null>(null); 
-  const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, isOpen: false});
+  const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, artist: undefined, isOpen: false});
   
   const sidebarToggleHandler = () => {
     setSidebarOpen(curr => !curr);
@@ -250,7 +251,6 @@ function App() {
       console.log(selectedCountry?.countryCode);
     }
     
-
     if(!isCountryCompareMode){
     layer.setStyle({
       weight: 1,
@@ -267,6 +267,7 @@ function App() {
     setPreviousLayer(layer);
 
   };
+
   const stableDisplayCountryData = useStableCallback(displayCountryData);
   const stableResetHighlight = useStableCallback(resetHighlight);
   const stableHighlightFeature = useStableCallback(highlightFeature);
@@ -369,7 +370,6 @@ function App() {
     }
     console.log(setIsCountryCompareMode);
   };
-  
 
   return (
     <div id="global">
