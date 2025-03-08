@@ -4,11 +4,13 @@ import { MapContainer, Marker, Popup, GeoJSON, Tooltip, useMap } from 'react-lea
 import 'leaflet/dist/leaflet.css';
 import worldGeoJSON from './assets/worldmap_large_centered_names.json';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import L, { LatLng, Layer, LeafletMouseEvent } from 'leaflet';
+import L, { geoJSON, LatLng, Layer, LeafletMouseEvent } from 'leaflet';
 import TaskBar from './TaskBar';
 import Sidebar from "./Sidebar";
 import FocusView from './FocusView';
 import useStableCallback from './useStableCallback';
+
+import mapStyler from './MapStyling';
 
 interface CountryData {
   countryName: string;
@@ -30,66 +32,13 @@ interface FocusOptions {
   song: any;
 }
 
-const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY;
-const TILE_LAYERS = {
-  rapidApi: {
-    url: `https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=${RAPIDAPI_KEY}`,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  },
-  openStreetMap: {
-    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }
-};
-const CURRENT_TILE_LAYER = TILE_LAYERS.rapidApi; // modify this to switch between tile layers
-
-// Function to set color based on properties (modify as needed)
-const getColor = (population: number) => {
-  // return population > 1000000000 ? '#800026' :
-  //   population > 500000000 ? '#BD0026' :
-  //     population > 200000000 ? '#E31A1C' :
-  //       population > 100000000 ? '#FC4E2A' :
-  //         population > 50000000 ? '#FD8D3C' :
-  //           population > 20000000 ? '#FEB24C' :
-  //             population > 10000000 ? '#FED976' :
-  //               '#FFEDA0';
-  return '#FFFFFF';
-};
-
-const styleFeature = (feature: Feature<Geometry, GeoJsonProperties> | undefined) => ({
-  fillColor: getColor(feature?.properties?.pop_est || 0),
-  weight: 2,
-  color: '#d0d0d0',
-  fillOpacity: 0.8
-});
+enum CountryCompareStatus {
+  Disabled,
+  Selecting,
+  Active
+}
 
 var serverResponsive = true;
-
-async function pingServer() {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', `http://127.0.0.1:5000/ping`);
-  var res = new Promise<boolean>((resolve, reject) => {
-    xhr.addEventListener('load', () => {
-      resolve(true);
-    });
-    xhr.addEventListener('timeout', () => {
-      if (serverResponsive) {
-        alert("Timeout connecting to server");
-        serverResponsive = false;
-      }
-      resolve(false);
-    });
-    xhr.addEventListener('error', () => {
-      if (serverResponsive) {
-        alert("Error connecting to server");
-        serverResponsive = false;
-      }
-      resolve(false);
-    })
-  });
-  xhr.send();
-  return await res;
-}
 
 const fetchSearchComplete = async (prefix: string) => {
   if (!serverResponsive) return [];
@@ -130,7 +79,7 @@ const fetchCountryCompareData = async (countryCode: string) => {
     });
   });
   xhr.send();
-  return await res;
+  return await res as CountrySimilarityData[];
 };
 
 function App() {
@@ -146,18 +95,26 @@ function App() {
   const [heatmapLayer, setHeatmapLayer] = useState<Layer | null>(null); 
   const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, isOpen: false});
   
+  const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
+
   const sidebarToggleHandler = () => {
     setSidebarOpen(curr => !curr);
   }
 
   // this would run it on first render, but means server crash isnt detected until page is reloaded
   //useEffect(() => {
-    pingServer();
+    //pingServer();
   //}, []);
 
+  const geoJsonRef = useRef<any | null>(null);
+  const mapStyle = mapStyler(geoJsonRef);
+
   const highlightFeature = (e: LeafletMouseEvent) => {
+
     const layer = e.target;
     const countryCode = layer.feature?.properties?.wb_a2;
+
+    mapStyle.mouseover(layer.feature);
 
     setMouseoverCountryTooltipPosition(new LatLng(layer.feature?.properties?.centre_lat, layer.feature?.properties?.centre_lng));
     setMouseoverCountry(layer.feature?.properties?.name);
@@ -169,10 +126,10 @@ function App() {
     //   fillOpacity: 0.5
     // });
 
-    // layer.bringToFront();
+    layer.bringToFront();
 
     // if (selectedCountry?.countryName != e.target.feature?.properties.name) {
-      
+      /*
       layer.setStyle({
         weight: 1,
         color: '#361836',
@@ -181,12 +138,15 @@ function App() {
       });
 
       layer.bringToFront();
+      */
     // }
   };
 
   const resetHighlight = (e: LeafletMouseEvent) => {
     const layer = e.target;
     const countryCode = layer.feature?.properties?.wb_a2;
+
+    mapStyle.mouseout();
 
     setMouseoverCountry(null);
     setMouseoverCountryTooltipPosition(undefined);
@@ -195,9 +155,9 @@ function App() {
       return;
     }
     if (selectedCountry?.countryName != e.target.feature?.properties.name) {
-      layer.setStyle(styleFeature(e.target.feature));
+      layer.setStyle(mapStyle.styleFeature(e.target.feature));
     }
-    layer.setStyle(styleFeature(e.target.feature));
+    layer.setStyle(mapStyle.styleFeature(e.target.feature));
     layer.bringToBack();
   };
 
@@ -206,35 +166,26 @@ function App() {
     const countryProp = layer.feature?.properties;
     if (!countryProp) return;
 
-    const countryCode = countryProp.wb_a2;
+    const countryCode = countryProp.wb_a2.toLowerCase();
+
+    setSelectedCountryCode(countryCode);
+
+    layer.bringToFront(); 
+
+    if (countryCompareStatus == CountryCompareStatus.Selecting) {
+      console.log("Country compare requested, origin: " + countryCode);
+      setCountryCompareStatus(CountryCompareStatus.Active);
+      fetchCountryCompareData(countryCode).then((data) => mapStyle.activateHeatmap({similarities: data, origin: countryCode}));
+    } else {
+      setSidebarOpen(true);
+    }
+
     const songList = await fetchMusicStats(countryCode, "country_top_tracks");
     const artistList = await fetchMusicStats(countryCode, "country_top_artists");
     const genreList = await fetchMusicStats(countryCode, "country_top_genres");
-    setSelectedCountryCode(countryCode);
-
-    if (isCountryCompareMode) {
-      setSidebarOpen(false);
-      const data = await fetchCountryCompareData(countryCode);
-      console.log(data);
-      setCountrySimilarityData(data as CountrySimilarityData[]);
-      // console.log("Fetching similarity data for:", selectedCountryCode);
-      // console.log("Fetched data:", data);
-      console.log("comparemode toggled, entering heatmap");
-      layer.setStyle({
-        weight: 7.5,
-        color: '#361836',
-        fillColor: '#361836',
-        dashArray: '',
-        fillOpacity: 0.8,
-        opacity:1
-      });
-      layer.bringToFront(); 
-
-      // doHeatmap(data as CountrySimilarityData[]);
-    }
 
     if (previousLayer) {
-      (previousLayer as L.Path).setStyle(styleFeature((previousLayer as any).feature));
+      (previousLayer as L.Path).setStyle(mapStyle.styleFeature((previousLayer as any).feature));
     }
 
     // only fires if you select a new country (avoids constantly replaying the same song - don't know if this feature is desirable)
@@ -249,19 +200,6 @@ function App() {
       });
       console.log(selectedCountry?.countryCode);
     }
-    
-
-    if(!isCountryCompareMode){
-    layer.setStyle({
-      weight: 1,
-      color: '#361836',
-      fillColor: '#361836',
-      dashArray: '',
-      fillOpacity: 0.5,
-      opacity:1
-    });
-    setSidebarOpen(true);
-  }
 
     layer.bringToFront();
     setPreviousLayer(layer);
@@ -369,6 +307,66 @@ function App() {
     }
     console.log(setIsCountryCompareMode);
   };
+
+  const geoJsonLayer = <GeoJSON
+      data={worldGeoJSON as GeoJSON.GeoJsonObject}
+      style={mapStyle.styleFeature} //sets unclicked default style
+      onEachFeature={onEachFeature}
+      ref={geoJsonRef}
+    >
+      <HeatmapLayer data={countrySimilarityData || undefined} />
+
+      {selectedCountry && !isCountryCompareMode && (
+        <Popup>
+          <strong style={{ fontSize: 20 }}>{selectedCountry.countryName}</strong>
+          
+          <br/>
+          <br/>
+
+          <div className="flex justify-centre">
+            <div>
+              <ul>
+                {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
+                  <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>{index + 1}. {song.song_name} </li>
+                )}
+              </ul>
+            </div>
+            <div>
+              <ul>
+                {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
+                  <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>&nbsp;- {song.artist}</li>
+                )}
+              </ul>
+            </div>
+            
+          
+          </div>
+          <br/>
+
+          <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
+            Top Artist: {selectedCountry.artistList?.[0]?.artist_name || "N/A"} 
+          </span>
+          
+          <br/>
+          <br/>
+
+          <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
+            Top Genre: {selectedCountry.genreList?.[0]?.genre_name || "N/A"}
+          </span>
+
+        </Popup>
+      )}
+
+      {popupDetails && ( // for the secondary pop up 
+        <Popup>
+          <strong>{popupDetails.type.toUpperCase()}</strong><br />
+          {popupDetails.value}<br />
+          <p>More details about {popupDetails.value}...</p>
+          <button onClick={() => setPopupDetails(null)}>Close</button>
+        </Popup>
+      )}
+
+    </GeoJSON>
   
 
   return (
@@ -387,64 +385,7 @@ function App() {
             noWrap={true}
           /> 
           tile layer not needed anymore */ }
-          <GeoJSON
-            data={worldGeoJSON as GeoJSON.GeoJsonObject}
-            style={styleFeature} //sets unclicked default style
-            onEachFeature={onEachFeature}
-          >
-            <HeatmapLayer data={countrySimilarityData || undefined} />
-
-            {selectedCountry && !isCountryCompareMode && (
-              <Popup>
-                <strong style={{ fontSize: 20 }}>{selectedCountry.countryName}</strong>
-                
-                <br/>
-                <br/>
-
-                <div className="flex justify-centre">
-                  <div>
-                    <ul>
-                      {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
-                        <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>{index + 1}. {song.song_name} </li>
-                      )}
-                    </ul>
-                  </div>
-                  <div>
-                    <ul>
-                      {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
-                        <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>&nbsp;- {song.artist}</li>
-                      )}
-                    </ul>
-                  </div>
-                  
-                
-                </div>
-                <br/>
-
-                <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
-                  Top Artist: {selectedCountry.artistList?.[0]?.artist_name || "N/A"} 
-                </span>
-                
-                <br/>
-                <br/>
-
-                <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
-                  Top Genre: {selectedCountry.genreList?.[0]?.genre_name || "N/A"}
-                </span>
-
-              </Popup>
-            )}
-
-            {popupDetails && ( // for the secondary pop up 
-              <Popup>
-                <strong>{popupDetails.type.toUpperCase()}</strong><br />
-                {popupDetails.value}<br />
-                <p>More details about {popupDetails.value}...</p>
-                <button onClick={() => setPopupDetails(null)}>Close</button>
-              </Popup>
-            )}
-
-          </GeoJSON>
+          {geoJsonLayer}
           {/* <HeatmapLayer data={countrySimilarityData || undefined} /> */}
 
           {mouseoverCountry && mouseoverCountryTooltipPosition &&
@@ -453,10 +394,26 @@ function App() {
             </Marker> // shows country name on mouseover
             )}
           <button className ="country-compare" onClick={() => {
-                setIsCountryCompareMode((prev) => !prev);
-                alert("How does one country's music taste compare with the rest of the world's? \nClick a country to see a heatmap animation! ");
+                if (countryCompareStatus == CountryCompareStatus.Disabled) {
+                  setCountryCompareStatus(CountryCompareStatus.Selecting);
+                  mapStyle.activateSelecting();
+                } else {
+                  setCountryCompareStatus(CountryCompareStatus.Disabled);
+                  mapStyle.activatePlain();
+                }
+                //fetchCountryCompareData('gb').then((data) => mapStyle.activateHeatmap({similarities: data, origin: 'gb'}));
+                
+                //setIsCountryCompareMode((prev) => !prev);
+                //alert("How does one country's music taste compare with the rest of the world's? \nClick a country to see a heatmap animation! ");
               }} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
-              country compare
+              {(() => {switch (countryCompareStatus) {
+                case CountryCompareStatus.Active: 
+                  return "Close country compare"
+                case CountryCompareStatus.Selecting:
+                  return "Click a country to compare against"
+                case CountryCompareStatus.Disabled:
+                  return "Activate country compare"
+                }})()}
               </button>          
 
         </MapContainer>
