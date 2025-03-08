@@ -7,20 +7,20 @@
 .closebutton {
     cursor: pointer;
     position: absolute;
-    left: 75vw;
+    left: 88vw;
 }
 
 .heatmapslider {
     position: absolute;
-    left: 40vw;
-    width: 30vw;
+    left: 25vw;
+    width: 60vw;
     top: 0vh;
 }
 
 .timemarks {
     position: absolute;
-    left: 37vw;
-    width: 36vw;
+    left: 22vw;
+    width: 66vw;
     top: 4vh;
     display:flex;
     flex-direction: row;

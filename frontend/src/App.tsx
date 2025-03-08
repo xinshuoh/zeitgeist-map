@@ -42,6 +42,11 @@ enum CountryCompareStatus {
   Active
 }
 
+enum PopularityHeatmapStatus {
+  Disabled,
+  Active
+}
+
 var serverResponsive = true;
 
 const fetchSearchComplete = async (prefix: string) => {
@@ -96,6 +101,7 @@ function App() {
   const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
   
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
+  const [popularityHeatmapStatus, setPopularityHeatmapStatus] = useState<PopularityHeatmapStatus>(PopularityHeatmapStatus.Disabled);
 
   const sidebarToggleHandler = () => {
     setSidebarOpen(curr => !curr);
@@ -197,14 +203,11 @@ function App() {
     map.openTooltip(mouseoverCountry as string, mouseoverCountryTooltipPosition as LatLng, { permanent: true });
   };
 
-  const viewPopularityHeatmap = (date: Date) => {
-    if (heatmapSong == null) return
-    console.log("viewing popularity heatmap for " + heatmapSong);
-    console.log(date);
-    heatMapPopularity(date, heatmapSong).then((res) => {
+  const viewPopularityHeatmap = (date: Date, song_name: string|undefined) => {
+    var song = song_name || heatmapSong;
+    if (!song) return;
+    heatMapPopularity(date, song).then((res) => {
       res.json().then(data => {
-        //console.log(data)
-        //setFocusOptions({song: undefined, isOpen: false})
         mapStyle.activatePopularityHeatmap(data);
       });
     });
@@ -267,6 +270,8 @@ function App() {
       )}
 
     </GeoJSON>
+
+  const sliderRef = useRef<any | null>(null);
   
 
   return (
@@ -309,8 +314,16 @@ function App() {
 
         </MapContainer>
       </div>
-      <HeatmapControl start={new Date(2017, 2, 5)} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap}/>
-      <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {setHeatmapSong(focusOptions.song.song_name)}}></FocusView>
+      {popularityHeatmapStatus == PopularityHeatmapStatus.Active && <HeatmapControl start={new Date(2017, 2, 5)} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap} sliderRef={sliderRef}/>}
+      
+      <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
+        setHeatmapSong(focusOptions.song.song_name);
+        setFocusOptions({song: undefined, artist: undefined, isOpen: false});
+        setSidebarOpen(false);
+        setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
+        sliderRef.current.value = sliderRef.current.max;
+        viewPopularityHeatmap(new Date(), focusOptions.song.song_name);
+        }}></FocusView>
     </div>
   );
 }
