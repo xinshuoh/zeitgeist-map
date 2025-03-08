@@ -272,6 +272,10 @@ function App() {
     </GeoJSON>
 
   const sliderRef = useRef<any | null>(null);
+
+  useEffect(() => {
+    if (sliderRef.current) sliderRef.current.value = sliderRef.current.max;
+  }, [popularityHeatmapStatus]);
   
 
   return (
@@ -314,14 +318,17 @@ function App() {
 
         </MapContainer>
       </div>
-      {popularityHeatmapStatus == PopularityHeatmapStatus.Active && <HeatmapControl start={new Date(2017, 2, 5)} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap} sliderRef={sliderRef}/>}
+      {popularityHeatmapStatus == PopularityHeatmapStatus.Active && <HeatmapControl start={new Date(2017, 2, 5)} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap} sliderRef={sliderRef}
+      close={() => {
+        setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
+        mapStyle.activatePlain();
+      }}/>}
       
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);
         setFocusOptions({song: undefined, artist: undefined, isOpen: false});
         setSidebarOpen(false);
         setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
-        sliderRef.current.value = sliderRef.current.max;
         viewPopularityHeatmap(new Date(), focusOptions.song.song_name);
         }}></FocusView>
     </div>

@@ -7,10 +7,11 @@ interface HeatmapControlProps {
     start: Date,
     end: Date,
     viewPopularityHeatmap: any,
-    sliderRef: any
+    sliderRef: any,
+    close: any
 }
 
-export default function HeatmapControl({start, end, viewPopularityHeatmap, sliderRef}: HeatmapControlProps) {
+export default function HeatmapControl({start, end, viewPopularityHeatmap, sliderRef, close}: HeatmapControlProps) {
     var days = Math.floor((end.getTime() - start.getTime()) / (1000*60*60*24));
     return <div className="controlbox">
         <input ref={sliderRef} className="heatmapslider" type="range" min="0" max={days} list="timemarks" 
@@ -23,7 +24,7 @@ export default function HeatmapControl({start, end, viewPopularityHeatmap, slide
           <span>{formatDate(start)}</span>
           <span>{formatDate(end)}</span>
         </datalist>
-        <button className="closebutton">Close heatmap</button>
+        <button className="closebutton" onClick={close}>Close heatmap</button>
       </div>
 
 }
