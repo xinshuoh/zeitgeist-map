@@ -34,7 +34,7 @@ def heat_map_popularity():
     d = {}
     #print("success")
     for pop in pops:
-        d[pop.country.name] = pop.position
+        d[pop.country.code] = pop.position
         #print(pop.position)
         #print(pop.country.name)
     #print("success2")
