@@ -12,12 +12,11 @@ import pycountry
 
 from models import *
 
-import dbupdate
-
 app = Flask(__name__)
 
 import rest_api
 import scrape
+import dbupdate
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'

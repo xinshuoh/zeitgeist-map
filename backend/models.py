@@ -3,7 +3,7 @@ from typing import List, Optional, Dict
 from datetime import date
 import pycountry
 
-from sqlalchemy import String, Integer, ForeignKey, Table, Column, Date
+from sqlalchemy import String, Integer, ForeignKey, Table, Column, Date, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from flask_sqlalchemy import SQLAlchemy
@@ -139,3 +139,16 @@ class GenreHasPopularity(db.Model):
 
     genre: Mapped[Genre] = relationship(back_populates="popularities")
     country: Mapped[Country] = relationship(back_populates="genre_popularities")
+
+
+class CountrySimilarity(db.Model):
+    __tablename__ = "country_similarity"
+
+    country1_id: Mapped[int] = mapped_column(ForeignKey("country.id"), primary_key=True)
+    country2_id: Mapped[int] = mapped_column(ForeignKey("country.id"), primary_key=True)
+
+    similarity: Mapped[float] = mapped_column(Float)
+
+    country1: Mapped[Country] = relationship(foreign_keys=country1_id)
+    
+    country2: Mapped[Country] = relationship(foreign_keys=country2_id)

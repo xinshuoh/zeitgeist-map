@@ -56,3 +56,7 @@ export function songCountryHistory(song_name: string) {
 export function searchComplete(prefix: string) {
 
 }
+
+export function heatMapPopularity(date: Date, name: string) {
+  return fetch(serverUrl+`/heat_map_popularity?date=${date.getFullYear()}-${date.getMonth().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}-${date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}&name=${name}`)
+}

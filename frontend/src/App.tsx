@@ -12,6 +12,8 @@ import useStableCallback from './useStableCallback';
 
 import mapStyler from './MapStyling';
 
+import { heatMapPopularity } from './Api';
+
 interface CountryData {
   countryName: string;
   countryCode: string;
@@ -193,6 +195,16 @@ function App() {
     map.openTooltip(mouseoverCountry as string, mouseoverCountryTooltipPosition as LatLng, { permanent: true });
   };
 
+  const viewPopularityHeatmap = () => {
+    console.log("viewing popularity heatmap for " + focusOptions.song.song_name);
+    heatMapPopularity(new Date(), focusOptions.song.song_name).then((res) => {
+      res.json().then(data => {
+        console.log(data)
+        setFocusOptions({song: undefined, isOpen: false})
+        mapStyle.activatePopularityHeatmap(data);
+      });
+    });
+  }
 
   const geoJsonLayer = <GeoJSON
       data={worldGeoJSON as GeoJSON.GeoJsonObject}
@@ -294,7 +306,7 @@ function App() {
         </MapContainer>
       </div>
 
-      <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions}></FocusView>
+      <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={viewPopularityHeatmap}></FocusView>
     </div>
   );
 }
