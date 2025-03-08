@@ -39,7 +39,7 @@ export default function mapStyler(geoJsonRef: any) {
     function activatePopularityHeatmap(data: PopularityData) {
         setPopularityData(data);
         setMapMode(MapMode.PopularityHeatmap);
-        geoJsonRef.current.resetStyle();
+        //geoJsonRef.current.resetStyle();
     }
 
     function activateSelecting() {

@@ -8,8 +8,6 @@ import { useState } from 'react';
 
 import {songCountryHistory} from './Api';
 
-var data = [{popularity: 100}, {popularity: 150}, {popularity: 125}, {popularity: 110}];
-
 interface FocusViewProps {
     focusOptions: any;
     setFocusOptions: any;

@@ -1,3 +1,5 @@
+import { formatDate } from "./Util";
+
 const serverUrl = "http://127.0.0.1:5000"
 
 export function ping() {
@@ -58,5 +60,5 @@ export function searchComplete(prefix: string) {
 }
 
 export function heatMapPopularity(date: Date, name: string) {
-  return fetch(serverUrl+`/heat_map_popularity?date=${date.getFullYear()}-${date.getMonth().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}-${date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}&name=${name}`)
+  return fetch(serverUrl+`/heat_map_popularity?date=${formatDate(date)}&name=${name}`)
 }

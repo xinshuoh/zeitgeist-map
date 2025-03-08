@@ -1,0 +1,29 @@
+.controlbox {
+    position: absolute;
+    top: 90vh;
+    width: 100vw;
+}
+
+.closebutton {
+    cursor: pointer;
+    position: absolute;
+    left: 75vw;
+}
+
+.heatmapslider {
+    position: absolute;
+    left: 40vw;
+    width: 30vw;
+    top: 0vh;
+}
+
+.timemarks {
+    position: absolute;
+    left: 37vw;
+    width: 36vw;
+    top: 4vh;
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+

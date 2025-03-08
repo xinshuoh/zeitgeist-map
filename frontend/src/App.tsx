@@ -8,6 +8,7 @@ import L, { geoJSON, LatLng, Layer, LeafletMouseEvent } from 'leaflet';
 import TaskBar from './TaskBar';
 import Sidebar from "./Sidebar";
 import FocusView from './FocusView';
+import HeatmapControl from './HeatmapControl';
 import useStableCallback from './useStableCallback';
 
 import mapStyler from './MapStyling';
@@ -92,6 +93,7 @@ function App() {
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
   const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, artist: undefined, isOpen: false});
+  const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
   
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
 
@@ -195,12 +197,14 @@ function App() {
     map.openTooltip(mouseoverCountry as string, mouseoverCountryTooltipPosition as LatLng, { permanent: true });
   };
 
-  const viewPopularityHeatmap = () => {
-    console.log("viewing popularity heatmap for " + focusOptions.song.song_name);
-    heatMapPopularity(new Date(), focusOptions.song.song_name).then((res) => {
+  const viewPopularityHeatmap = (date: Date) => {
+    if (heatmapSong == null) return
+    console.log("viewing popularity heatmap for " + heatmapSong);
+    console.log(date);
+    heatMapPopularity(date, heatmapSong).then((res) => {
       res.json().then(data => {
-        console.log(data)
-        setFocusOptions({song: undefined, isOpen: false})
+        //console.log(data)
+        //setFocusOptions({song: undefined, isOpen: false})
         mapStyle.activatePopularityHeatmap(data);
       });
     });
@@ -305,8 +309,8 @@ function App() {
 
         </MapContainer>
       </div>
-
-      <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={viewPopularityHeatmap}></FocusView>
+      <HeatmapControl start={new Date(2017, 2, 5)} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap}/>
+      <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {setHeatmapSong(focusOptions.song.song_name)}}></FocusView>
     </div>
   );
 }
