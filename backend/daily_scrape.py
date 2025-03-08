@@ -10,6 +10,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from time import sleep
 
 from models import *
+from rest_api import get_top_tracks
 
 class DailyScraper:
     def __init__(self, db):
@@ -103,7 +104,7 @@ class DailyScraper:
 
         kworb_countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
 
-        for country_code in ['gb', 'fr', 'de', 'es', 'us']:  # ['gb', 'fr', 'de', 'es', 'us'] for now for testing purposes
+        for country_code in ['gb', 'fr']:  # ['gb', 'fr', 'de', 'es', 'us'] for now for testing purposes
             response = requests.get(f'https://kworb.net/spotify/country/{country_code}_daily.html')
             # Check the page exists
             if response.status_code == 200:
@@ -242,7 +243,47 @@ class DailyScraper:
                     # if not g_pop:
                     g_pop = GenreHasPopularity(genre = g, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
                     self.db.session.add(g_pop)
-            
+
+
+    def get_today_track_names(self, country):
+        current_date = dt.datetime.now().date()
+        country_top_tracks = get_top_tracks(country, current_date)
+        tracks = set()
+        for entry in country_top_tracks:
+            tracks.add(entry['song_name'])
+        return tracks
+
+
+    def precompute_country_compare(self):
+        # delete the previous country compare data
+        db.session.execute(db.delete(CountrySimilarity))
+        db.session.commit()
+
+        countries = db.session.execute(db.select(Country)).scalars()  # Get all countries
+
+        # this loop should do every comparison once (not including comparing to itself)
+        for i in range(len(countries) - 1):
+            tracks1 = self.get_today_track_names(countries[i])
+            for j in range(i+1, len(countries)):
+                tracks2 = self.get_today_track_names(countries[j])
+                similarity = len(set.intersection(tracks1, tracks2)) / len(set.union(tracks1, tracks2))
+                comp = CountrySimilarity(country1_id=countries[i].id, country2_id = countries[j].id, similarity=similarity)
+                db.session.add(comp)
+        
+        db.session.commit()
+
+
+# @app.route('/country_compare')
+# def country_compare():
+#     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
+#     tracks = get_today_track_names(c)
+#     # TODO : deal better with when there is no match 
+#     return get_percentage_similarity(tracks, c.code)
+
+    
+    
+
+
     def scrape(self):
         self.reset()
         
@@ -253,6 +294,11 @@ class DailyScraper:
         self.populate_database(self.genre_popularity_measures, Genre)
 
         self.db.session.commit()
+
+        self.precompute_country_compare()
+
+    
+    
 
 
 if __name__ == "__main__":
