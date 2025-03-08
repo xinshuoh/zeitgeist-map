@@ -5,7 +5,8 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 enum MapMode {
     Plain,
     Heatmap,
-    Selecting
+    Selecting,
+    PopularityHeatmap
 }
 
 type CountrySimilarityData = {
@@ -19,9 +20,12 @@ type CountryCompareData = {
     origin: string;
 }
 
+type PopularityData = any
+
 export default function mapStyler(geoJsonRef: any) {
     const [mapMode, setMapMode] = useState<MapMode>(MapMode.Plain);
     const [heatmapData, setHeatmapData] = useState<CountryCompareData | undefined>(undefined);
+    const [popularityData, setPopularityData] = useState<PopularityData | undefined>(undefined);
     const [mouseoverFeature, setMouseoverFeature] = useState<any>(undefined);
 
     const getColor = (_population: any) => '#FFFFFF';
@@ -29,6 +33,12 @@ export default function mapStyler(geoJsonRef: any) {
     function activateHeatmap(data: CountryCompareData) {
         setHeatmapData(data);
         setMapMode(MapMode.Heatmap);
+        geoJsonRef.current.resetStyle();
+    }
+
+    function activatePopularityHeatmap(data: PopularityData) {
+        setPopularityData(data);
+        setMapMode(MapMode.PopularityHeatmap);
         geoJsonRef.current.resetStyle();
     }
 
@@ -79,6 +89,18 @@ export default function mapStyler(geoJsonRef: any) {
                     dashArray: '3,8',
                     fillOpacity: 0.8
                   });
+
+            case MapMode.PopularityHeatmap:
+                if (popularityData && feature?.properties?.wb_a2.toLowerCase() in popularityData) {
+                    const v = (200-popularityData[feature?.properties?.wb_a2.toLowerCase()])/199;
+                    const ccolor = `rgba(255, 0, 0)`;
+                    return { fillColor: ccolor, fillOpacity: v, weight: 1, color: '#361836' };
+                } else                 return ({
+                    fillColor: getColor(feature?.properties?.pop_est || 0),
+                    weight: 2,
+                    color: '#888888',
+                    fillOpacity: 0.8
+                  });
         }
     }
 
@@ -95,6 +117,7 @@ export default function mapStyler(geoJsonRef: any) {
         activateHeatmap, 
         activateSelecting,
         activatePlain,
+        activatePopularityHeatmap,
         mouseover, 
         mouseout
     };

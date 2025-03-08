@@ -13,9 +13,10 @@ var data = [{popularity: 100}, {popularity: 150}, {popularity: 125}, {popularity
 interface FocusViewProps {
     focusOptions: any;
     setFocusOptions: any;
+    viewPopularityHeatmap: any;
   }
 
-const FocusView = ({focusOptions, setFocusOptions}: FocusViewProps) => {
+const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: FocusViewProps) => {
 
     const [viewReady, setViewReady] = useState<boolean>(false);
     const [lineData, setLineData] = useState<any>([]);
@@ -66,7 +67,7 @@ const FocusView = ({focusOptions, setFocusOptions}: FocusViewProps) => {
     <YAxis />
   </LineChart>
   </div>   
-  <button className="heatmapButton">View heatmap</button>
+  <button className="heatmapButton" onClick={viewPopularityHeatmap}>View heatmap</button>
 </div>   : <p>Loading data...</p>}</>  
 )}}  
   </PopupComponent>
