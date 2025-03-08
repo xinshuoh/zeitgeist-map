@@ -84,15 +84,10 @@ const fetchCountryCompareData = async (countryCode: string) => {
 
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
-  const [selectedCountryCode, setSelectedCountryCode] = useState<string | null>(null);
   const [popupDetails, setPopupDetails] = useState<{ type: string; value: string } | null>(null);
-  const [previousLayer, setPreviousLayer] = useState<Layer | null>(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
-  const [isCountryCompareMode, setIsCountryCompareMode] = useState(false);
-  const [countrySimilarityData, setCountrySimilarityData] = useState<CountrySimilarityData[] | null>(null);
-  const [heatmapLayer, setHeatmapLayer] = useState<Layer | null>(null); 
   const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, isOpen: false});
   
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
@@ -119,27 +114,8 @@ function App() {
     setMouseoverCountryTooltipPosition(new LatLng(layer.feature?.properties?.centre_lat, layer.feature?.properties?.centre_lng));
     setMouseoverCountry(layer.feature?.properties?.name);
 
-    // layer.setStyle({
-    //   weight: 2.5,
-    //   color: '#666',
-    //   dashArray: '',
-    //   fillOpacity: 0.5
-    // });
-
     layer.bringToFront();
 
-    // if (selectedCountry?.countryName != e.target.feature?.properties.name) {
-      /*
-      layer.setStyle({
-        weight: 1,
-        color: '#361836',
-        dashArray: '',
-        fillOpacity: 0.5,
-      });
-
-      layer.bringToFront();
-      */
-    // }
   };
 
   const resetHighlight = (e: LeafletMouseEvent) => {
@@ -151,12 +127,6 @@ function App() {
     setMouseoverCountry(null);
     setMouseoverCountryTooltipPosition(undefined);
 
-    if (selectedCountry?.countryName === e.target.feature?.properties.name) {
-      return;
-    }
-    if (selectedCountry?.countryName != e.target.feature?.properties.name) {
-      layer.setStyle(mapStyle.styleFeature(e.target.feature));
-    }
     layer.setStyle(mapStyle.styleFeature(e.target.feature));
     layer.bringToBack();
   };
@@ -168,7 +138,6 @@ function App() {
 
     const countryCode = countryProp.wb_a2.toLowerCase();
 
-    setSelectedCountryCode(countryCode);
 
     layer.bringToFront(); 
 
@@ -184,10 +153,6 @@ function App() {
     const artistList = await fetchMusicStats(countryCode, "country_top_artists");
     const genreList = await fetchMusicStats(countryCode, "country_top_genres");
 
-    if (previousLayer) {
-      (previousLayer as L.Path).setStyle(mapStyle.styleFeature((previousLayer as any).feature));
-    }
-
     // only fires if you select a new country (avoids constantly replaying the same song - don't know if this feature is desirable)
     if (countryCode != selectedCountry?.countryCode) {
       setSelectedCountry({
@@ -202,7 +167,6 @@ function App() {
     }
 
     layer.bringToFront();
-    setPreviousLayer(layer);
 
   };
   const stableDisplayCountryData = useStableCallback(displayCountryData);
@@ -227,86 +191,6 @@ function App() {
     map.openTooltip(mouseoverCountry as string, mouseoverCountryTooltipPosition as LatLng, { permanent: true });
   };
 
-  // const doHeatMap = async () => {
-  //   const countrySimilarities: CountrySimilarityData[] = (await fetchCountryCompareData("gb")) as CountrySimilarityData[];
-    
-  //   // alert(countrySimilarities)
-  //   alert(JSON.stringify(countrySimilarities, null, 2));
-  // };
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  const HeatmapLayer = ({ data }: { data?: CountrySimilarityData[] }) => {
-    const map = useMap(); 
-    const [heatmapLayer, setHeatmapLayer] = useState<L.GeoJSON | null>(null);
-    const heatmapLayerRef = useRef<L.GeoJSON | null>(null);
-
-    useEffect(() => {
-      if (!map || !data) return;
-
-      if (heatmapLayerRef.current) { 
-        map.removeLayer(heatmapLayerRef.current);
-        console.log("heatmap layer in if remove block", heatmapLayerRef.current);
-        heatmapLayerRef.current = null;
-      }
-      const newLayer = L.geoJSON(worldGeoJSON as GeoJSON.GeoJsonObject, {
-        style: (feature) => {
-          const similarity = data?.find(c => c.country_code === feature?.properties?.wb_a2.toLowerCase())?.similarity ?? 0;
-          console.log("Similarity:", similarity, feature?.properties?.wb_a2.toLowerCase());
-          const ccolor = `rgba(255, 0, 0)`;
-          return { fillColor: ccolor, fillOpacity: similarity, weight: 1, color: '#361836' };
-        }
-      });
-  
-      newLayer.addTo(map);
-      newLayer.bringToFront();
-      sleep(5000).then(() => { 
-        map.removeLayer(newLayer);
-        setIsCountryCompareMode(false);
-        setCountrySimilarityData(null);
-        console.log("Heatmap removed after 20 seconds");
-      });
-
-
-      return () => {
-        if (heatmapLayerRef.current) {
-          setIsCountryCompareMode(false);
-          map.removeLayer(heatmapLayerRef.current);
-          heatmapLayerRef.current = null;
-          console.log("Heatmap removed on unmount");
-        }};
-    }, [map, data]); // runs when map or data changes
-    
-    // const exitCompareMode = () => {
-    //   console.log("Exiting compare mode");
-    
-    //   if (heatmapLayerRef.current) {
-    //     console.log("Removing heatmap layer:", heatmapLayerRef.current);
-    //     heatmapLayerRef.current.remove(); // Remove the heatmap layer immediately
-    //     heatmapLayerRef.current = null;
-    //     console.log("Heatmap layer removed");
-    //   } else {
-    //     console.log("No heatmap layer found when exiting compare mode");
-    //   }
-    
-    //   setIsCountryCompareMode(false);
-    // };
-    return null;
-  };
-
-  const exitCompareMode = () => {
-    console.log("exit entered");
-    console.log(heatmapLayer);
-    setIsCountryCompareMode(false);
-    setCountrySimilarityData(null);
-    if (heatmapLayer) {
-      heatmapLayer.remove(); // Remove the heatmap layer immediately
-      setHeatmapLayer(null); // Clear the reference
-      console.log("Heatmap layer removed thru button");
-    }
-    console.log(setIsCountryCompareMode);
-  };
 
   const geoJsonLayer = <GeoJSON
       data={worldGeoJSON as GeoJSON.GeoJsonObject}
@@ -314,9 +198,7 @@ function App() {
       onEachFeature={onEachFeature}
       ref={geoJsonRef}
     >
-      <HeatmapLayer data={countrySimilarityData || undefined} />
-
-      {selectedCountry && !isCountryCompareMode && (
+      {selectedCountry && countryCompareStatus == CountryCompareStatus.Disabled && (
         <Popup>
           <strong style={{ fontSize: 20 }}>{selectedCountry.countryName}</strong>
           
@@ -379,14 +261,8 @@ function App() {
       <div id="map-container" className="flex">
         <MapContainer center={[51.505, -0.09]} zoom={3} style={{ position: "static", top: "0px", left: "0px", "zIndex": "0" }}
           maxBounds={[[85, 180], [-85, -180]]} minZoom={3} maxZoom={5} zoomControl={false}>
-          {/* <TileLayer
-            attribution={CURRENT_TILE_LAYER.attribution}
-            url={CURRENT_TILE_LAYER.url}
-            noWrap={true}
-          /> 
-          tile layer not needed anymore */ }
+
           {geoJsonLayer}
-          {/* <HeatmapLayer data={countrySimilarityData || undefined} /> */}
 
           {mouseoverCountry && mouseoverCountryTooltipPosition &&
             (<Marker opacity={0} interactive={false} draggable={false} position={mouseoverCountryTooltipPosition}>
@@ -401,16 +277,13 @@ function App() {
                   setCountryCompareStatus(CountryCompareStatus.Disabled);
                   mapStyle.activatePlain();
                 }
-                //fetchCountryCompareData('gb').then((data) => mapStyle.activateHeatmap({similarities: data, origin: 'gb'}));
-                
-                //setIsCountryCompareMode((prev) => !prev);
                 //alert("How does one country's music taste compare with the rest of the world's? \nClick a country to see a heatmap animation! ");
               }} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
               {(() => {switch (countryCompareStatus) {
                 case CountryCompareStatus.Active: 
                   return "Close country compare"
                 case CountryCompareStatus.Selecting:
-                  return "Click a country to compare against"
+                  return <>Click a country to compare against<br />Click here again to cancel</>
                 case CountryCompareStatus.Disabled:
                   return "Activate country compare"
                 }})()}

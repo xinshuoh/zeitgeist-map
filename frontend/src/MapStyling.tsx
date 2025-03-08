@@ -24,7 +24,7 @@ export default function mapStyler(geoJsonRef: any) {
     const [heatmapData, setHeatmapData] = useState<CountryCompareData | undefined>(undefined);
     const [mouseoverFeature, setMouseoverFeature] = useState<any>(undefined);
 
-    const getColor = (population: any) => '#FFFFFF';
+    const getColor = (_population: any) => '#FFFFFF';
 
     function activateHeatmap(data: CountryCompareData) {
         setHeatmapData(data);
