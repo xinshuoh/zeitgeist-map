@@ -56,7 +56,13 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
                   <div>
                     {/* Display a FocusView for a song */}
                     <strong className="viewHeading">{song ? song.song_name : ""}</strong>
-                    <p className="viewSubheading"><span className="viewLink" onClick={() => setFocusOptions({isOpen: true, song: undefined, artist: song.artist})}>{song? song.artist : ""}</span></p> 
+                    <p className="viewSubheading">
+                      <span className="viewLink" onClick={() => {
+                        setFocusOptions({isOpen: true, song: undefined, artist: song.artist});
+                      }}>
+                        {song? song.artist : ""}
+                      </span>
+                    </p> 
 
                     {/* Display a FocusView for an artist */}
                     <strong className="viewHeading">{artist ? artist : ""}</strong>
