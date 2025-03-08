@@ -21,6 +21,8 @@ class Song(db.Model):
 
     artists: Mapped[List[Artist]] = relationship(secondary='credit', back_populates="songs")
 
+    genres: Mapped[List[Genre]] = relationship(secondary='has_genre', back_populates="songs")
+
     popularities: Mapped[List[SongHasPopularity]] = relationship(back_populates="song")
 
 
@@ -35,17 +37,9 @@ class Artist(db.Model):
 
     songs: Mapped[List[Song]] = relationship(secondary='credit', back_populates="artists")
 
-    genres: Mapped[List[Genre]] = relationship(secondary='has_genre', back_populates="artists")
+    # genres: Mapped[List[Genre]] = relationship(secondary='has_genre', back_populates="artists")
 
     popularities: Mapped[List[ArtistHasPopularity]] = relationship(back_populates="artist")
-
-
-credit = Table(
-    "credit",
-    db.Model.metadata,
-    Column("song_id", ForeignKey("song.id")),
-    Column("artist_id", ForeignKey("artist.id"))
-)
 
 
 class Genre(db.Model):
@@ -55,17 +49,11 @@ class Genre(db.Model):
 
     name: Mapped[str] = mapped_column(String(128), unique=True)
 
-    artists: Mapped[List[Artist]] = relationship(secondary='has_genre', back_populates="genres")
+    # artists: Mapped[List[Artist]] = relationship(secondary='has_genre', back_populates="genres")
+
+    songs: Mapped[List[Song]] = relationship(secondary='has_genre', back_populates="genres")
 
     popularities: Mapped[List[GenreHasPopularity]] = relationship(back_populates="genre")
-
-
-has_genre = Table(
-    "has_genre",
-    db.Model.metadata,
-    Column("artist_id", ForeignKey("artist.id")),
-    Column("genre_id", ForeignKey("genre.id"))
-)
 
 
 class Country(db.Model):
@@ -79,7 +67,23 @@ class Country(db.Model):
     song_popularities: Mapped[List[SongHasPopularity]] = relationship(back_populates="country")
     artist_popularities: Mapped[List[ArtistHasPopularity]] = relationship(back_populates="country")
     genre_popularities: Mapped[List[GenreHasPopularity]] = relationship(back_populates="country")
-#    today_popularities: Mapped[List[SongHasPopularityToday]] = relationship(back_populates="country")
+ 
+    # today_popularities: Mapped[List[SongHasPopularityToday]] = relationship(back_populates="country")
+
+
+credit = Table(
+    "credit",
+    db.Model.metadata,
+    Column("song_id", ForeignKey("song.id")),
+    Column("artist_id", ForeignKey("artist.id"))
+)
+
+has_genre = Table(
+     "has_genre",
+     db.Model.metadata,
+     Column("song_id", ForeignKey("song.id")),
+     Column("genre_id", ForeignKey("genre.id"))
+ )
 
 
 class SongHasPopularity(db.Model):
@@ -97,12 +101,13 @@ class SongHasPopularity(db.Model):
     country: Mapped[Country] = relationship(back_populates="song_popularities")
 
 
-#class SongHasPopularityToday(db.Model):
-#    __tablename__ = "song_has_popularity_today"
+# class SongHasPopularityToday(db.Model):
+#     __tablename__ = "song_has_popularity_today"
 
-#    popularity_id: Mapped[Integer] = mapped_column(ForeignKey("song_has_popularity.id"), primary_key=True)
+#     popularity_id: Mapped[Integer] = mapped_column(ForeignKey("song_has_popularity.id"), primary_key=True)
 
-#    popularity_entry: Mapped[SongHasPopularity] = relationship()
+#     popularity_entry: Mapped[SongHasPopularity] = relationship()
+
 
 class ArtistHasPopularity(db.Model):
     __tablename__ = "artist_has_popularity"
