@@ -48,7 +48,7 @@ const TaskBar: React.FC<TaskBarProps> = ({autocomplete}) => {
           {autocompleteOptions}
         </datalist>
         {/* <button className="compare-button" onClick={onCountryCompare}> */}
-        <img src="/countrycomparelogo2.png" alt="Zeitgeist Map" className="logo-image" />
+        {/* <img src="/countrycomparelogo2.png" alt="Zeitgeist Map" className="logo-image" /> */}
       </div>
     </div>
   );

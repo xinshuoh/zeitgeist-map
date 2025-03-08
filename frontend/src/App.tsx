@@ -32,6 +32,7 @@ type CountrySimilarityData = {
 interface FocusOptions {
   isOpen: boolean;
   song: any;
+  artist: any;
 }
 
 enum CountryCompareStatus {
@@ -90,7 +91,7 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
-  const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, isOpen: false});
+  const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, artist: undefined, isOpen: false});
   
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
 
@@ -171,6 +172,7 @@ function App() {
     layer.bringToFront();
 
   };
+
   const stableDisplayCountryData = useStableCallback(displayCountryData);
   const stableResetHighlight = useStableCallback(resetHighlight);
   const stableHighlightFeature = useStableCallback(highlightFeature);

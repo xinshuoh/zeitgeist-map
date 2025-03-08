@@ -21,57 +21,69 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
     const [viewReady, setViewReady] = useState<boolean>(false);
     const [lineData, setLineData] = useState<any>([]);
 
-    let song = focusOptions.song;
+  let song = focusOptions.song;
+  let artist = focusOptions.artist;
 
-    return (      
-        <div className="w-[300px] bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
-        <PopupComponent 
-        open={focusOptions.isOpen}
-        position="top left"
-        contentStyle={{
-            maxWidth: '600px',
-            width: '90%',
-            height: '80%'
-            }} modal 
-        onOpen={() => {
-            console.log(song);
-            songCountryHistory(song.song_name).then((v) => {
-                v.json().then((d) => {
-                    setLineData(d);
-                    setViewReady(true);
-                });
-            }
-        )}}
-        onClose={() => {
-            console.log("Closing")
-            setFocusOptions({song: undefined, isOpen: false})
+  return (      
+    <div className="w-[300px] bg-gray-200 rounded-lg shadow-md flex items-center justify-center">
+      <PopupComponent 
+        open = {focusOptions.isOpen}
+        position = "top left"
+        contentStyle = {{
+          maxWidth: '600px',
+          width: '90%',
+          height: '80%'
+        }} 
+        modal 
+        onOpen = {() => {
+          console.log(song);
+          songCountryHistory(song.song_name).then((v) => {
+            v.json().then((d) => {
+              setLineData(d);
+              setViewReady(true);
+            });
+          });
         }}
-        >
-{ close => {
-        return (
-<>{viewReady ? <div>
-  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
-    <div>
-      <strong className="viewHeading">{song? song.song_name : ""}</strong>
-      <p className="viewSubheading"><span className="viewLink" onClick={() => close()}>{song? song.artist : ""}</span></p> 
-    </div>
-    <div className="close" style={{color: "#333"}} onClick={() => {setFocusOptions({song: undefined, isOpen: false})}}>       
-      &times;         
-    </div>
-    
-  </div>
-  <div className="graph-container">
-  <LineChart width={500} height={200} data={lineData}>
-    <Line type="monotone" dataKey="popularity" stroke="#8884d8" strokeWidth={3} dot={false} isAnimationActive={false}/>
-    <CartesianGrid style={{backgroundColor: "#d6b8c3"}} stroke="#ccc" />
-    <YAxis />
-  </LineChart>
-  </div>   
-  <button className="heatmapButton" onClick={viewPopularityHeatmap}>View heatmap</button>
-</div>   : <p>Loading data...</p>}</>  
-)}}  
-  </PopupComponent>
+        onClose = {() => {
+          console.log("Closing");
+          setFocusOptions({song: undefined, artist: undefined, isOpen: false});
+        }}
+      >
+        { close => { return (
+          <>
+            {
+              viewReady ? 
+              <div>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "10px"}}>
+                  <div>
+                    {/* Display a FocusView for a song */}
+                    <strong className="viewHeading">{song ? song.song_name : ""}</strong>
+                    <p className="viewSubheading"><span className="viewLink" onClick={() => setFocusOptions({isOpen: true, song: undefined, artist: song.artist})}>{song? song.artist : ""}</span></p> 
+
+                    {/* Display a FocusView for an artist */}
+                    <strong className="viewHeading">{artist ? artist : ""}</strong>
+                  </div>
+                  <div className="close" style={{color: "#333"}} onClick={() => close()}>       
+                    &times;         
+                  </div> 
+                </div>
+
+                <div className="graph-container">
+                  <LineChart width={500} height={200} data={lineData}>
+                    <Line type="monotone" dataKey="popularity" stroke="#8884d8" strokeWidth={3} dot={false} isAnimationActive={false}/>
+                    <CartesianGrid style={{backgroundColor: "#d6b8c3"}} stroke="#ccc" />
+                    <YAxis />
+                  </LineChart>
+                </div> 
+
+                <button className="heatmapButton" onClick={viewPopularityHeatmap}>View heatmap</button>
+              </div> : <p>Loading data...</p>
+            }
+          </>
+        )}}  
+      </PopupComponent>
     </div>   
-          )}
+  )
+}
 
 export default FocusView;
