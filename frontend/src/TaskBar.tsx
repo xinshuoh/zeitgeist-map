@@ -20,13 +20,14 @@ const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, o
           <img src="/zeitgeistlogo.png" alt="Zeitgeist Map" className="logo-image w-25" />
         </button>
 
+        <div className="search-container">
+          <SearchBar
+            onSelect={(item) => console.log(item)}
+            setFocusOptions={setFocusOptions}
+            autocomplete={autocomplete} />
+          </div>
 
-        <SearchBar
-          onSelect={(item) => console.log(item)}
-          setFocusOptions={setFocusOptions}
-          autocomplete={autocomplete} />
-
-        <button className="w-25 h-full text-[10px] pl-1 pr-1  bg-white text-gray-600 font-bold text-center cursor-pointer hover:bg-gray-200 table-cell align-middle"
+        <button className="compare"
           onClick={onCountryCompare}>
           {(() => {
             switch (countryCompareStatus) {

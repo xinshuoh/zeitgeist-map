@@ -8,6 +8,16 @@
     cursor: pointer;
     position: absolute;
     left: 88vw;
+    color:white;
+    background-color: #361836;
+    opacity: 100%;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+    border-radius: 4px;
+    
 }
 
 .heatmapslider {
@@ -15,7 +25,25 @@
     left: 25vw;
     width: 60vw;
     top: 0vh;
+
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    background: #b0b0b0; /* Grey background */
+    opacity: 0.99; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+    border-radius: 8px;  
 }
+
+.heatmapslider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; 
+    border-radius: 7px;
+    background: #361836;
+    cursor: pointer; 
+  }
 
 .timemarks {
     position: absolute;
@@ -27,3 +55,8 @@
     justify-content: space-between;
   }
 
+.timemarks span{
+    color:white;
+    background-color: grey;
+    opacity: 80%
+}

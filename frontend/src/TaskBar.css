@@ -1,3 +1,9 @@
+.taskbar .search-container {
+  display: flex;
+  justify-content: center;
+
+}
+
 .taskbar .logo-button {
   background-color: transparent;
   padding: 0;
@@ -14,4 +20,26 @@
   background-color: #ffa7c9;
   padding: 4px;
 
+}
+.taskbar .compare {
+  height: 100%;
+  font-size: 10px;
+  background-color: #d0a4b4;
+  color: #4b5563; 
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  display: table-cell;
+  vertical-align: middle;
+  transition: background-color 0.2s ease-in-out;
+  min-width: 6rem; 
+  width: max-content; 
+  max-width: 100%; 
+  padding: 4px 8px;
+  text-align: center;
+  white-space: nowrap; 
+}
+
+.compare:hover {
+  background-color: #e5e7eb; 
 }
