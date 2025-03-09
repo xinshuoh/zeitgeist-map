@@ -30,12 +30,12 @@ const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, o
           </button>
         </div>
 
-        <div className="search-container">
+        <div className="search-container absolute left-110">
           <SearchBar
             onSelect={(item) => console.log(item)}
             setFocusOptions={setFocusOptions}
             autocomplete={autocomplete} />
-          </div>
+        </div>
 
         <button className="compare"
           onClick={onCountryCompare}>
