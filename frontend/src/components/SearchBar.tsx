@@ -69,9 +69,9 @@ export const SearchBar = ({ onSelect, autocomplete, setFocusOptions }: SearchBar
             tabIndex={1}
             onKeyDown={handleKeyDown}
             onBlur={resetSearchComplete}
-            className="pt-1 h-full self-start flex-row items-center relative z-2 outline-none">
+            className="h-full self-start flex-row items-center relative z-2 outline-none">
             <input type="text" list="search-autocomplete"
-                className={`m-0 w-150 search-button p-2 bg-[#d0a4b4] text-center text-black cursor-text
+                className={`w-150 p-2 bg-[#d0a4b4] text-center text-black cursor-text outline-none
                     ${showResults ? "rounded-t-lg" : "rounded-lg"} border-[#361836]`}
                 placeholder="Search through songs/artists/genres here..."
                 value={input}
