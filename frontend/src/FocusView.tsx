@@ -53,20 +53,29 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
               viewReady ? 
               <div>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "10px"}}>
-                  <div>
+                    
                     {/* Display a FocusView for a song */}
-                    <strong className="viewHeading">{song ? song.song_name : ""}</strong>
-                    <p className="viewSubheading">
-                      <span className="viewLink" onClick={() => {
-                        setFocusOptions({isOpen: true, song: undefined, artist: song.artist});
-                      }}>
-                        {song? song.artist : ""}
-                      </span>
-                    </p> 
+                    {song && 
+                      <div>
+                        <strong className="viewHeading">{song ? song.song_name : ""}</strong>
+                        
+                        <p className="viewSubheading">
+                          <span className="viewLink" onClick={() => {
+                            setFocusOptions({isOpen: true, song: undefined, artist: song.artist});
+                            }}>
+                            {song? song.artist : ""}
+                          </span>
+                        </p> 
+                      </div>
+                    }
 
                     {/* Display a FocusView for an artist */}
-                    <strong className="viewHeading">{artist ? artist : ""}</strong>
-                  </div>
+                    {artist && 
+                      <div>
+                        <strong className="viewHeading">{artist ? artist : ""}</strong>
+                      </div>
+                    }
+
                   <div className="close" style={{color: "#333"}} onClick={() => close()}>       
                     &times;         
                   </div> 

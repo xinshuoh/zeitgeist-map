@@ -46,7 +46,20 @@ export function countryCompare(countryCode: string) {
     });
     xhr.send()
     return res
-  };
+};
+
+export function songTopCountries(songName: string) {
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', serverUrl+`/song_popularity?name=${songName}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText)
+      resolve(data)
+    })
+  });
+  xhr.send()
+  return res
+}
 
 export function songCountryHistory(song_name: string) {
     console.log("api call")
