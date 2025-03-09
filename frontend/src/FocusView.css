@@ -17,16 +17,16 @@
 .heatmapButton {
     cursor:pointer;
     padding: 5px;
-    background-color: #eaeadd;
+    background-color: #361836;
     margin: 10px;
 }
 
 .heatmapButton:hover {
-    background-color: #cfcfc2;
+    opacity: 90%
 }
 
 .viewLink {
-    color: purple;
+    color: #361836;
     text-decoration: underline;
     cursor: pointer;
 }

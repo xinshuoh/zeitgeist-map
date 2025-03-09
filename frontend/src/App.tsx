@@ -212,14 +212,71 @@ function App() {
       });
     });
   }
+  const HeatmapLegend = ({ countryCompareStatus }: { countryCompareStatus: CountryCompareStatus }) => {
+    const map = useMap();
+  
+    useEffect(() => {
+      if (countryCompareStatus !== CountryCompareStatus.Active) {
+        return; 
+      }
+  
+      const indexColor = [
+        '#FFCCCC',// Very light red (Low similarity)
+        '#FFAAAA',
+        '#FF6666',
+        '#FF4444',
+        '#FF0000',
+        '#D50000',
+        '#AA0000',  // Dark red (High similarity)
+      ];
 
+      const legend = new L.Control({ position: "bottomright" });
+
+      legend.onAdd = function () {
+        const div = L.DomUtil.create("div", "heatmap-legend");
+        div.innerHTML = `
+          <div style="background: white; padding: 8px; border-radius: 5px; font-size: 12px; color:black; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+            <strong>Similarity Index</strong>
+            <div style="margin-top: 5px;">
+              ${indexColor.map((color, index) => `
+                <div style="display: flex; align-items: center; margin-top: 5px;">
+                  <span style="background: ${color}; width: 20px; height: 10px; display: inline-block; margin-right: 5px;"></span> 
+                  ${getLabelForIndex(index)}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        return div;
+      };
+  
+      legend.addTo(map);
+  
+      return () => {
+        legend.remove();
+      };
+    }, [map, countryCompareStatus]);
+
+    const getLabelForIndex = (index: number) => {
+      if (index === 0) {
+        return 'Very Low';
+      } else if (index === 6) {
+        return 'Very High';
+      }
+      return index < 7 / 2 ? 'Low' : 'High';
+    };
+
+    return null;
+};
+
+  
   const geoJsonLayer = <GeoJSON
     data={worldGeoJSON as GeoJSON.GeoJsonObject}
     style={mapStyle.styleFeature} //sets unclicked default style
     onEachFeature={onEachFeature}
     ref={geoJsonRef}
   >
-    {selectedCountry && countryCompareStatus == CountryCompareStatus.Disabled && (
+    {selectedCountry && countryCompareStatus == CountryCompareStatus.Disabled && popularityHeatmapStatus == PopularityHeatmapStatus.Disabled && (
       <Popup>
         <strong style={{ fontSize: 20 }}>{selectedCountry.countryName}</strong>
 
@@ -288,6 +345,7 @@ function App() {
           countryCompareStatus={countryCompareStatus}
           onCountryCompare={() => {
             if (countryCompareStatus == CountryCompareStatus.Disabled) {
+              setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
               setCountryCompareStatus(CountryCompareStatus.Selecting);
               mapStyle.activateSelecting();
             } else {
@@ -312,6 +370,7 @@ function App() {
             </Marker> // shows country name on mouseover
             )}
 
+        <HeatmapLegend countryCompareStatus={countryCompareStatus} />
 
         </MapContainer>
       </div>
