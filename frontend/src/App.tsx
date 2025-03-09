@@ -379,6 +379,11 @@ function App() {
           setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
           mapStyle.activatePlain();
         }} />}
+        {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
+            <div style={{ position: 'absolute', top: '10%', left: '40%', backgroundColor: '#361836', padding: '5px', borderRadius: '5px', zIndex: 1000 }}>
+            Popularity Heat Map for: {heatmapSong}
+            </div>
+        )}
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);

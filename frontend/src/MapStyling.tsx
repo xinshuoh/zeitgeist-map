@@ -119,7 +119,7 @@ export default function mapStyler(geoJsonRef: any) {
             case MapMode.PopularityHeatmap:
                 if (popularityData && feature?.properties?.wb_a2.toLowerCase() in popularityData) {
                     const v = (200-popularityData[feature?.properties?.wb_a2.toLowerCase()])/199;
-                    const ccolor = `rgba(255, 0, 0)`;
+                    const ccolor = `#AA0000`;
                     return { fillColor: ccolor, fillOpacity: v, weight: 1, color: '#d0d0d0' };
                 } else                 return ({
                     fillColor: getColor(feature?.properties?.pop_est || 0),
