@@ -281,7 +281,7 @@ function App() {
   return (
     <div id="global">
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
-        <TaskBar autocomplete={fetchSearchComplete} />
+        <TaskBar autocomplete={fetchSearchComplete} setFocusOptions={setFocusOptions}/>
         <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} setFocusOptions={setFocusOptions}/>
       </div>
 
