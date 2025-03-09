@@ -235,4 +235,7 @@ def country_compare():
 @args(p('prefix'))
 def search_complete():
     c = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
-    return list(map(lambda song : song.name, c))
+    a = db.session.execute(db.select(Artist).where(Artist.name.startswith(request.args['prefix']))).scalars()
+    song_names = list(map(lambda song: song.name, c))
+    artist_names = list(map(lambda artist: artist.name, a))
+    return list(set(song_names) | set(artist_names))

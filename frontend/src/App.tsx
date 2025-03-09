@@ -343,6 +343,7 @@ function App() {
           autocomplete={fetchSearchComplete}
           setFocusOptions={setFocusOptions}
           countryCompareStatus={countryCompareStatus}
+          setHelpOptions={undefined}
           onCountryCompare={() => {
             if (countryCompareStatus == CountryCompareStatus.Disabled) {
               setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
@@ -352,8 +353,7 @@ function App() {
               setCountryCompareStatus(CountryCompareStatus.Disabled);
               mapStyle.activatePlain();
             }
-            //alert("How does one country's music taste compare with the rest of the world's? \nClick a country to see a heatmap animation! ");
-          }} />
+          } }  />
         <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} setFocusOptions={setFocusOptions} />
 
       </div>

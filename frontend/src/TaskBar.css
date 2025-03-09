@@ -38,6 +38,7 @@
   padding: 4px 8px;
   text-align: center;
   white-space: nowrap; 
+  border-radius: 6px;
 }
 
 .compare:hover {
