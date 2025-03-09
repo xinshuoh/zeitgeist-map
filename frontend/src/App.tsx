@@ -390,6 +390,7 @@ function App() {
         setFocusOptions({ song: undefined, artist: undefined, isOpen: false });
         setSidebarOpen(false);
         setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
+        setCountryCompareStatus(CountryCompareStatus.Disabled);
         viewPopularityHeatmap(new Date(), focusOptions.song.song_name);
       }}></FocusView>
     </div>
