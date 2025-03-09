@@ -101,10 +101,10 @@ export default function mapStyler(geoJsonRef: any) {
                 if (similarity === 0) {
                     return { fillColor: '#FFFFFF', fillOpacity: 1, weight: 1, color: '#d0d0d0' };
                 }
-                const colorIndex = Math.min(Math.floor(4 * similarity * indexColor.length), indexColor.length - 1);
+                const colorIndex = Math.min(Math.floor(3 * similarity * indexColor.length), indexColor.length - 1);
                 const fillColor = indexColor[colorIndex];
 
-            return { fillColor, fillOpacity: 0.7, weight: 1, color: '#d0d0d0' };
+            return { fillColor, fillOpacity: 1, weight: 1, color: '#d0d0d0' };
 
 
             case MapMode.Selecting:

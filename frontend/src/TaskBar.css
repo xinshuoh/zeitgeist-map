@@ -43,3 +43,10 @@
 .compare:hover {
   background-color: #e5e7eb; 
 }
+
+.help-button{
+  padding-left: 15px;
+}
+.help-button:hover{
+  cursor: pointer;
+}
