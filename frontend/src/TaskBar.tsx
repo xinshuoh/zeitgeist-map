@@ -3,7 +3,7 @@ import { SearchBar } from './components/SearchBar';
 
 interface TaskBarProps {
   onCountryCompare: () => void;
-  setFocusOptions: () => void;
+  setFocusOptions: any;
   autocomplete: any;
 }
 
