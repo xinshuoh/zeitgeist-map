@@ -4,7 +4,7 @@ import ChartBox from "./ChartBox";
 import { useEffect, useRef } from 'react';
 
 
-const data = [{popularity: 100}, {popularity: 150}, {popularity: 125}, {popularity: 110}];
+const data = [{ popularity: 100 }, { popularity: 150 }, { popularity: 125 }, { popularity: 110 }];
 
 interface SidebarProps {
     isOpen: boolean;
@@ -35,9 +35,9 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
             IFrameAPI.createController(element, {}, callback);
         };
     }, []);
-    
+
     const updateSong = () => {
-        if (!controllerRef.current)  {
+        if (!controllerRef.current) {
             return;
         } else if (!selectedCountry?.songList?.length) {
             return;

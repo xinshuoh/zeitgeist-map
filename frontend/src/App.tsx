@@ -36,7 +36,7 @@ interface FocusOptions {
   artist: any;
 }
 
-enum CountryCompareStatus {
+export enum CountryCompareStatus {
   Disabled,
   Selecting,
   Active
@@ -97,9 +97,9 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
-  const [focusOptions, setFocusOptions] = useState<FocusOptions>({song: undefined, artist: undefined, isOpen: false});
+  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false });
   const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
-  
+
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
   const [popularityHeatmapStatus, setPopularityHeatmapStatus] = useState<PopularityHeatmapStatus>(PopularityHeatmapStatus.Disabled);
 
@@ -109,7 +109,7 @@ function App() {
 
   // this would run it on first render, but means server crash isnt detected until page is reloaded
   //useEffect(() => {
-    //pingServer();
+  //pingServer();
   //}, []);
 
   const geoJsonRef = useRef<any | null>(null);
@@ -150,12 +150,12 @@ function App() {
     const countryCode = countryProp.wb_a2.toLowerCase();
 
 
-    layer.bringToFront(); 
+    layer.bringToFront();
 
     if (countryCompareStatus == CountryCompareStatus.Selecting) {
       console.log("Country compare requested, origin: " + countryCode);
       setCountryCompareStatus(CountryCompareStatus.Active);
-      fetchCountryCompareData(countryCode).then((data) => mapStyle.activateHeatmap({similarities: data, origin: countryCode}));
+      fetchCountryCompareData(countryCode).then((data) => mapStyle.activateHeatmap({ similarities: data, origin: countryCode }));
     } else {
       setSidebarOpen(true);
     }
@@ -203,7 +203,7 @@ function App() {
     map.openTooltip(mouseoverCountry as string, mouseoverCountryTooltipPosition as LatLng, { permanent: true });
   };
 
-  const viewPopularityHeatmap = (date: Date, song_name: string|undefined) => {
+  const viewPopularityHeatmap = (date: Date, song_name: string | undefined) => {
     var song = song_name || heatmapSong;
     if (!song) return;
     heatMapPopularity(date, song).then((res) => {
@@ -214,75 +214,90 @@ function App() {
   }
 
   const geoJsonLayer = <GeoJSON
-      data={worldGeoJSON as GeoJSON.GeoJsonObject}
-      style={mapStyle.styleFeature} //sets unclicked default style
-      onEachFeature={onEachFeature}
-      ref={geoJsonRef}
-    >
-      {selectedCountry && countryCompareStatus == CountryCompareStatus.Disabled && (
-        <Popup>
-          <strong style={{ fontSize: 20 }}>{selectedCountry.countryName}</strong>
-          
-          <br/>
-          <br/>
+    data={worldGeoJSON as GeoJSON.GeoJsonObject}
+    style={mapStyle.styleFeature} //sets unclicked default style
+    onEachFeature={onEachFeature}
+    ref={geoJsonRef}
+  >
+    {selectedCountry && countryCompareStatus == CountryCompareStatus.Disabled && (
+      <Popup>
+        <strong style={{ fontSize: 20 }}>{selectedCountry.countryName}</strong>
 
-          <div className="flex justify-centre">
-            <div>
-              <ul>
-                {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
-                  <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>{index + 1}. {song.song_name} </li>
-                )}
-              </ul>
-            </div>
-            <div>
-              <ul>
-                {selectedCountry.songList.slice(0, 5).map((song: any, index: number) => 
-                  <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap"}}>&nbsp;- {song.artist}</li>
-                )}
-              </ul>
-            </div>
-            
-          
+        <br />
+        <br />
+
+        <div className="flex justify-centre">
+          <div>
+            <ul>
+              {selectedCountry.songList.slice(0, 5).map((song: any, index: number) =>
+                <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>{index + 1}. {song.song_name} </li>
+              )}
+            </ul>
           </div>
-          <br/>
+          <div>
+            <ul>
+              {selectedCountry.songList.slice(0, 5).map((song: any, index: number) =>
+                <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>&nbsp;- {song.artist}</li>
+              )}
+            </ul>
+          </div>
 
-          <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
-            Top Artist: {selectedCountry.artistList?.[0]?.artist_name || "N/A"} 
-          </span>
-          
-          <br/>
-          <br/>
 
-          <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
-            Top Genre: {selectedCountry.genreList?.[0]?.genre_name || "N/A"}
-          </span>
+        </div>
+        <br />
 
-        </Popup>
-      )}
+        <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
+          Top Artist: {selectedCountry.artistList?.[0]?.artist_name || "N/A"}
+        </span>
 
-      {popupDetails && ( // for the secondary pop up 
-        <Popup>
-          <strong>{popupDetails.type.toUpperCase()}</strong><br />
-          {popupDetails.value}<br />
-          <p>More details about {popupDetails.value}...</p>
-          <button onClick={() => setPopupDetails(null)}>Close</button>
-        </Popup>
-      )}
+        <br />
+        <br />
 
-    </GeoJSON>
+        <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
+          Top Genre: {selectedCountry.genreList?.[0]?.genre_name || "N/A"}
+        </span>
+
+      </Popup>
+    )}
+
+    {popupDetails && ( // for the secondary pop up 
+      <Popup>
+        <strong>{popupDetails.type.toUpperCase()}</strong><br />
+        {popupDetails.value}<br />
+        <p>More details about {popupDetails.value}...</p>
+        <button onClick={() => setPopupDetails(null)}>Close</button>
+      </Popup>
+    )}
+
+  </GeoJSON>
 
   const sliderRef = useRef<any | null>(null);
 
   useEffect(() => {
     if (sliderRef.current) sliderRef.current.value = sliderRef.current.max;
   }, [popularityHeatmapStatus]);
-  
+
 
   return (
     <div id="global">
       <div id="map" className="w-0 h-full fixed top-0 left-0 z-1">
-        <TaskBar autocomplete={fetchSearchComplete} />
-        <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} setFocusOptions={setFocusOptions}/>
+
+        <TaskBar
+          autocomplete={fetchSearchComplete}
+          setFocusOptions={setFocusOptions}
+          countryCompareStatus={countryCompareStatus}
+          onCountryCompare={() => {
+            if (countryCompareStatus == CountryCompareStatus.Disabled) {
+              setCountryCompareStatus(CountryCompareStatus.Selecting);
+              mapStyle.activateSelecting();
+            } else {
+              setCountryCompareStatus(CountryCompareStatus.Disabled);
+              mapStyle.activatePlain();
+            }
+            //alert("How does one country's music taste compare with the rest of the world's? \nClick a country to see a heatmap animation! ");
+          }} />
+        <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} setFocusOptions={setFocusOptions} />
+
       </div>
 
       <div id="map-container" className="flex">
@@ -296,41 +311,23 @@ function App() {
               <Tooltip className='bg-blue-500' direction="bottom" offset={[-15, 17]} permanent>{mouseoverCountry}</Tooltip>
             </Marker> // shows country name on mouseover
             )}
-          <button className ="country-compare" onClick={() => {
-                if (countryCompareStatus == CountryCompareStatus.Disabled) {
-                  setCountryCompareStatus(CountryCompareStatus.Selecting);
-                  mapStyle.activateSelecting();
-                } else {
-                  setCountryCompareStatus(CountryCompareStatus.Disabled);
-                  mapStyle.activatePlain();
-                }
-                //alert("How does one country's music taste compare with the rest of the world's? \nClick a country to see a heatmap animation! ");
-              }} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
-              {(() => {switch (countryCompareStatus) {
-                case CountryCompareStatus.Active: 
-                  return "Close country compare"
-                case CountryCompareStatus.Selecting:
-                  return <>Click a country to compare against<br />Click here again to cancel</>
-                case CountryCompareStatus.Disabled:
-                  return "Activate country compare"
-                }})()}
-              </button>          
+
 
         </MapContainer>
       </div>
       {popularityHeatmapStatus == PopularityHeatmapStatus.Active && <HeatmapControl start={new Date(2017, 2, 5)} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap} sliderRef={sliderRef}
-      close={() => {
-        setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
-        mapStyle.activatePlain();
-      }}/>}
-      
+        close={() => {
+          setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
+          mapStyle.activatePlain();
+        }} />}
+
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);
-        setFocusOptions({song: undefined, artist: undefined, isOpen: false});
+        setFocusOptions({ song: undefined, artist: undefined, isOpen: false });
         setSidebarOpen(false);
         setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
         viewPopularityHeatmap(new Date(), focusOptions.song.song_name);
-        }}></FocusView>
+      }}></FocusView>
     </div>
   );
 }

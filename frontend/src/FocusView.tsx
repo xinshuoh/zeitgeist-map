@@ -1,6 +1,6 @@
 import './FocusView.css';
 
-import {Popup as PopupComponent} from 'reactjs-popup';
+import { Popup as PopupComponent } from 'reactjs-popup';
 
 import { LineChart, Line, CartesianGrid, YAxis } from 'recharts';
 
@@ -16,8 +16,8 @@ interface FocusViewProps {
 
 const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: FocusViewProps) => {
 
-    const [viewReady, setViewReady] = useState<boolean>(false);
-    const [lineData, setLineData] = useState<any>([]);
+  const [viewReady, setViewReady] = useState<boolean>(false);
+  const [lineData, setLineData] = useState<any>([]);
 
   let song = focusOptions.song;
   let artist = focusOptions.artist;
