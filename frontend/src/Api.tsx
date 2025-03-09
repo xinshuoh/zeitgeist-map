@@ -49,15 +49,7 @@ export function countryCompare(countryCode: string) {
 };
 
 export function songTopCountries(songName: string) {
-  var xhr = new XMLHttpRequest()
-  xhr.open('GET', serverUrl+`/song_popularity?name=${songName}`)
-  var res = new Promise((resolve, reject) => {
-    xhr.addEventListener('load', () => {
-      var data = JSON.parse(xhr.responseText)
-      resolve(data)
-    })
-  });
-  xhr.send()
+  const res = fetch(serverUrl+`/song_top_countries?name=${songName}`)
   return res
 }
 

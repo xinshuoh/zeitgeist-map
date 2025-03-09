@@ -57,6 +57,21 @@ def track_popularity():
         'popularity': {p.country.code: p.position for p in v.popularities}})
     return res
 
+@app.route("/song_top_countries")
+# @args(p("song_id")|p("name"))
+def song_top_countries():
+    if 'song_id' in request.args:
+        vals = list(db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalars())
+    if 'name' in request.args:
+        vals = list(db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalars())
+    res = []
+    if vals:
+        v = vals[0]
+        for p in sorted(v.popularities, key=lambda x : x.position):
+            res.append({'country_name': p.country.name, 'position': p.position})
+
+    return res
+
 
 @app.route("/country_top_tracks")
 # @args(p("country_code"))

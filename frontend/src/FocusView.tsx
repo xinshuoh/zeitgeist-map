@@ -6,7 +6,7 @@ import { LineChart, Line, CartesianGrid, YAxis } from 'recharts';
 
 import { useState } from 'react';
 
-import {songCountryHistory} from './Api';
+import {songCountryHistory, songTopCountries} from './Api';
 
 interface FocusViewProps {
     focusOptions: any;
@@ -18,6 +18,7 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
 
   const [viewReady, setViewReady] = useState<boolean>(false);
   const [lineData, setLineData] = useState<any>([]);
+  const [topCountries, setTopCountries] = useState<any>([]);
 
   let song = focusOptions.song;
   let artist = focusOptions.artist;
@@ -39,6 +40,11 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
             v.json().then((d) => {
               setLineData(d);
               setViewReady(true);
+            });
+          });
+          songTopCountries(song.song_name).then((v) => {
+            v.json().then((d) => {
+              setTopCountries(d || []);
             });
           });
         }}
@@ -65,7 +71,26 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
                             }}>
                             {song? song.artist : ""}
                           </span>
-                        </p> 
+                        </p>
+                        <br></br>
+                        <strong style={{ color: '#fff' }}>Global Popularity</strong>
+                        <div className="flex justify-centre">
+                          
+                          <div>
+                            <ul>
+                              {topCountries.slice(0, 5).map((country: any) =>
+                                <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>{country.country_name}: </li>
+                              )}
+                            </ul>
+                          </div>
+                          <div>
+                            <ul>
+                              {topCountries.slice(0, 5).map((country: any) =>
+                                <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>&nbsp; #{country.position} in charts</li>
+                              )}
+                            </ul>
+                          </div>
+                        </div>
                       </div>
                     }
 
