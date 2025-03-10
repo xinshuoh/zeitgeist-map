@@ -143,7 +143,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
         <div className="relative w-full h-screen flex">
             <div className={`h-full transition-all ${isOpen ? "w-100" : "w-0"} z-1`}>
                 <div className={`h-full flex-col border-r border-gray-300 shadow-lg overflow-y-scroll min-h-[calc(100%+40px)]`}
-                    style={{ scrollbarWidth: "thin", backgroundColor: '#330033' }}>
+                    style={{ scrollbarWidth: "thin", backgroundColor: '#d6b8c3' }}>
 
                     <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
                         <div className={`
@@ -153,7 +153,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                     </div>
 
                     <div className="w-full flex justify-center p-4">
-                        <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white" style={{ backgroundColor: '#d6b8c3' }}>
+                        <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white" style={{ backgroundColor: '#330033' }}>
                             <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
                             <div id="embed-iframe"></div>
                         </div>
