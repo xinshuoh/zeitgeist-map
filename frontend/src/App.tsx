@@ -102,18 +102,28 @@ function App() {
 
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
   const [popularityHeatmapStatus, setPopularityHeatmapStatus] = useState<PopularityHeatmapStatus>(PopularityHeatmapStatus.Disabled);
+  
+  const [forceRenderKey, setForceRenderKey] = useState(0);
 
   const sidebarToggleHandler = () => {
     setSidebarOpen(curr => !curr);
   }
 
-  // this would run it on first render, but means server crash isnt detected until page is reloaded
-  //useEffect(() => {
-  //pingServer();
-  //}, []);
-
   const geoJsonRef = useRef<any | null>(null);
   const mapStyle = mapStyler(geoJsonRef);
+
+
+  // hacky fix to issue on startup - load an empty country
+  useEffect(() => { 
+    setSelectedCountry({
+      countryName: 'loading...',
+      countryCode: 'loading...',
+      songList: [],
+      artistList: [],
+      genreList: [],
+      streams: "todo"
+    });
+  }, []);
 
   const highlightFeature = (e: LeafletMouseEvent) => {
 
@@ -142,14 +152,35 @@ function App() {
   };
 
   const displayCountryData = async (e: LeafletMouseEvent) => {
+    // get the layer and bring it to front straight away
     const layer = e.target;
-    const countryProp = layer.feature?.properties;
-    if (!countryProp) return;
-
-    const countryCode = countryProp.wb_a2.toLowerCase();
-
     layer.bringToFront();
 
+    // extract the country code
+    const countryProp = layer.feature?.properties;
+    if (!countryProp) return;
+    const countryCode = countryProp.wb_a2.toLowerCase();  
+
+    // set the selected country - with all the relevant data
+    // only fires if you select a new country 
+    if (countryCode != selectedCountry?.countryCode) {
+      const songList = await fetchMusicStats(countryCode, "country_top_tracks");
+      const artistList = await fetchMusicStats(countryCode, "country_top_artists");
+      const genreList = await fetchMusicStats(countryCode, "country_top_genres");
+      
+      setSelectedCountry({
+        countryName: countryProp.name,
+        countryCode: countryCode,
+        songList: songList,
+        artistList: artistList,
+        genreList: genreList,
+        streams: "todo"
+      });
+
+      // setForceRenderKey(prev => prev + 1);
+    }
+
+    // opens the correct thing, but with selected country already set
     if (countryCompareStatus == CountryCompareStatus.Selecting) {
       console.log("Country compare requested, origin: " + countryCode);
       setCountryCompareStatus(CountryCompareStatus.Active);
@@ -157,25 +188,6 @@ function App() {
     } else {
       setSidebarOpen(true);
     }
-
-    const songList = await fetchMusicStats(countryCode, "country_top_tracks");
-    const artistList = await fetchMusicStats(countryCode, "country_top_artists");
-    const genreList = await fetchMusicStats(countryCode, "country_top_genres");
-
-    // only fires if you select a new country (avoids constantly replaying the same song - don't know if this feature is desirable)
-    if (countryCode != selectedCountry?.countryCode) {
-      setSelectedCountry({
-        countryName: countryProp.name,
-        countryCode: countryCode,
-        songList,
-        artistList,
-        genreList,
-        streams: "todo"
-      });
-      console.log(selectedCountry?.countryCode);
-    }
-
-    layer.bringToFront();
 
   };
 

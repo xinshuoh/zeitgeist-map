@@ -2,6 +2,7 @@ import { ChevronFirst, ChevronLast } from "lucide-react";
 
 import ChartBox from "./ChartBox";
 import { useEffect, useRef } from 'react';
+import selectedCountry from "./App"
 
 
 const data = [{ popularity: 100 }, { popularity: 150 }, { popularity: 125 }, { popularity: 110 }];
@@ -17,13 +18,14 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarProps) => {
     const controllerRef = useRef<any>(null);
 
+    // happens on initialisation
     useEffect(() => {
         (window as any).onSpotifyIframeApiReady = (IFrameAPI: any) => {
 
             const element = document.getElementById('embed-iframe');
-            // const options = {
-            //     uri: 'spotify:track:11dFghVXANMlKmJXsNCbNl' // Default song
-            // };
+            const options = {
+                uri: 'spotify:track:11dFghVXANMlKmJXsNCbNl' // Default song
+            };
 
             const callback = (EmbedController: any) => {
                 controllerRef.current = EmbedController;
@@ -32,7 +34,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                 }
             };
 
-            IFrameAPI.createController(element, {}, callback);
+            IFrameAPI.createController(element, {options}, callback);
         };
     }, []);
 
@@ -50,6 +52,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
         }
     };
 
+    // happens each time selectedCountry changes
     useEffect(() => {
         if (controllerRef.current && selectedCountry?.songList?.length) {
             updateSong();
