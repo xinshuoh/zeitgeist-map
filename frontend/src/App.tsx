@@ -314,14 +314,14 @@ function App() {
         <br />
 
         <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
-          Top Artist: {selectedCountry.artistList?.[0]?.artist_name || "N/A"}
+          Top Artist: {selectedCountry.artistList?.[0]?.artist_name || "unknown"}
         </span>
 
         <br />
         <br />
 
         <span style={{ fontSize: 14, fontWeight: "bold", cursor: "pointer" }} onClick={() => handleSecondaryPopup("streams", selectedCountry.streams)}>
-          Top Genre: {selectedCountry.genreList?.[0]?.genre_name || "N/A"}
+          Top Genre: {selectedCountry.genreList?.[0]?.genre_name || "unknown"}
         </span>
 
       </Popup>
