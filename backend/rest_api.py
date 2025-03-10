@@ -55,6 +55,23 @@ def track_popularity():
         'popularity': {p.country.code: p.position for p in v.popularities}})
     return res
 
+@app.route("/song_top_countries")
+# @args(p("song_id")|p("name"))
+def song_top_countries():
+    if 'song_id' in request.args:
+        vals = list(db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalars())
+    if 'name' in request.args:
+        vals = list(db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalars())
+
+    res = []
+    if vals:
+        v = vals[0]
+        pops = sorted(filter(lambda v: v.date == dt.datetime.now().date(), v.popularities), key=lambda x : x.position)
+        for p in pops:
+            res.append({'country_name': p.country.name, 'position': p.position})
+
+    return res
+
 
 @app.route("/country_top_tracks")
 # @args(p("country_code"))
@@ -236,4 +253,7 @@ def country_compare():
 @args(p('prefix'))
 def search_complete():
     c = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
-    return list(map(lambda song : song.name, c))
+    a = db.session.execute(db.select(Artist).where(Artist.name.startswith(request.args['prefix']))).scalars()
+    song_names = list(map(lambda song: song.name, c))
+    artist_names = list(map(lambda artist: artist.name, a))
+    return list(set(song_names) | set(artist_names))

@@ -4,13 +4,9 @@ import { useState } from 'react';
 
 import { Popup as PopupComponent } from 'reactjs-popup';
 
-import { LineChart, Line, CartesianGrid, YAxis } from 'recharts';
-
-import { artistCountryHistory, songCountryHistory } from './Api';
+import { artistCountryHistory, songCountryHistory, songTopCountries } from './Api';
 
 import PopularityLineChart from './PopularityLineChart'
-
-var data = [{popularity: 100}, {popularity: 150}, {popularity: 125}, {popularity: 110}];
 
 interface FocusViewProps {
     focusOptions: any;
@@ -20,8 +16,11 @@ interface FocusViewProps {
 
 const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: FocusViewProps) => {
 
-    const [viewReady, setViewReady] = useState<boolean>(false);
-    const [lineData, setLineData] = useState<any>([]);
+  const [viewReady, setViewReady] = useState<boolean>(false);
+  const [lineData, setLineData] = useState<any>([]);
+  const [topCountries, setTopCountries] = useState<any>([]);
+
+  console.log(topCountries);
 
   let song = focusOptions.song;
   let artist = focusOptions.artist;
@@ -45,6 +44,11 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
               setViewReady(true);
             });
           });
+          songTopCountries(song.song_name).then((v) => {
+            v.json().then((d) => {
+              setTopCountries(d || []);
+            });
+          });
         }}
         onClose = {() => {
           console.log("Closing");
@@ -55,7 +59,7 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
           <>
             {
               viewReady ? 
-              <div style={{ margin: "15px"}}>
+              <div style={{ margin: "10px"}}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "15px", width: "100%"}}>
                   <div>
                     {/* Display a FocusView for either songs or artists */}
@@ -77,23 +81,42 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
                       }}>
                         {song ? song.artist : ""}
                       </span>
-                    </p> 
+                    </p>
                   </div>
+
                   <div className="close" style={{color: "#333"}} onClick={() => close()}>       
                     &times;         
                   </div> 
                 </div>
 
                 <div className="graph-container">
-                  {/* <LineChart width={500} height={200} data={lineData}>
-                    <Line type="monotone" dataKey="popularity" stroke="#8884d8" strokeWidth={3} dot={false} isAnimationActive={false}/>
-                    <CartesianGrid style={{backgroundColor: "#d6b8c3"}} stroke="#ccc" />
-                    <YAxis />
-                  </LineChart> */}
                   {song ? <PopularityLineChart lineData={lineData} song={song} artist_name={""}/> : <PopularityLineChart lineData={lineData} song={undefined} artist_name={artist}/>}
                 </div> 
 
                 <button className="heatmapButton" onClick={viewPopularityHeatmap}>View heatmap</button>
+
+                <br></br>
+
+                <div style={{ padding: "10px" }}>
+                  <strong style={{ color: '#fff' }}>Global Popularity</strong>
+                </div>
+
+                <div className="flex justify-centre" style={{ padding: "10px" }}>
+                  <div>
+                    <ul>
+                      {topCountries.slice(0, 5).map((country: any) =>
+                        <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>{country.country_name}: </li>
+                      )}
+                    </ul>
+                  </div>
+                  <div>
+                    <ul>
+                      {topCountries.slice(0, 5).map((country: any) =>
+                        <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>&nbsp; #{country.position} in charts</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
               </div> : <p>Loading data...</p>
             }
           </>

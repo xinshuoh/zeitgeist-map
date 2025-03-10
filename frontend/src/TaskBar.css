@@ -1,53 +1,53 @@
-.taskbar {
-    position: static;
-    top: 0;
-    width: 100vw;
-    background-color: #330033;
-    fill-opacity: 0.7;
-    color: white;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1;
-    opacity: 100%;
-    box-sizing: border-box;
-  }
-  
-  .taskbar button {
-    background-color: #c12121;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-  }
-  
-  .taskbar button:hover {
-    background-color: #555;
-  }
+.taskbar .search-container {
+  display: flex;
+  justify-content: center;
 
-  .taskbar .logo-button {
-    background-color: transparent;
-    padding: 0;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .taskbar .logo-image {
-    height: 40px;
-  }
-  
-  .taskbar .search-button {
-    background-color: #d0a4b4;
-    flex-grow: 1;
-    margin: 0 20%;
-    text-align: center;
-    /* text-decoration-color: black; */
-    color: black;
-  }
+}
 
-  .taskbar .compare-button {
-    background-color: #ffa7c9;
-    padding: 4px;
+.taskbar .logo-button {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
 
-  }
+.taskbar .logo-image {
+  height: 40px;
+}
+
+
+.taskbar .compare-button {
+  background-color: #ffa7c9;
+  padding: 4px;
+
+}
+.taskbar .compare {
+  height: 100%;
+  font-size: 10px;
+  background-color: #d0a4b4;
+  color: #4b5563; 
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  display: table-cell;
+  vertical-align: middle;
+  transition: background-color 0.2s ease-in-out;
+  min-width: 6rem; 
+  width: max-content; 
+  max-width: 100%; 
+  padding: 4px 8px;
+  text-align: center;
+  white-space: nowrap; 
+  border-radius: 6px;
+}
+
+.compare:hover {
+  background-color: #e5e7eb; 
+}
+
+.help-button{
+  padding-left: 15px;
+}
+.help-button:hover{
+  cursor: pointer;
+}
