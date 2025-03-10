@@ -141,6 +141,7 @@ def song_country_history():
             'date': p.date,
             'popularity': p.position
         })
+
     return res
 
 

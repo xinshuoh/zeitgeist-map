@@ -47,11 +47,16 @@ export function countryCompare(countryCode: string) {
   };
 
 export function songCountryHistory(song_name: string) {
-    console.log("api call")
-    const res = fetch(serverUrl+`/song_country_history?country_code=${'gb'}&song_name=${song_name}`)
+    console.log("API call (songCountryHistory)");
+    const res = fetch(serverUrl + `/song_country_history?country_code=${'gb'}&song_name=${song_name}`);
     return res;
 }
 
+export function artistCountryHistory(artist_name: string) {
+    console.log("API call (artistCountryHistory)");
+    const res = fetch(serverUrl + `/artist_country_history?country_code=${'gb'}&artist_name=${artist_name}`);
+    return res;
+}
 
 export function searchComplete(prefix: string) {
 

@@ -123,7 +123,6 @@ function App() {
 
   const resetHighlight = (e: LeafletMouseEvent) => {
     const layer = e.target;
-    const countryCode = layer.feature?.properties?.wb_a2;
 
     mapStyle.mouseout();
 
@@ -140,7 +139,6 @@ function App() {
     if (!countryProp) return;
 
     const countryCode = countryProp.wb_a2.toLowerCase();
-
 
     layer.bringToFront(); 
 
@@ -301,7 +299,7 @@ function App() {
                 case CountryCompareStatus.Disabled:
                   return "Activate country compare"
                 }})()}
-              </button>          
+              </button>
 
         </MapContainer>
       </div>
