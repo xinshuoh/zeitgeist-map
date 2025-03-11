@@ -20,8 +20,6 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
   const [lineData, setLineData] = useState<any>([]);
   const [topCountries, setTopCountries] = useState<any>([]);
 
-  console.log(topCountries);
-
   let song = focusOptions.song;
   let artist = focusOptions.artist;
 
@@ -33,7 +31,7 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
         contentStyle = {{
           maxWidth: '1000px',
           width: '100%',
-          height: '75%'
+          height: '75%',
         }} 
         modal 
         onOpen = {() => {
@@ -59,7 +57,7 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
           <>
             {
               viewReady ? 
-              <div style={{ margin: "10px"}}>
+              <div className='overflow-y-scroll' style={{ margin: "10px", scrollbarWidth: "thin", maxHeight: "60vh" }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "15px", width: "100%"}}>
                   <div>
                     {/* Display a FocusView for either songs or artists */}
@@ -97,9 +95,11 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
 
                 <br></br>
 
-                <div style={{ padding: "10px" }}>
+                {topCountries.length &&
+                  <div style={{ padding: "10px" }}>
                   <strong style={{ color: '#fff' }}>Global Popularity</strong>
                 </div>
+                }
 
                 <div className="flex justify-centre" style={{ padding: "10px" }}>
                   <div>
