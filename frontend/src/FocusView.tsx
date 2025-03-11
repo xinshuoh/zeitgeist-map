@@ -23,8 +23,6 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
 
   const scrollableRef = useRef<HTMLDivElement>(null);
 
-  console.log(topCountries);
-
   let song = focusOptions.song;
   let artist = focusOptions.artist;
 
@@ -47,7 +45,6 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
             scrollableRef.current.scrollTop = 0;
           }
 
-          console.log(song);
           songCountryHistory(song.song_name).then((v) => {
             v.json().then((d) => {
               setLineData(d);

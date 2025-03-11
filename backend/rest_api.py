@@ -204,7 +204,7 @@ def song_country_history():
     for p in pops:
         res.append({
             'date': p.date,
-            'popularity': p.position
+            'value': p.position
         })
 
     return res
@@ -224,7 +224,7 @@ def artist_country_history():
     for p in pops:
         res.append({
             'date': p.date,
-            'popularity': p.position
+            'value': p.popularity
         })
     return res
 

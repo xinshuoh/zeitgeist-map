@@ -19,18 +19,22 @@ const PopularityLineChart = ({ lineData, song, artist_name }: lineChartProps) =>
   }));
 
   const filteredLineData = formattedLineData.filter((_, index) => index % Math.floor(formattedLineData.length / 5) === 0);
-  const maxValue = filteredLineData.reduce((max, item) => { return item.popularity > max ? item.popularity : max}, -Infinity);
+  const transformedLineData = filteredLineData.map(item => ({
+    ...item,
+    value: Math.round(item.value * 1000) / 1000
+  }));
+  const maxValue = transformedLineData.reduce((max, item) => { return item.value > max ? item.value : max}, -Infinity);
 
   return (
     <div>
       <h2 className="text-xl font-bold text-gray-800 mb-4">Popularity Trends </h2>
-      {song ? <div className="mb-4 text-sm text-gray-600">Showing popularity over time for the song {song.song_name}, by {song.artist}.</div> :
+      {song ? <div className="mb-4 text-sm text-gray-600">Showing position in charts over time for the song {song.song_name}, by {song.artist}.</div> :
               <div className="mb-4 text-sm text-gray-600">Showing popularity over time for the artist {artist_name}.</div>}
       
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={filteredLineData}
+            data={transformedLineData}
             margin={{ top: 10, right: 75, left: 50, bottom: 0 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -42,7 +46,7 @@ const PopularityLineChart = ({ lineData, song, artist_name }: lineChartProps) =>
             />
             
             <YAxis 
-              dataKey="popularity"
+              dataKey="value"
               tick={{ fill: '#6b7280' }}
               domain={song ? [1, maxValue + 1] : [0, Math.ceil(maxValue)]}
               allowDecimals={song ? false : true}
@@ -66,8 +70,8 @@ const PopularityLineChart = ({ lineData, song, artist_name }: lineChartProps) =>
             />
             <Line 
               type="linear"
-              dataKey="popularity" 
-              name="popularity" 
+              dataKey="value" 
+              name="position in charts" 
               stroke="#3b82f6" 
               strokeWidth={3}
               dot={{ r: 4, strokeWidth: 2, fill: '#ffffff' }}
