@@ -4,6 +4,7 @@ from urllib.parse import quote, unquote
 from flask import request, jsonify
 from flask_cors import cross_origin
 from sqlalchemy import or_
+import heapq
 
 from app import app
 from app import db
@@ -252,8 +253,21 @@ def country_compare():
 @app.route('/search_complete')
 @args(p('prefix'))
 def search_complete():
-    c = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
+    s = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
     a = db.session.execute(db.select(Artist).where(Artist.name.startswith(request.args['prefix']))).scalars()
-    song_names = list(map(lambda song: song.name, c))
-    artist_names = list(map(lambda artist: artist.name, a))
-    return list(set(song_names) | set(artist_names))
+    song_names = list(map(lambda song: {"type": "song", "name": song.name, "artist_name": song.artists[0].name}, s))
+    artist_names = list(map(lambda artist: {"type": "artist", "name": artist.name}, a))
+    
+    return song_names + artist_names
+    
+# @app.route('/get_specific_song')
+# def get_specific_song():
+#     songs = list(db.session.execute(db.select(Song).where(Song.name == request.args['song_name'])).scalars())
+#     if not songs:
+#         return
+#     song = songs[0]
+#     return {
+#             'song_name': song.name,
+#             'spotify_id': song.spotify_id,
+#             'artist': song.artists[0].name,
+#         }
