@@ -78,7 +78,7 @@
 
 .popup-content {
   margin: auto;
-  background: rgb(255, 255, 255);
+  background: hsl(0, 0%, 100%);
   width: 50%;
   padding: 5px;
 }
@@ -103,7 +103,7 @@
 /* styling for the popups - feel free to adjust as wanted */
 
 .leaflet-popup-content-wrapper {
-  background: #d6b8c3 !important;
+  background: #e0a7bb !important;
   color: #333;
   box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
   border: 2.5px solid #361836;

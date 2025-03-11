@@ -7,7 +7,7 @@
 .closebutton {
     cursor: pointer;
     position: absolute;
-    left: 88vw;
+    left: 86vw;
     color:white;
     background-color: #361836;
     opacity: 100%;
@@ -22,7 +22,7 @@
 
 .heatmapslider {
     position: absolute;
-    left: 24vw;
+    left: 22vw;
     width: 60vw;
     top: 0vh;
 
@@ -32,15 +32,16 @@
     opacity: 0.99; /* Set transparency (for mouse-over effects on hover) */
     -webkit-transition: .2s; /* 0.2 seconds transition on hover */
     transition: opacity .2s;
-    border-radius: 8px;  
+    border-radius: 5px;  
+    outline-color:#361836;
 }
 
 .heatmapslider::-webkit-slider-thumb {
     -webkit-appearance: none; /* Override default look */
     appearance: none;
-    width: 25px; /* Set a specific slider handle width */
+    width: 5px; /* Set a specific slider handle width */
     height: 25px; 
-    border-radius: 7px;
+    border-radius: 5px;
     background: #361836;
     cursor: pointer; 
 }
@@ -49,7 +50,7 @@
 
 .timemarks {
     position: absolute;
-    left: 22vw;
+    left: 19vw;
     width: 66vw;
     top: 4vh;
     display:flex;

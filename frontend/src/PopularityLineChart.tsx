@@ -40,6 +40,7 @@ const PopularityLineChart = ({ lineData, song, artist_name }: lineChartProps) =>
               axisLine={{ stroke: '#d1d5db' }}
               width={40}
             />
+            
             <YAxis 
               dataKey="popularity"
               tick={{ fill: '#6b7280' }}
@@ -47,6 +48,7 @@ const PopularityLineChart = ({ lineData, song, artist_name }: lineChartProps) =>
               allowDecimals={song ? false : true}
               axisLine={{ stroke: '#d1d5db' }}
               width={40}
+              reversed={song ? true : false}
             />
             <Tooltip 
               contentStyle={{ 
