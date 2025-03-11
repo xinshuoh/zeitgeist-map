@@ -4,6 +4,7 @@ import HelpPage from './HelpPage';
 import { SearchBar } from './components/SearchBar';
 import { CountryCompareStatus } from './App';
 import { useState } from 'react';
+import { SpiritualMusicalHome } from './SMH.tsx';
 
 interface TaskBarProps {
   onCountryCompare: () => void;
@@ -36,6 +37,8 @@ const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, o
             setFocusOptions={setFocusOptions}
             autocomplete={autocomplete} />
         </div>
+
+        <SpiritualMusicalHome />
 
         <button className="compare"
           onClick={onCountryCompare}>

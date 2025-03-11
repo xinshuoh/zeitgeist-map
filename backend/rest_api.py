@@ -12,15 +12,40 @@ from models import *
 
 from param_check import *
 
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
 @app.route("/ping")
 #@cross_origin()
 @args(p.all)
 def ping():
     return "Hello from backend!"
 
-@app.route("/heat_map_popularity")
+@app.route("/heat_map_song_first_date")
+# @args(p("song_id")|p("name"))
+def heat_map_song_first_date():
+    if 'song_id' in request.args:
+        val = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalar()
+    if 'name' in request.args:
+        val = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalar()
+
+    pop = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.song == val).order_by(SongHasPopularity.date)).scalar()
+
+    return str(pop.date)
+
+@app.route("/heat_map_artist_first_date")
+# @args(p("artist_name"))
+def heat_map_artist_first_date():
+    val = db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['artist_name']))).scalar()
+
+    pop = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.song == val).order_by(ArtistHasPopularity.date)).scalar()
+
+    return str(pop.date)
+
+
+@app.route("/heat_map_song_popularity")
 # @args(p("date")&(p("song_id")|p("name")))
-def heat_map_popularity():
+def heat_map_song_popularity():
     #2017-06-29 date format
     
     if 'song_id' in request.args:
@@ -28,36 +53,41 @@ def heat_map_popularity():
     if 'name' in request.args:
         val = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalar()
     
-    #print(val.name)
-    
     pops = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.song == val, SongHasPopularity.date == request.args['date'])).scalars()
 
     d = {}
-    #print("success")
     for pop in pops:
         d[pop.country.code] = pop.position
-        #print(pop.position)
-        #print(pop.country.name)
-    #print("success2")
-    print(d)
+
     return d
 
+@app.route("/heat_map_artist_popularity")
+# @args(p("date")&p("artist_name"))
+def heat_map_artist_popularity():
+    #2017-06-29 date format
+    val = db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['artist_name']))).scalar()
+    
+    pops = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.artist == val, ArtistHasPopularity.date == request.args['date'])).scalars()
 
-# @app.route("/track_popularity")
-# # @args(p("song_id")|p("name"))
-# def track_popularity():
-#     if 'song_id' in request.args:
-#         vals = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalars()
-#     if 'name' in request.args:
-#         vals = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalars()
+    d = {}
+    for pop in pops:
+        d[pop.country.code] = pop.position
 
-#     res = []
-#     for v in vals:
-#         res.append({'artist': v.artists[0].name,
-#         'popularity': {p.country.code: p.position for p in v.popularities}})
+    return d
 
-#     return res
-
+#not used
+@app.route("/track_popularity")
+# @args(p("song_id")|p("name"))
+def track_popularity():
+    if 'song_id' in request.args:
+        vals = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalars()
+    if 'name' in request.args:
+        vals = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalars()
+    res = []
+    for v in vals:
+        res.append({'artist': v.artists[0].name,
+        'popularity': {p.country.code: p.position for p in v.popularities}})
+    return res
 
 @app.route("/song_top_countries")
 # @args(p("song_id")|p("name"))
@@ -80,9 +110,8 @@ def song_top_countries():
 @app.route("/country_top_tracks")
 # @args(p("country_code"))
 def country_top_tracks():
-    current_date = dt.datetime.now().date()
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
-    return get_top_tracks(c, current_date)
+    return get_top5_tracks(c)
 
 
 @app.route("/country_top_artists")
@@ -100,9 +129,24 @@ def country_top_genres():
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
     return get_top_genres(c, current_date)
 
+    
 
-def get_top_tracks(country, date):
-    vals = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.country == country, SongHasPopularity.date == date).order_by(SongHasPopularity.position)).scalars()
+def get_top_tracks(country):
+    # gets todays popularities, don't need to check the date as it must be today
+    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country).order_by(SongHasPopularityToday.position)).scalars()
+    res = []
+    for v in vals:
+        res.append({
+            'song_name': v.song.name,
+            'spotify_id': v.song.spotify_id,
+            'artist': v.song.artists[0].name,
+            'position': v.position,
+        })
+    return res
+
+def get_top5_tracks(country):
+    # note, this relies on the fact that songs are entered into the database in order of popularity (would return bogus stuff otherwise)
+    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country).limit(5)).scalars()
     res = []
     for v in vals:
         res.append({
@@ -167,6 +211,7 @@ def song_country_history():
 
 
 @app.route("/artist_country_history")
+# @args(p("country_code")&p("artist_name"))
 def artist_country_history():
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
     a = db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['artist_name']))).scalars().first()
@@ -185,8 +230,7 @@ def artist_country_history():
 
 
 def get_today_track_names(country):
-    current_date = dt.datetime.now().date()
-    country_top_tracks = get_top_tracks(country, current_date)
+    country_top_tracks = get_top_tracks(country)
     tracks = set()
     for entry in country_top_tracks:
         tracks.add(entry['song_name'])
@@ -274,3 +318,39 @@ def search_complete():
 #             'spotify_id': song.spotify_id,
 #             'artist': song.artists[0].name,
 #         }
+
+client_id = 'b0d6aef0a4f846d3afe4dc5ab695bc3b'
+client_secret = 'ed600a63a1be4d2f83fc69f2be3169fe'
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
+
+@app.route('/spiritual_musical_home')
+# @args(p("playlist_id"))
+def spiritual_musical_home():
+    results = spotify.playlist(request.args['playlist_id'])
+    print(results)
+    tracks = results['tracks']
+    total = tracks['total']
+    songs = tracks['items']
+    names = set()
+    for i in range(total):
+        names.add(songs[i]['track']['name'])
+
+
+    date = dt.datetime.now().date()
+    vals = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.date == date, SongHasPopularity.position == 1)).scalars()
+    countries = {}
+    for val in vals:
+        similarity = 0
+        country = val.country.code
+        billboard = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.country == country, SongHasPopularity.date == date)).scalars()
+        for track in billboard:
+            if track.song.name in names:
+                similarity += 1
+        countries[country] = similarity#
+ 
+    return countries
+    #print(songs["total"])
+    #print(songs)
+    #tot = songs[total]
+    #print(tot)
+    #return results

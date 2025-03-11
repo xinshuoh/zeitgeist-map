@@ -341,11 +341,12 @@ function App() {
           setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
           mapStyle.activatePlain();
         }} />}
-      {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
-        <div style={{ position: 'absolute', top: '10%', left: '40%', backgroundColor: '#361836', color: 'white', padding: '5px', borderRadius: '5px', zIndex: 1000 }}>
-          Popularity Heat Map for: {heatmapSong}
-        </div>
-      )}
+
+        {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
+            <div style={{ position: 'absolute', top: '10%', right: '1%', backgroundColor: '#ffa7c9', color:'#361836', padding: '5px', borderRadius: '5px', zIndex: 1000, boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+              <strong>Popularity Heat Map for: {heatmapSong}</strong>
+            </div>
+        )}
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);
