@@ -109,9 +109,11 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
 
                     <br></br>
 
-                    <div style={{ padding: "10px" }}>
-                      <strong style={{ color: '#fff' }}>Global Popularity</strong>
-                    </div>
+                {topCountries.length &&
+                  <div style={{ padding: "10px" }}>
+                  <strong style={{ color: '#fff' }}>Global Popularity</strong>
+                </div>
+                }
 
                     <div className="flex justify-centre" style={{ padding: "10px" }}>
                       <div>
