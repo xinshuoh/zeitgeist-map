@@ -12,12 +12,11 @@ import pycountry
 
 from models import *
 
-import dbupdate
-
 app = Flask(__name__)
 
 import rest_api
 import scrape
+import dbupdate
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -42,8 +41,10 @@ def build_tables():
     db.create_all()
 
     countries = [country.alpha_2.lower() for country in pycountry.countries]
-
     names = coco.convert(names=countries, to='name_short')
+    countries.append("glb")
+    names.append("global")
+    
     for country, name in zip(countries, names):
         c = Country(code = country, name = name)
         db.session.add(c)

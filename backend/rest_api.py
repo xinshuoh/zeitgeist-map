@@ -3,6 +3,8 @@ from urllib.parse import quote, unquote
 
 from flask import request, jsonify
 from flask_cors import cross_origin
+from sqlalchemy import or_
+import heapq
 
 from app import app
 from app import db
@@ -16,6 +18,30 @@ from param_check import *
 def ping():
     return "Hello from backend!"
 
+@app.route("/heat_map_popularity")
+# @args(p("date")&(p("song_id")|p("name")))
+def heat_map_popularity():
+    #2017-06-29 date format
+    
+    if 'song_id' in request.args:
+        val = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalar()
+    if 'name' in request.args:
+        val = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalar()
+    
+    #print(val.name)
+    
+    pops = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.song == val, SongHasPopularity.date == request.args['date'])).scalars()
+
+    d = {}
+    #print("success")
+    for pop in pops:
+        d[pop.country.code] = pop.position
+        #print(pop.position)
+        #print(pop.country.name)
+    #print("success2")
+    print(d)
+    return d
+
 
 @app.route("/track_popularity")
 # @args(p("song_id")|p("name"))
@@ -28,6 +54,23 @@ def track_popularity():
     for v in vals:
         res.append({'artist': v.artists[0].name,
         'popularity': {p.country.code: p.position for p in v.popularities}})
+    return res
+
+@app.route("/song_top_countries")
+# @args(p("song_id")|p("name"))
+def song_top_countries():
+    if 'song_id' in request.args:
+        vals = list(db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalars())
+    if 'name' in request.args:
+        vals = list(db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalars())
+
+    res = []
+    if vals:
+        v = vals[0]
+        pops = sorted(filter(lambda v: v.date == dt.datetime.now().date(), v.popularities), key=lambda x : x.position)
+        for p in pops:
+            res.append({'country_name': p.country.name, 'position': p.position})
+
     return res
 
 
@@ -67,6 +110,7 @@ def get_top_tracks(country, date):
         })
     return res
 
+
 def get_top_artists(country, date):
     vals = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.country == country, ArtistHasPopularity.date == date).order_by(ArtistHasPopularity.position)).scalars()
     res = []
@@ -77,6 +121,7 @@ def get_top_artists(country, date):
             'popularity_measure': v.popularity
         })
     return res
+
 
 def get_top_genres(country, date):
     vals = db.session.execute(db.select(GenreHasPopularity).where(GenreHasPopularity.country == country, GenreHasPopularity.date == date).order_by(GenreHasPopularity.position)).scalars()
@@ -93,10 +138,9 @@ def get_top_genres(country, date):
 @app.route("/song_country_history")
 # @args(p("country_code")&(p("song_id")|p("song_name")))
 def song_country_history():
-    # this might be really clunky
-
     # returns a list of dict(date, popularity) items in date order to be used for trends
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
+
     if 'song_id' in request.args:
         pops = db.session.execute(db.select(SongHasPopularity).where(
             SongHasPopularity.country == c, 
@@ -104,11 +148,30 @@ def song_country_history():
         ).order_by(SongHasPopularity.date)).scalars()
     elif 'song_name' in request.args:
         s = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['song_name']))).scalars().first() # pick the first song with matching name
-        print(s)
         pops = db.session.execute(db.select(SongHasPopularity).where(
             SongHasPopularity.country == c, 
             SongHasPopularity.song_id == s.id
         ).order_by(SongHasPopularity.date)).scalars()
+
+    res = []
+    for p in pops:
+        res.append({
+            'date': p.date,
+            'popularity': p.position
+        })
+
+    return res
+
+
+@app.route("/artist_country_history")
+def artist_country_history():
+    c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
+    a = db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['artist_name']))).scalars().first()
+    pops = db.session.execute(db.select(ArtistHasPopularity).where(
+        ArtistHasPopularity.country == c, 
+        ArtistHasPopularity.artist_id == a.id
+    ).order_by(ArtistHasPopularity.date)).scalars()
+
     res = []
     for p in pops:
         res.append({
@@ -146,11 +209,29 @@ def get_percentage_similarity(comparison_tracks, country_code=None):
 
 @app.route('/country_compare')
 def country_compare():
-    c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
-    tracks = get_today_track_names(c)
-    # TODO : deal better with when there is no match 
-    return get_percentage_similarity(tracks, c.code)
+    # get the country
+    country = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
+
+    # get it's similarities
+    similarities = list(db.session.execute(db.select(CountrySimilarity).where(or_(CountrySimilarity.country1==country, CountrySimilarity.country2==country))).scalars())
     
+    res = []
+    for sim in similarities:
+        if sim.country1 == country:
+            name = sim.country2.name
+            code = sim.country2.code
+        else:
+            name = sim.country1.name
+            code = sim.country1.code
+        
+        res.append({
+                'name': name,
+                'country_code': code,
+                'similarity': sim.similarity
+            })
+    
+    return res
+
 
 # @app.route('/spiritual_musical_home')
 # def spiritual_musical_home():
@@ -172,5 +253,21 @@ def country_compare():
 @app.route('/search_complete')
 @args(p('prefix'))
 def search_complete():
-    c = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
-    return list(map(lambda song : song.name, c))
+    s = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
+    a = db.session.execute(db.select(Artist).where(Artist.name.startswith(request.args['prefix']))).scalars()
+    song_names = list(map(lambda song: {"type": "song", "name": song.name, "artist_name": song.artists[0].name}, s))
+    artist_names = list(map(lambda artist: {"type": "artist", "name": artist.name}, a))
+    
+    return song_names + artist_names
+    
+# @app.route('/get_specific_song')
+# def get_specific_song():
+#     songs = list(db.session.execute(db.select(Song).where(Song.name == request.args['song_name'])).scalars())
+#     if not songs:
+#         return
+#     song = songs[0]
+#     return {
+#             'song_name': song.name,
+#             'spotify_id': song.spotify_id,
+#             'artist': song.artists[0].name,
+#         }

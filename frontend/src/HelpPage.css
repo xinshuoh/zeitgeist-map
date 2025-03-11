@@ -1,11 +1,11 @@
 .viewHeading {
     font-size: 26px;
+    color: #361836;
 }
 
 .viewSubheading {
  
 }
-
 .close {
     font-size: 40px;
 }
@@ -16,12 +16,22 @@
 
 .heatmapButton {
     cursor:pointer;
-    padding: 5px;
     background-color: #361836;
     margin: 10px;
-    color: white;
 }
-
+h3 {
+    font-size: 22px;
+    color: #361836;
+}
+h4{
+    font-size: 16px;
+    text-align: center;
+    font-weight: bold;
+}
+p{
+    font-size: 14px;
+    color: #361836;
+}
 .heatmapButton:hover {
     opacity: 90%
 }
