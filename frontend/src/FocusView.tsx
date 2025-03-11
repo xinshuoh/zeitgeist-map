@@ -46,7 +46,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
           if (scrollableRef.current) {
             scrollableRef.current.scrollTop = 0;
           }
-          
+
           console.log(song);
           songCountryHistory(song.song_name).then((v) => {
             v.json().then((d) => {
@@ -97,7 +97,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
                       </div>
 
                       <button className="self-start cursor-pointer" style={{ color: "#333" }} onClick={() => close()}>
-                        <X size={30}/>
+                        <X size={30} />
                       </button>
                     </div>
 
@@ -109,11 +109,11 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
 
                     <br></br>
 
-                {topCountries.length &&
-                  <div style={{ padding: "10px" }}>
-                  <strong style={{ color: '#fff' }}>Global Popularity</strong>
-                </div>
-                }
+                    {topCountries.length &&
+                      <div style={{ padding: "10px" }}>
+                        <strong style={{ color: '#fff' }}>Global Popularity</strong>
+                      </div>
+                    }
 
                     <div className="flex justify-centre" style={{ padding: "10px" }}>
                       <div>
