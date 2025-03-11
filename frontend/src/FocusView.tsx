@@ -20,8 +20,6 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
   const [lineData, setLineData] = useState<any>([]);
   const [topCountries, setTopCountries] = useState<any>([]);
 
-  console.log(topCountries);
-
   let song = focusOptions.song;
   let artist = focusOptions.artist;
 
@@ -37,7 +35,6 @@ const FocusView = ({focusOptions, setFocusOptions, viewPopularityHeatmap}: Focus
         }} 
         modal 
         onOpen = {() => {
-          console.log(song);
           songCountryHistory(song.song_name).then((v) => {
             v.json().then((d) => {
               setLineData(d);
