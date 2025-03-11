@@ -21,6 +21,9 @@ class DailyScraper:
         with open('genres.txt', mode='r', encoding="utf-8") as f:
             self.genres = {line.rstrip() for line in f}
 
+        # The current date 
+        self.current_date = dt.datetime.now()
+
         spotify_client_id = 'b0d6aef0a4f846d3afe4dc5ab695bc3b'
         spotify_client_secret = 'ed600a63a1be4d2f83fc69f2be3169fe'
         self.spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=spotify_client_id, client_secret=spotify_client_secret))
@@ -156,9 +159,9 @@ class DailyScraper:
 
                     # Add a relationship indicating the popularity of the song in a particular country to the database if not present
                     c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
-                    s_pop = self.db.session.execute(self.db.select(SongHasPopularity).where(SongHasPopularity.song_id == s.id, SongHasPopularity.country_id == c.id, SongHasPopularity.date == dt.datetime.now())).scalar()
+                    s_pop = self.db.session.execute(self.db.select(SongHasPopularity).where(SongHasPopularity.song_id == s.id, SongHasPopularity.country_id == c.id, SongHasPopularity.date == self.current_date)).scalar()
                     if not s_pop:
-                        s_pop = SongHasPopularity(song = s, country = c, position = position, date = dt.datetime.now())
+                        s_pop = SongHasPopularity(song = s, country = c, position = position, date = self.current_date)
                         self.db.session.add(s_pop)
 
                 self.calculate_genre_data(country_code, track_information)
@@ -221,34 +224,26 @@ class DailyScraper:
                     a = self.db.session.execute(self.db.select(Artist).where(Artist.name == name)).scalar()  # The artist should always already be present in the database 
 
                     # Add a relationship indicating the popularity of the artist in a particular country to the database if not present
-                    a_pop = self.db.session.execute(self.db.select(ArtistHasPopularity).where(ArtistHasPopularity.artist_id == a.id, ArtistHasPopularity.country_id == c.id, ArtistHasPopularity.date == dt.datetime.now())).scalar()
+                    a_pop = self.db.session.execute(self.db.select(ArtistHasPopularity).where(ArtistHasPopularity.artist_id == a.id, ArtistHasPopularity.country_id == c.id, ArtistHasPopularity.date == self.current_date)).scalar()
                     if not a_pop:
-                        a_pop = ArtistHasPopularity(artist = a, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
+                        a_pop = ArtistHasPopularity(artist = a, country = c, position = position, popularity = popularity_measure, date = self.current_date)
                         self.db.session.add(a_pop)
 
                 elif table == Genre:
                     g = self.db.session.execute(self.db.select(Genre).where(Genre.name == name)).scalar()  # The genre should always already be present in the database
 
                     # Add a relationship indicating the popularity of the genre in a particular country to the database if not present
-                    g_pop = self.db.session.execute(self.db.select(GenreHasPopularity).where(GenreHasPopularity.genre_id == g.id, GenreHasPopularity.country_id == c.id, GenreHasPopularity.date == dt.datetime.now())).scalar()
+                    g_pop = self.db.session.execute(self.db.select(GenreHasPopularity).where(GenreHasPopularity.genre_id == g.id, GenreHasPopularity.country_id == c.id, GenreHasPopularity.date == self.current_date)).scalar()
                     if not g_pop:
-                        g_pop = GenreHasPopularity(genre = g, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
+                        g_pop = GenreHasPopularity(genre = g, country = c, position = position, popularity = popularity_measure, date = self.current_date)
                         self.db.session.add(g_pop)
 
-                    # g_pop = self.db.session.execute(self.db.select(GenreHasPopularity).where(GenreHasPopularity.genre_id == g.id, GenreHasPopularity.country_id == c.id, GenreHasPopularity.date == dt.datetime.now()))
-                    # if not g_pop:
-                    g_pop = GenreHasPopularity(genre = g, country = c, position = position, popularity = popularity_measure, date = dt.datetime.now())
-                    self.db.session.add(g_pop)
-
-
     def get_today_track_names(self, country):
-        current_date = dt.datetime.now().date()
-        country_top_tracks = get_top_tracks(country, current_date)
+        country_top_tracks = get_top_tracks(country, self.current_date.date())
         tracks = set()
         for entry in country_top_tracks:
             tracks.add(entry['song_name'])
         return tracks
-
 
     def precompute_country_compare(self):
         # delete the previous country compare data
@@ -271,7 +266,6 @@ class DailyScraper:
                 db.session.add(comp)
         
         db.session.commit()    
-
 
     def scrape(self):
         self.reset()

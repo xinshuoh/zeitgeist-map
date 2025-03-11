@@ -3,15 +3,12 @@ import { ChevronFirst, ChevronLast } from "lucide-react";
 import ChartBox from "./ChartBox";
 import { useEffect, useRef } from 'react';
 
-const data = [{ popularity: 100 }, { popularity: 150 }, { popularity: 125 }, { popularity: 110 }];
-
 interface SidebarProps {
     isOpen: boolean;
     toggle: any;
     selectedCountry: any;
     setFocusOptions: any;
 }
-
 
 const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarProps) => {
     const controllerRef = useRef<any>(null);
@@ -22,7 +19,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
 
             const element = document.getElementById('embed-iframe');
             const options = {
-                uri: 'spotify:track:11dFghVXANMlKmJXsNCbNl' // Default song
+                uri: 'spotify:track:11dFghVXANMlKmJXsNCbNl',  // Default song
             };
 
             const callback = (EmbedController: any) => {
@@ -32,7 +29,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                 }
             };
 
-            IFrameAPI.createController(element, { options }, callback);
+            IFrameAPI.createController(element, options, callback);
         };
     }, []);
 
@@ -57,32 +54,13 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
         }
     }, [selectedCountry]);
 
-    // in case this ever happens, it shouldn't do
-    if (selectedCountry == null)
+    // When the page is first loaded 
+    if (selectedCountry == null) {
         return (
             <div className="relative w-full h-screen flex">
                 <div className={`h-full transition-all ${isOpen ? "w-100" : "w-0"} z-1`}>
                     <div className={`h-full flex-col border-r border-gray-300 shadow-lg overflow-y-scroll`}
                         style={{ scrollbarWidth: "thin", backgroundColor: '#330033' }}>
-
-                        {/* <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
-                            <div className={`
-                        flex justify-center p-4 items-center overflow-hidden transition-all ${isOpen ? "w-100 ml-3" : "w-0"}`}>
-                                <span className={`text-2xl text-black font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `}>Select a country</span>
-                            </div>
-                        </div>
-
-                        <div className={`h-70 flex justify-center items-center overflow-hidden ${isOpen ? "w-full pt-4 pb-4 pl-8 pr-8" : "w-0 p-0"}`}>
-                            <div className={`rounded-md h-full overflow-hidden ${isOpen ? "w-full p-6" : "w-0 p-0"}`} style={{ backgroundColor: '#d6b8c3' }}>Chart 1</div>
-                        </div>
-
-                        <div className={`h-70 flex justify-center items-center overflow-hidden ${isOpen ? "w-full pt-4 pb-4 pl-8 pr-8" : "w-0 p-0"}`}>
-                            <div className={`rounded-md h-full overflow-hidden ${isOpen ? "w-full p-6" : "w-0 p-0"}` } style={{ backgroundColor: '#d6b8c3' }}>Chart 2</div>
-                        </div>
-
-                        <div className={`h-70 flex justify-center items-center overflow-hidden ${isOpen ? "w-full pt-4 pb-4 pl-8 pr-8" : "w-0 p-0"}`}>
-                            <div className={`rounded-md h-full overflow-hidden ${isOpen ? "w-full p-6" : "w-0 p-0"}`} style={{ backgroundColor: '#d6b8c3' }}>Chart 3</div>
-                        </div> */}
                     </div>
                 </div>
 
@@ -96,6 +74,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                 </div>
             </div>
         )
+    }
 
     // if user accidentally opens sidebar before clicking any country
     if (selectedCountry.countryName == 'loading...') {
@@ -109,7 +88,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                         <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
                             <div className={`
                         flex justify-center p-4 items-center overflow-hidden transition-all ${isOpen ? "w-100 ml-3" : "w-0"}`}>
-                                <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#FFFFFF' }}></span>
+                                <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#330033' }}></span>
                             </div>
                         </div>
 
@@ -195,8 +174,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                     style={{ scrollbarWidth: "thin", backgroundColor: '#e0a7bb' }}>
 
                     <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
-                        <div className={`
-                    flex justify-center p-4 items-center overflow-hidden transition-all ${isOpen ? "w-100 ml-3" : "w-0"}`}>
+                        <div className={`flex justify-center p-4 items-center overflow-hidden transition-all ${isOpen ? "w-100 ml-3" : "w-0"}`}>
                             <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#330033' }}>{selectedCountry.countryName}</span>
                         </div>
                     </div>
