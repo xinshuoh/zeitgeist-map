@@ -34,6 +34,7 @@ interface FocusOptions {
   isOpen: boolean;
   song: any;
   artist: any;
+  type: string;
 }
 
 export enum CountryCompareStatus {
@@ -53,7 +54,7 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
-  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false });
+  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false, type: "" });
   const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
 
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
@@ -131,8 +132,6 @@ function App() {
         genreList: genreList,
         streams: "todo"
       });
-
-      // setForceRenderKey(prev => prev + 1);
     }
 
     // opens the correct thing, but with selected country already set
@@ -350,7 +349,7 @@ function App() {
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);
-        setFocusOptions({ song: undefined, artist: undefined, isOpen: false });
+        setFocusOptions({ song: undefined, artist: undefined, isOpen: false, type: "" });
         setSidebarOpen(false);
         setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
         setCountryCompareStatus(CountryCompareStatus.Disabled);

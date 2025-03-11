@@ -41,6 +41,7 @@ class DailyScraper:
         
         # clear the today similarity table
         db.session.execute(db.delete(SongHasPopularityToday))
+        db.session.execute(db.delete(ArtistHasPopularityToday))
         db.session.commit()
 
     def fetch_track_spotify_info(self, track_spotify_id):
@@ -163,7 +164,7 @@ class DailyScraper:
 
                     # Add a relationship indicating the popularity of the song in a particular country to the database if not present
                     c = self.db.session.execute(self.db.select(Country).where(Country.code == country_code)).scalar()
-                    s_pop = self.db.session.execute(self.db.select(SongHasPopularity).where(SongHasPopularity.song_id == s.id, SongHasPopularity.country_id == c.id, SongHasPopularity.date == self.current_date)).scalar()
+                    s_pop = self.db.session.execute(self.db.select(SongHasPopularityToday).where(SongHasPopularityToday.song == s, SongHasPopularityToday.country == c)).scalar()
                     if not s_pop:
                         s_pop = SongHasPopularity(song = s, country = c, position = position, date = self.current_date)
                         self.db.session.add(s_pop)
@@ -232,10 +233,15 @@ class DailyScraper:
                     a = self.db.session.execute(self.db.select(Artist).where(Artist.name == name)).scalar()  # The artist should always already be present in the database 
 
                     # Add a relationship indicating the popularity of the artist in a particular country to the database if not present
-                    a_pop = self.db.session.execute(self.db.select(ArtistHasPopularity).where(ArtistHasPopularity.artist_id == a.id, ArtistHasPopularity.country_id == c.id, ArtistHasPopularity.date == self.current_date)).scalar()
+
+                    # only need to check if exists in todays data
+                    a_pop = self.db.session.execute(self.db.select(ArtistHasPopularityToday).where(ArtistHasPopularityToday.artist == a, ArtistHasPopularityToday.country == c)).scalar()
                     if not a_pop:
+                        # add to both the main table and the
                         a_pop = ArtistHasPopularity(artist = a, country = c, position = position, popularity = popularity_measure, date = self.current_date)
                         self.db.session.add(a_pop)
+                        a_pop_today = ArtistHasPopularityToday(artist = a, country = c, position = position, popularity = popularity_measure, date = self.current_date)
+                        self.db.session.add(a_pop_today)
 
                 elif table == Genre:
                     g = self.db.session.execute(self.db.select(Genre).where(Genre.name == name)).scalar()  # The genre should always already be present in the database

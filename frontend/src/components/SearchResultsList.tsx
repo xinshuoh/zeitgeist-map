@@ -21,7 +21,7 @@ export const SearchResultsList = ({ handleSelection, focusedIndex, setFocusedInd
     }, [focusedIndex]);
 
     return (
-        <div className="absolute w-full rounded-b-lg bg-[#d0a4b4] max-h-[49vh] overflow-x-hidden overflow-y-auto pb-2">
+        <div className="absolute w-full rounded-b-lg bg-[#e0a7bb] max-h-[49vh] overflow-x-hidden overflow-y-auto pb-2">
             <div className={`h-0 border-[rgb(232,234,237)] border-t-[1px] ml-4 mr-4 pb-1`}></div>
             {autocompleteResults.map((item: any, index: number) => {
                 return (

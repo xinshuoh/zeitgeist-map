@@ -100,9 +100,28 @@ def song_top_countries():
     res = []
     if vals:
         v = vals[0]
-        pops = sorted(filter(lambda v: v.date == dt.datetime.now().date(), v.popularities), key=lambda x : x.position)
-        for p in pops:
+        # gets the top 5 countries
+        pops = sorted(v.today_popularities, key=lambda x : x.position)
+        for p in pops[:5]:
             res.append({'country_name': p.country.name, 'position': p.position})
+
+    return res
+
+@app.route("/artist_top_countries")
+# @args(p("artist_id")|p("name"))
+def artist_top_countries():
+    if 'artist_id' in request.args:
+        vals = list(db.session.execute(db.select(Artist).where(Artist.id == request.args['artist_id'])).scalars())
+    if 'name' in request.args:
+        vals = list(db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['name']))).scalars())
+
+    res = []
+    if vals:
+        v = vals[0]
+        # gets the top 5 countries
+        pops = sorted(v.today_popularities, key=lambda x : x.popularity, reverse=True)
+        for p in pops:
+            res.append({'country_name': p.country.name, 'popularity': p.popularity})
 
     return res
 
@@ -117,9 +136,8 @@ def country_top_tracks():
 @app.route("/country_top_artists")
 # @args(p("country_code"))
 def country_top_artists():
-    current_date = dt.datetime.now().date()
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
-    return get_top_artists(c, current_date)
+    return get_top_artists(c)
 
 
 @app.route("/country_top_genres")
@@ -158,8 +176,8 @@ def get_top5_tracks(country):
     return res
 
 
-def get_top_artists(country, date):
-    vals = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.country == country, ArtistHasPopularity.date == date)).scalars()
+def get_top_artists(country):
+    vals = db.session.execute(db.select(ArtistHasPopularityToday).where(ArtistHasPopularityToday.country == country).limit(5)).scalars()
     res = []
     for v in vals:
         res.append({
