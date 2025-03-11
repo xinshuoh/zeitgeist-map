@@ -128,9 +128,8 @@ def fetch_historical():
 
                 # a_pop = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.artist_id == a.id, ArtistHasPopularity.country_id == c.id, ArtistHasPopularity.date == date_time)).scalar()
                 # if not a_pop:
-                a_pop = ArtistHasPopularity(artist = a, country = c, position = popularity[artist_key][country] / normalising_constants[country], date = date_time) 
+                a_pop = ArtistHasPopularity(artist = a, country = c, popularity = popularity[artist_key][country] / normalising_constants[country], date = date_time) 
                 db.session.add(a_pop)
 
         db.session.commit()
         print("Fetched", date_)
-        

@@ -43,18 +43,21 @@ def heat_map_popularity():
     return d
 
 
-@app.route("/track_popularity")
-# @args(p("song_id")|p("name"))
-def track_popularity():
-    if 'song_id' in request.args:
-        vals = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalars()
-    if 'name' in request.args:
-        vals = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalars()
-    res = []
-    for v in vals:
-        res.append({'artist': v.artists[0].name,
-        'popularity': {p.country.code: p.position for p in v.popularities}})
-    return res
+# @app.route("/track_popularity")
+# # @args(p("song_id")|p("name"))
+# def track_popularity():
+#     if 'song_id' in request.args:
+#         vals = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalars()
+#     if 'name' in request.args:
+#         vals = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalars()
+
+#     res = []
+#     for v in vals:
+#         res.append({'artist': v.artists[0].name,
+#         'popularity': {p.country.code: p.position for p in v.popularities}})
+
+#     return res
+
 
 @app.route("/song_top_countries")
 # @args(p("song_id")|p("name"))
@@ -157,7 +160,7 @@ def song_country_history():
     for p in pops:
         res.append({
             'date': p.date,
-            'popularity': p.position
+            'value': p.position
         })
 
     return res
@@ -176,7 +179,7 @@ def artist_country_history():
     for p in pops:
         res.append({
             'date': p.date,
-            'popularity': p.position
+            'value': p.popularity
         })
     return res
 

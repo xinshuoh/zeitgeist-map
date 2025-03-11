@@ -118,7 +118,7 @@ class ArtistHasPopularity(db.Model):
     country_id: Mapped[int] = mapped_column(ForeignKey("country.id"))
     date: Mapped[date] = mapped_column(Date)
 
-    position: Mapped[int] = mapped_column(Integer)
+    position: Mapped[int] = mapped_column(Integer, nullable=True)
     popularity: Mapped[int] = mapped_column(Integer, nullable=True)
 
     artist: Mapped[Artist] = relationship(back_populates="popularities")
