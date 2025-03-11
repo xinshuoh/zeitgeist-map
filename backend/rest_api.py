@@ -133,7 +133,7 @@ def country_top_genres():
 
 def get_top_tracks(country):
     # gets todays popularities, don't need to check the date as it must be today
-    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country).order_by(SongHasPopularityToday.position)).scalars()
+    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country)).scalars()
     res = []
     for v in vals:
         res.append({
