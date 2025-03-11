@@ -20,7 +20,7 @@ const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, o
 
   return (
     <div id="global">
-      <div id="taskbar" className="taskbar flex  box-border t-0 justify-between w-[100vw] p-[18px] bg-[#330033] bg-opacity-0.7 h-18 items-center text-white z-1">
+      <div id="taskbar" className="taskbar flex shadow-lg box-border t-0 justify-between w-[100vw] p-[18px] bg-[#330033] bg-opacity-0.7 h-18 items-center text-white z-1">
         <div className="logo-help-group flex items-center">
           <button className="logo-button" onClick={() => alert('logo clicked')}>
             <img src="zeitgeistlogo.png" alt="Zeitgeist Map" className="logo-image w-25" />
