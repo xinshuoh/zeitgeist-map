@@ -89,15 +89,24 @@ export default function mapStyler(geoJsonRef: any) {
                     return { fillColor: '#361836', fillOpacity: 1, weight: 1, color: '#361836' };
                 }
                 const similarity = heatmapData?.similarities.find((c: any) => c.country_code === feature?.properties?.wb_a2.toLowerCase())?.similarity ?? 0;
+                // const indexColor = [
+                //     '#FFCCCC',// Very light red (Low similarity)
+                //     '#FFAAAA',
+                //     '#FF6666',
+                //     '#FF4444',
+                //     '#FF0000',
+                //     '#D50000',
+                //     '#AA0000',  // Dark red (High similarity)
+                // ];
                 const indexColor = [
-                    '#FFCCCC',// Very light red (Low similarity)
-                    '#FFAAAA',
-                    '#FF6666',
-                    '#FF4444',
-                    '#FF0000',
-                    '#D50000',
-                    '#AA0000',  // Dark red (High similarity)
-                ];
+                    '#330033',// Very light purple (Low similarity)
+                    '#502450',
+                    '#6D496D',
+                    '#8A6D8A',
+                    '#A892A8',
+                    '#C5B6C5',
+                    '#E2DBE2',  // Dark purple (High similarity)
+                  ];
                 if (similarity === 0) {
                     return { fillColor: '#FFFFFF', fillOpacity: 1, weight: 1, color: '#d0d0d0' };
                 }
@@ -119,7 +128,7 @@ export default function mapStyler(geoJsonRef: any) {
             case MapMode.PopularityHeatmap:
                 if (popularityData && feature?.properties?.wb_a2.toLowerCase() in popularityData) {
                     const v = (200-popularityData[feature?.properties?.wb_a2.toLowerCase()])/199;
-                    const ccolor = `#AA0000`;
+                    const ccolor = `#330033`;
                     return { fillColor: ccolor, fillOpacity: v, weight: 1, color: '#d0d0d0' };
                 } else                 return ({
                     fillColor: getColor(feature?.properties?.pop_est || 0),
