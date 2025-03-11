@@ -68,7 +68,7 @@ export default function mapStyler(geoJsonRef: any) {
             case MapMode.Plain:
                 return ({
                     fillColor: getColor(feature?.properties?.pop_est || 0),
-                    weight: 2,
+                    weight: 1,
                     color: '#d0d0d0',
                     fillOpacity: 0.8
                   });
