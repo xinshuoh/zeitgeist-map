@@ -81,7 +81,7 @@ export const fetchSearchComplete = async (prefix: string) => {
 }
 
 export function heatMapPopularity(date: Date, name: string) {
-  return fetch(serverUrl+`/heat_map_popularity?date=${formatDate(date)}&name=${name}`)
+  return fetch(serverUrl+`/heat_map_song_popularity?date=${formatDate(date)}&name=${name}`)
 }
 
 export const fetchMusicStats = async (countryCode: string, stat: string) => {

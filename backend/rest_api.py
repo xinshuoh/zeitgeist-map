@@ -133,7 +133,7 @@ def country_top_genres():
 
 def get_top_tracks(country):
     # gets todays popularities, don't need to check the date as it must be today
-    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country).order_by(SongHasPopularityToday.position)).scalars()
+    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country)).scalars()
     res = []
     for v in vals:
         res.append({
@@ -334,18 +334,15 @@ def spiritual_musical_home():
     for i in range(total):
         names.add(songs[i]['track']['name'])
 
-    #names = set(["Dream"])
+    #date = dt.datetime.now().date()
 
-
-    date = dt.datetime.now().date()
-    #date = "2025-03-03"
-    vals = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.date == date, SongHasPopularity.position == 1)).scalars()
+    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.position == 1)).scalars()
     countries = {}
     for val in vals:
         similarity = 0
         country = val.country
         
-        billboard = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.country == country, SongHasPopularity.date == date)).scalars()
+        billboard = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country)).scalars()
         for track in billboard:
             if track.song.name in names:
                 similarity += 1
