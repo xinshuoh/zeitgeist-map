@@ -128,7 +128,6 @@ function App() {
   const highlightFeature = (e: LeafletMouseEvent) => {
 
     const layer = e.target;
-    const countryCode = layer.feature?.properties?.wb_a2;
 
     mapStyle.mouseover(layer.feature);
 
@@ -208,9 +207,6 @@ function App() {
       mouseover: stableHighlightFeature,
       mouseout: stableResetHighlight,
     });
-
-    const map = useMap();
-    map.openTooltip(mouseoverCountry as string, mouseoverCountryTooltipPosition as LatLng, { permanent: true });
   };
 
   const viewPopularityHeatmap = (date: Date, song_name: string | undefined) => {
@@ -376,7 +372,7 @@ function App() {
 
           {mouseoverCountry && mouseoverCountryTooltipPosition &&
             (<Marker opacity={0} interactive={false} draggable={false} position={mouseoverCountryTooltipPosition}>
-              <Tooltip className='bg-blue-500' direction="bottom" offset={[-15, 17]} permanent>{mouseoverCountry}</Tooltip>
+              <Tooltip className='bg-blue-500' direction="bottom" offset={[-25, 17]} permanent>{mouseoverCountry}</Tooltip>
             </Marker> // shows country name on mouseover
             )}
 
@@ -390,7 +386,7 @@ function App() {
           mapStyle.activatePlain();
         }} />}
         {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
-            <div style={{ position: 'absolute', top: '10%', left: '40%', backgroundColor: '#361836', padding: '5px', borderRadius: '5px', zIndex: 1000 }}>
+            <div style={{ position: 'absolute', top: '10%', left: '40%', backgroundColor: '#361836', color:'white', padding: '5px', borderRadius: '5px', zIndex: 1000 }}>
             Popularity Heat Map for: {heatmapSong}
             </div>
         )}

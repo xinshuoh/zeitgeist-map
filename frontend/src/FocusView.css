@@ -10,15 +10,13 @@
     font-size: 40px;
 }
 
-.close:hover {
-    cursor:pointer
-}
 
 .heatmapButton {
     cursor:pointer;
     padding: 5px;
     background-color: #361836;
     margin: 10px;
+    color: white;
 }
 
 .heatmapButton:hover {

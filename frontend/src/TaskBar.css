@@ -47,6 +47,7 @@
 
 .help-button{
   padding-left: 15px;
+  background-color: transparent;
 }
 .help-button:hover{
   cursor: pointer;
