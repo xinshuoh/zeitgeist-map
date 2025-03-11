@@ -207,9 +207,6 @@ function App() {
       mouseover: stableHighlightFeature,
       mouseout: stableResetHighlight,
     });
-
-    const map = useMap();
-    map.openTooltip(mouseoverCountry as string, mouseoverCountryTooltipPosition as LatLng, { permanent: true });
   };
 
   const viewPopularityHeatmap = (date: Date, song_name: string | undefined) => {
@@ -375,7 +372,7 @@ function App() {
 
           {mouseoverCountry && mouseoverCountryTooltipPosition &&
             (<Marker opacity={0} interactive={false} draggable={false} position={mouseoverCountryTooltipPosition}>
-              <Tooltip className='bg-blue-500' direction="bottom" offset={[-15, 17]} permanent>{mouseoverCountry}</Tooltip>
+              <Tooltip className='bg-blue-500' direction="bottom" offset={[-25, 17]} permanent>{mouseoverCountry}</Tooltip>
             </Marker> // shows country name on mouseover
             )}
 
