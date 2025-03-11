@@ -18,9 +18,31 @@ from param_check import *
 def ping():
     return "Hello from backend!"
 
-@app.route("/heat_map_popularity")
+@app.route("/heat_map_song_first_date")
+# @args(p("song_id")|p("name"))
+def heat_map_song_first_date():
+    if 'song_id' in request.args:
+        val = db.session.execute(db.select(Song).where(Song.id == request.args['song_id'])).scalar()
+    if 'name' in request.args:
+        val = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalar()
+
+    pop = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.song == val).order_by(SongHasPopularity.date)).scalar()
+
+    return str(pop.date)
+
+@app.route("/heat_map_artist_first_date")
+# @args(p("artist_name"))
+def heat_map_artist_first_date():
+    val = db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['artist_name']))).scalar()
+
+    pop = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.song == val).order_by(ArtistHasPopularity.date)).scalar()
+
+    return str(pop.date)
+
+
+@app.route("/heat_map_song_popularity")
 # @args(p("date")&(p("song_id")|p("name")))
-def heat_map_popularity():
+def heat_map_song_popularity():
     #2017-06-29 date format
     
     if 'song_id' in request.args:
@@ -28,21 +50,29 @@ def heat_map_popularity():
     if 'name' in request.args:
         val = db.session.execute(db.select(Song).where(Song.name == unquote(request.args['name']))).scalar()
     
-    #print(val.name)
-    
     pops = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.song == val, SongHasPopularity.date == request.args['date'])).scalars()
 
     d = {}
-    #print("success")
     for pop in pops:
         d[pop.country.code] = pop.position
-        #print(pop.position)
-        #print(pop.country.name)
-    #print("success2")
-    print(d)
+
     return d
 
+@app.route("/heat_map_artist_popularity")
+# @args(p("date")&p("artist_name"))
+def heat_map_artist_popularity():
+    #2017-06-29 date format
+    val = db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['artist_name']))).scalar()
+    
+    pops = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.artist == val, ArtistHasPopularity.date == request.args['date'])).scalars()
 
+    d = {}
+    for pop in pops:
+        d[pop.country.code] = pop.position
+
+    return d
+
+#not used
 @app.route("/track_popularity")
 # @args(p("song_id")|p("name"))
 def track_popularity():
