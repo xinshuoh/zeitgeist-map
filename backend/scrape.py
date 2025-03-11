@@ -41,7 +41,8 @@ def fetch_historical():
 
     for row in soup.find_all('a')[-1:-6:-1]: # first row is headings
         date_ = row.text
-        #print(date_)
+        print(date_)
+        
         contents_1 = urllib.request.urlopen(f"https://kworb.net/apple_songs/archive/{date_}").read()
         soup_1 = BeautifulSoup(contents_1, features="html.parser")
 
@@ -84,6 +85,8 @@ def fetch_historical():
 
             ###global popularity
             c = db.session.execute(db.select(Country).where(Country.code == "glb")).scalar()
+            # s_pop = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.song_id == s.id, SongHasPopularity.country_id == c.id, SongHasPopularity.date == date_time)).scalar()
+            # if not s_pop:
             s_pop = SongHasPopularity(song = s, country = c, position = pos, date = date_time)
             db.session.add(s_pop)
 
@@ -102,7 +105,8 @@ def fetch_historical():
                             popularity[artist][country] += (1 / (country_pos + 47.45) ** 1.11)
 
                     c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
-
+                    # s_pop = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.song_id == s.id, SongHasPopularity.country_id == c.id, SongHasPopularity.date == date_time)).scalar()
+                    # if not s_pop:
                     s_pop = SongHasPopularity(song = s, country = c, position = country_pos, date = date_time)
                     db.session.add(s_pop)
 
@@ -122,6 +126,8 @@ def fetch_historical():
                 c = db.session.execute(db.select(Country).where(Country.code == country)).scalar()
                 a = db.session.execute(db.select(Artist).where(Artist.name == artist_key)).scalar()
 
+                # a_pop = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.artist_id == a.id, ArtistHasPopularity.country_id == c.id, ArtistHasPopularity.date == date_time)).scalar()
+                # if not a_pop:
                 a_pop = ArtistHasPopularity(artist = a, country = c, position = popularity[artist_key][country] / normalising_constants[country], date = date_time) 
                 db.session.add(a_pop)
 
