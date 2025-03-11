@@ -28,10 +28,17 @@ export const SearchResultsList = ({ handleSelection, focusedIndex, setFocusedInd
                     <div onMouseDown={() => handleSelection(index)}
                         onMouseEnter={() => setFocusedIndex(index)}
                         ref={index === focusedIndex ? resultContainer : null}
-                        style={{ backgroundColor: index === focusedIndex ? "rgba(0,0,0,0.1)" : "" }}
+                        style={{ whiteSpace: "nowrap", justifyContent: 'space-between', backgroundColor: index === focusedIndex ? "rgba(0,0,0,0.1)" : "" }}
                         key={index}
-                        className={`text-left text-black w-full pt-1 pb-1 pl-3 hover:bg-[rgba(0,0,0,0.1)] hover:cursor-default`}>
-                        {item}
+                        className={`flex text-black w-full pt-1 pb-1 pl-3 hover:bg-[rgba(0,0,0,0.1)] hover:cursor-default pr-3`}>
+                        <div className='flex justify-centre'>
+                        {item.name}
+                        {item.type == 'song' &&
+                            <div style={{color: '#330033'}}>&nbsp;- {item.artist_name}</div> 
+                        }
+                        </div>
+                        
+                        <div style={{ color: 'white' }}>{item.type}</div>
                     </div>
                 );
             })}

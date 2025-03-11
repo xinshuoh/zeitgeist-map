@@ -39,7 +39,7 @@ def fetch_historical():
 
     countries = ["us","gb","jp","de","au","ca","fr","it","kr","mx","ru","th","be","br","ch","cn","co","es","hk","id","ie","in","nl","nz","tr","tw","za","ae","ar","at","cl","cz","dk","ec","ee","eg","fi","gr","hu","il","ke","kz","lb","lt","lu","my","ng","no","pe","ph","pl","pt","ro","sa","se","si","sg","sk","ua","vn"]
 
-    for row in soup.find_all('a')[:1:-1]: # first row is headings
+    for row in soup.find_all('a')[-1:-6:-1]: # first row is headings
         date_ = row.text
         #print(date_)
         contents_1 = urllib.request.urlopen(f"https://kworb.net/apple_songs/archive/{date_}").read()

@@ -390,7 +390,7 @@ function App() {
           mapStyle.activatePlain();
         }} />}
         {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
-            <div style={{ position: 'absolute', top: '10%', left: '40%', backgroundColor: '#361836', padding: '5px', borderRadius: '5px', zIndex: 1000 }}>
+            <div style={{ position: 'absolute', top: '10%', left: '40%', backgroundColor: '#361836', color:'white', padding: '5px', borderRadius: '5px', zIndex: 1000 }}>
             Popularity Heat Map for: {heatmapSong}
             </div>
         )}

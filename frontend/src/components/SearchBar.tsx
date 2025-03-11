@@ -50,11 +50,19 @@ export const SearchBar = ({ onSelect, autocomplete, setFocusOptions }: SearchBar
     const handleSelection = (selectedIndex: number) => {
         const selectedItem = autocompleteResults[selectedIndex];
         if (!selectedItem) resetSearchComplete();
-        onSelect && onSelect(selectedItem);
-        setInput(selectedItem);
+        const selectedName = selectedItem.name
+        onSelect && onSelect(selectedName);
+        setInput(selectedName);
 
-        // Open focus view for song
-        setFocusOptions({ song: {song_name: selectedItem}, isOpen: true });
+        // Open focus view for song or artist
+        if (selectedItem.type == "song") {
+            // need to lookup the actual song here
+            setFocusOptions({ song: {song_name: selectedName, artist: selectedItem.artist_name}, isOpen: true });
+        } else if (selectedItem.type == "artist") {
+            // do something else
+            setFocusOptions({ artist: selectedName, isOpen: true });
+        }
+        
         
         resetSearchComplete();
     };
