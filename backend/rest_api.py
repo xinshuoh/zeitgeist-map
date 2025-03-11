@@ -79,7 +79,7 @@ def song_top_countries():
 def country_top_tracks():
     current_date = dt.datetime.now().date()
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
-    return get_top_tracks(c, current_date)
+    return get_top_tracks(c)
 
 
 @app.route("/country_top_artists")
@@ -98,8 +98,9 @@ def country_top_genres():
     return get_top_genres(c, current_date)
 
 
-def get_top_tracks(country, date):
-    vals = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.country == country, SongHasPopularity.date == date).order_by(SongHasPopularity.position)).scalars()
+def get_top_tracks(country):
+    # gets todays popularities, don't need to check the date as it must be today
+    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country).order_by(SongHasPopularityToday.position)).scalars()
     res = []
     for v in vals:
         res.append({
@@ -182,8 +183,7 @@ def artist_country_history():
 
 
 def get_today_track_names(country):
-    current_date = dt.datetime.now().date()
-    country_top_tracks = get_top_tracks(country, current_date)
+    country_top_tracks = get_top_tracks(country)
     tracks = set()
     for entry in country_top_tracks:
         tracks.add(entry['song_name'])

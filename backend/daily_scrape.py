@@ -35,6 +35,10 @@ class DailyScraper:
         self.artist_popularity_measures = {country: defaultdict(int) for country in self.countries}
 
         self.lastfmAPI_call_count = 0
+        
+        # clear the today similarity table
+        db.session.execute(db.delete(SongHasPopularityToday))
+        db.session.commit()
 
     def fetch_track_spotify_info(self, track_spotify_id):
         track_uri = f'spotify:track:{track_spotify_id}'
@@ -161,6 +165,10 @@ class DailyScraper:
                         s_pop = SongHasPopularity(song = s, country = c, position = position, date = dt.datetime.now())
                         self.db.session.add(s_pop)
 
+                        # add the exact same entry for todays denormalised version, so the queries will work the same
+                        s_pop_today = SongHasPopularityToday(song = s, country = c, position = position, date = dt.datetime.now())
+                        self.db.session.add(s_pop_today)
+
                 self.calculate_genre_data(country_code, track_information)
 
     def fetch_artist_data(self):
@@ -243,7 +251,7 @@ class DailyScraper:
 
     def get_today_track_names(self, country):
         current_date = dt.datetime.now().date()
-        country_top_tracks = get_top_tracks(country, current_date)
+        country_top_tracks = get_top_tracks(country)
         tracks = set()
         for entry in country_top_tracks:
             tracks.add(entry['song_name'])
