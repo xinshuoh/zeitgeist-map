@@ -159,7 +159,7 @@ def get_top5_tracks(country):
 
 
 def get_top_artists(country, date):
-    vals = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.country == country, ArtistHasPopularity.date == date).order_by(ArtistHasPopularity.position)).scalars()
+    vals = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.country == country, ArtistHasPopularity.date == date)).scalars()
     res = []
     for v in vals:
         res.append({
@@ -171,7 +171,7 @@ def get_top_artists(country, date):
 
 
 def get_top_genres(country, date):
-    vals = db.session.execute(db.select(GenreHasPopularity).where(GenreHasPopularity.country == country, GenreHasPopularity.date == date).order_by(GenreHasPopularity.position)).scalars()
+    vals = db.session.execute(db.select(GenreHasPopularity).where(GenreHasPopularity.country == country, GenreHasPopularity.date == date).limit(5)).scalars()
     res = []
     for v in vals:
         res.append({
