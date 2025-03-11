@@ -12,6 +12,9 @@ from models import *
 
 from param_check import *
 
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
 @app.route("/ping")
 #@cross_origin()
 @args(p.all)
@@ -194,6 +197,7 @@ def song_country_history():
 
 
 @app.route("/artist_country_history")
+# @args(p("country_code")&p("artist_name"))
 def artist_country_history():
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
     a = db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['artist_name']))).scalars().first()
@@ -301,3 +305,15 @@ def search_complete():
 #             'spotify_id': song.spotify_id,
 #             'artist': song.artists[0].name,
 #         }
+
+client_id = 'b0d6aef0a4f846d3afe4dc5ab695bc3b'
+client_secret = 'ed600a63a1be4d2f83fc69f2be3169fe'
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
+
+@app.route('/spiritual_musical_home')
+# @args(p("playlist_id"))
+def spiritual_musical_home():
+    results = spotify.playlist(request.args['playlist_id'])
+    items = results
+    print(items)
+    return items
