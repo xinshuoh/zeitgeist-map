@@ -314,7 +314,7 @@ spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(cl
 # @args(p("playlist_id"))
 def spiritual_musical_home():
     results = spotify.playlist(request.args['playlist_id'])
-    print(results)
+    #print(results)
     tracks = results['tracks']
     total = tracks['total']
     songs = tracks['items']
