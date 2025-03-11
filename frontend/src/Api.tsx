@@ -3,8 +3,8 @@ import { formatDate } from "./Util";
 const serverUrl = "http://127.0.0.1:5000"
 
 export function ping() {
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', serverUrl+'ping')
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', serverUrl+'ping');
     var res = new Promise<boolean>((resolve, reject) => {
       xhr.addEventListener('load', () => {
         resolve(true);
@@ -16,41 +16,42 @@ export function ping() {
         resolve(false);
       })
     });
-    xhr.send()
+    xhr.send();
     return res;
 }
 
 export function countryTopTracks(countryCode: string) {
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', serverUrl+`/country_top_tracks?country_code=${countryCode.toLowerCase()}`)
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', serverUrl+`/country_top_tracks?country_code=${countryCode.toLowerCase()}`);
     var res = new Promise((resolve, reject) => {
       xhr.addEventListener('load', () => {
-        var data = JSON.parse(xhr.responseText)
-        resolve(data)
+        var data = JSON.parse(xhr.responseText);
+        resolve(data);
         //resolve(data.map((song:any) => Object({song: song, genre: "todo", streams: "todo"})))
       })
     });
-    xhr.send()
-    return res
+    xhr.send();
+    return res;
     //return { country: countryName, topArtist: "Example Artist", genre: "Pop", streams: "10M+" };
 };
 
 export function countryCompare(countryCode: string) {
-    var xhr = new XMLHttpRequest()
-    xhr.open('GET', serverUrl+`/country_compare?country_code=${countryCode.toLowerCase()}`)
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', serverUrl+`/country_compare?country_code=${countryCode.toLowerCase()}`);
     var res = new Promise((resolve, reject) => {
       xhr.addEventListener('load', () => {
-        var data = JSON.parse(xhr.responseText)
-        resolve(data)
-      })
+        var data = JSON.parse(xhr.responseText);
+        resolve(data);
+      });
     });
-    xhr.send()
-    return res
+    xhr.send();
+    return res;
 };
 
 export function songTopCountries(songName: string) {
-  const res = fetch(serverUrl+`/song_top_countries?name=${songName}`)
-  return res
+  console.log("API call (songTopCountries)");
+  const res = fetch(serverUrl+`/song_top_countries?name=${songName}`);
+  return res;
 }
 
 export function songCountryHistory(song_name: string) {
@@ -65,10 +66,48 @@ export function artistCountryHistory(artist_name: string) {
     return res;
 }
 
-export function searchComplete(prefix: string) {
-
+export const fetchSearchComplete = async (prefix: string) => {
+  //if (!serverResponsive) return [];
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', `${serverUrl}/search_complete?prefix=${prefix}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
+  });
+  xhr.send();
+  return await res;
 }
 
 export function heatMapPopularity(date: Date, name: string) {
   return fetch(serverUrl+`/heat_map_popularity?date=${formatDate(date)}&name=${name}`)
 }
+
+export const fetchMusicStats = async (countryCode: string, stat: string) => {
+  //if (!serverResponsive) return [];
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', `${serverUrl}/${stat}?country_code=${countryCode.toLowerCase()}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
+  });
+  xhr.send();
+  return await res;
+};
+
+export const fetchCountryCompareData = async (countryCode: string) => {
+  //if (!serverResponsive) return [];
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', `${serverUrl}/country_compare?country_code=${countryCode.toLowerCase()}`);
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
+  });
+  xhr.send();
+  return await res as CountrySimilarityData[];
+};
