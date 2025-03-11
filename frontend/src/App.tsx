@@ -4,7 +4,7 @@ import { MapContainer, Marker, Popup, GeoJSON, Tooltip, useMap } from 'react-lea
 import 'leaflet/dist/leaflet.css';
 import worldGeoJSON from './assets/worldmap_large_centered_names.json';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import L, { geoJSON, LatLng, Layer, LeafletMouseEvent } from 'leaflet';
+import L, { LatLng, Layer, LeafletMouseEvent } from 'leaflet';
 import TaskBar from './TaskBar';
 import Sidebar from "./Sidebar";
 import FocusView from './FocusView';
@@ -58,7 +58,7 @@ function App() {
 
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
   const [popularityHeatmapStatus, setPopularityHeatmapStatus] = useState<PopularityHeatmapStatus>(PopularityHeatmapStatus.Disabled);
-  
+
   const [forceRenderKey, setForceRenderKey] = useState(0);
 
   const sidebarToggleHandler = () => {
@@ -70,7 +70,7 @@ function App() {
 
 
   // hacky fix to issue on startup - load an empty country
-  useEffect(() => { 
+  useEffect(() => {
     setSelectedCountry({
       countryName: 'loading...',
       countryCode: 'loading...',
@@ -114,7 +114,7 @@ function App() {
     // extract the country code
     const countryProp = layer.feature?.properties;
     if (!countryProp) return;
-    const countryCode = countryProp.wb_a2.toLowerCase();  
+    const countryCode = countryProp.wb_a2.toLowerCase();
 
     // set the selected country - with all the relevant data
     // only fires if you select a new country 
@@ -122,7 +122,7 @@ function App() {
       const songList = await fetchMusicStats(countryCode, "country_top_tracks");
       const artistList = await fetchMusicStats(countryCode, "country_top_artists");
       const genreList = await fetchMusicStats(countryCode, "country_top_genres");
-      
+
       setSelectedCountry({
         countryName: countryProp.name,
         countryCode: countryCode,
@@ -176,12 +176,12 @@ function App() {
   }
   const HeatmapLegend = ({ countryCompareStatus }: { countryCompareStatus: CountryCompareStatus }) => {
     const map = useMap();
-  
+
     useEffect(() => {
       if (countryCompareStatus !== CountryCompareStatus.Active) {
-        return; 
+        return;
       }
-  
+
       const indexColor = [
         '#FFCCCC',// Very light red (Low similarity)
         '#FFAAAA',
@@ -211,9 +211,9 @@ function App() {
         `;
         return div;
       };
-  
+
       legend.addTo(map);
-  
+
       return () => {
         legend.remove();
       };
@@ -229,9 +229,9 @@ function App() {
     };
 
     return null;
-};
+  };
 
-  
+
   const geoJsonLayer = <GeoJSON
     data={worldGeoJSON as GeoJSON.GeoJsonObject}
     style={mapStyle.styleFeature} //sets unclicked default style
@@ -315,14 +315,14 @@ function App() {
               setCountryCompareStatus(CountryCompareStatus.Disabled);
               mapStyle.activatePlain();
             }
-          } }  />
+          }} />
         <Sidebar isOpen={isSidebarOpen} toggle={sidebarToggleHandler} selectedCountry={selectedCountry} setFocusOptions={setFocusOptions} />
 
       </div>
 
       <div id="map-container" className="flex">
         <MapContainer center={[51.505, -0.09]} zoom={3} style={{ position: "static", top: "0px", left: "0px", "zIndex": "0" }}
-          maxBounds={[[85, 180], [-85, -180]]} minZoom={3} maxZoom={5} zoomControl={false}>
+          maxBounds={[[85, 180], [-85, -180]]} minZoom={3} maxZoom={9} zoomControl={false}>
 
           {geoJsonLayer}
 
@@ -332,7 +332,7 @@ function App() {
             </Marker> // shows country name on mouseover
             )}
 
-        <HeatmapLegend countryCompareStatus={countryCompareStatus} />
+          <HeatmapLegend countryCompareStatus={countryCompareStatus} />
 
         </MapContainer>
       </div>
@@ -341,11 +341,11 @@ function App() {
           setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
           mapStyle.activatePlain();
         }} />}
-        {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
-            <div style={{ position: 'absolute', top: '10%', left: '40%', backgroundColor: '#361836', color:'white', padding: '5px', borderRadius: '5px', zIndex: 1000 }}>
-            Popularity Heat Map for: {heatmapSong}
-            </div>
-        )}
+      {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
+        <div style={{ position: 'absolute', top: '10%', left: '40%', backgroundColor: '#361836', color: 'white', padding: '5px', borderRadius: '5px', zIndex: 1000 }}>
+          Popularity Heat Map for: {heatmapSong}
+        </div>
+      )}
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);
