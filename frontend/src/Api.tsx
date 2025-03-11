@@ -65,10 +65,48 @@ export function artistCountryHistory(artist_name: string) {
     return res;
 }
 
-export function searchComplete(prefix: string) {
-
+export const fetchSearchComplete = async (prefix: string) => {
+  //if (!serverResponsive) return [];
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', `${serverUrl}/search_complete?prefix=${prefix}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
+  });
+  xhr.send();
+  return await res;
 }
 
 export function heatMapPopularity(date: Date, name: string) {
   return fetch(serverUrl+`/heat_map_popularity?date=${formatDate(date)}&name=${name}`)
 }
+
+export const fetchMusicStats = async (countryCode: string, stat: string) => {
+  //if (!serverResponsive) return [];
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', `${serverUrl}/${stat}?country_code=${countryCode.toLowerCase()}`)
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
+  });
+  xhr.send();
+  return await res;
+};
+
+export const fetchCountryCompareData = async (countryCode: string) => {
+  //if (!serverResponsive) return [];
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', `${serverUrl}/country_compare?country_code=${countryCode.toLowerCase()}`);
+  var res = new Promise((resolve, reject) => {
+    xhr.addEventListener('load', () => {
+      var data = JSON.parse(xhr.responseText);
+      resolve(data);
+    });
+  });
+  xhr.send();
+  return await res as CountrySimilarityData[];
+};

@@ -13,7 +13,7 @@ import useStableCallback from './useStableCallback';
 
 import mapStyler from './MapStyling';
 
-import { heatMapPopularity } from './Api';
+import { heatMapPopularity, fetchSearchComplete, fetchMusicStats, fetchCountryCompareData } from './Api';
 
 interface CountryData {
   countryName: string;
@@ -46,50 +46,6 @@ enum PopularityHeatmapStatus {
   Disabled,
   Active
 }
-
-var serverResponsive = true;
-
-const fetchSearchComplete = async (prefix: string) => {
-  if (!serverResponsive) return [];
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', `http://127.0.0.1:5000/search_complete?prefix=${prefix}`)
-  var res = new Promise((resolve, reject) => {
-    xhr.addEventListener('load', () => {
-      var data = JSON.parse(xhr.responseText);
-      resolve(data);
-    });
-  });
-  xhr.send();
-  return await res;
-}
-
-const fetchMusicStats = async (countryCode: string, stat: string) => {
-  if (!serverResponsive) return [];
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', `http://127.0.0.1:5000/${stat}?country_code=${countryCode.toLowerCase()}`)
-  var res = new Promise((resolve, reject) => {
-    xhr.addEventListener('load', () => {
-      var data = JSON.parse(xhr.responseText);
-      resolve(data);
-    });
-  });
-  xhr.send();
-  return await res;
-};
-
-const fetchCountryCompareData = async (countryCode: string) => {
-  if (!serverResponsive) return [];
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', `http://127.0.0.1:5000/country_compare?country_code=${countryCode.toLowerCase()}`);
-  var res = new Promise((resolve, reject) => {
-    xhr.addEventListener('load', () => {
-      var data = JSON.parse(xhr.responseText);
-      resolve(data);
-    });
-  });
-  xhr.send();
-  return await res as CountrySimilarityData[];
-};
 
 function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
