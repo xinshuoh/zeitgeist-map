@@ -128,7 +128,6 @@ function App() {
   const highlightFeature = (e: LeafletMouseEvent) => {
 
     const layer = e.target;
-    const countryCode = layer.feature?.properties?.wb_a2;
 
     mapStyle.mouseover(layer.feature);
 
