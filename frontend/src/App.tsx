@@ -233,7 +233,7 @@ function App() {
         const div = L.DomUtil.create("div", "heatmap-legend");
         div.innerHTML = `
           <div style="background: white; padding: 8px; border-radius: 5px; font-size: 12px; color:black; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-            <strong>Similarity Index</strong>
+            <strong>Musical Similarity Index</strong>
             <div style="margin-top: 5px;">
               ${indexColor.map((color, index) => `
                 <div style="display: flex; align-items: center; margin-top: 5px;">
