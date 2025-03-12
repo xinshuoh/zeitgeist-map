@@ -34,6 +34,7 @@ interface FocusOptions {
   isOpen: boolean;
   song: any;
   artist: any;
+  type: string;
 }
 
 export enum CountryCompareStatus {
@@ -53,7 +54,7 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
-  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false });
+  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false, type: "" });
   const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
 
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
@@ -131,8 +132,6 @@ function App() {
         genreList: genreList,
         streams: "todo"
       });
-
-      // setForceRenderKey(prev => prev + 1);
     }
 
     // opens the correct thing, but with selected country already set
@@ -182,15 +181,25 @@ function App() {
         return;
       }
 
+      // const indexColor = [
+      //   '#FFCCCC',// Very light red (Low similarity)
+      //   '#FFAAAA',
+      //   '#FF6666',
+      //   '#FF4444',
+      //   '#FF0000',
+      //   '#D50000',
+      //   '#AA0000',  // Dark red (High similarity)
+      // ];
       const indexColor = [
-        '#FFCCCC',// Very light red (Low similarity)
-        '#FFAAAA',
-        '#FF6666',
-        '#FF4444',
-        '#FF0000',
-        '#D50000',
-        '#AA0000',  // Dark red (High similarity)
+        '#330033',// Very light purple (Low similarity)
+        '#502450',
+        '#6D496D',
+        '#8A6D8A',
+        '#A892A8',
+        '#C5B6C5',
+        '#E2DBE2',  // Dark purple (High similarity)
       ];
+
 
       const legend = new L.Control({ position: "bottomright" });
 
@@ -343,14 +352,14 @@ function App() {
         }} />}
 
         {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
-            <div style={{ position: 'absolute', top: '10%', right: '1%', backgroundColor: '#ffa7c9', color:'#361836', padding: '5px', borderRadius: '5px', zIndex: 1000, boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+            <div style={{ position: 'absolute', top: '10%', right: '1%', backgroundColor: '#e0a7bb', color:'#361836', padding: '5px', borderRadius: '5px', zIndex: 1000, boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
               <strong>Popularity Heat Map for: {heatmapSong}</strong>
             </div>
         )}
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);
-        setFocusOptions({ song: undefined, artist: undefined, isOpen: false });
+        setFocusOptions({ song: undefined, artist: undefined, isOpen: false, type: "" });
         setSidebarOpen(false);
         setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
         setCountryCompareStatus(CountryCompareStatus.Disabled);

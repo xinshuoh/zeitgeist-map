@@ -42,7 +42,7 @@ export default function HeatmapControl({ start, end, viewPopularityHeatmap, slid
                 <span>Viewing the Popularity on: {formatDate(new Date(start.getTime() + (Number(sliderRef?.current?.value || 0) * 1000 * 60 * 60 * 24)))} </span>
                 <span>{formatDate(end)}</span>
             </datalist>
-            <button className="closebutton" onClick={close}>Close heatmap</button>
+            <button className="closebutton shadow-md" onClick={close}>Close heatmap</button>
         </div>
     );
 }

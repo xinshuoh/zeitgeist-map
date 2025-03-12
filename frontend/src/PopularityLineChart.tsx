@@ -72,7 +72,7 @@ const PopularityLineChart = ({ lineData, song, artist_name }: lineChartProps) =>
             <Line 
               type="linear"
               dataKey="value" 
-              name="position in charts" 
+              name={song ? "position in charts" : "popularity score"}
               stroke="#3b82f6" 
               strokeWidth={3}
               dot={{ r: 4, strokeWidth: 2, fill: '#ffffff' }}
