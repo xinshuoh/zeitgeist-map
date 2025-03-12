@@ -292,7 +292,7 @@ class DailyScraper:
         self.fetch_artist_data()
 
         self.populate_database(self.artist_popularity_measures, Artist)
-        yyself.populate_database(self.genre_popularity_measures, Genre)
+        self.populate_database(self.genre_popularity_measures, Genre)
 
         self.db.session.commit()
 
