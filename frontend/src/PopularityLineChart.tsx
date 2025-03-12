@@ -18,8 +18,7 @@ const PopularityLineChart = ({ lineData, song, artist_name }: lineChartProps) =>
     }),
   }));
 
-  const filteredLineData = formattedLineData.filter((_, index) => index % Math.floor(formattedLineData.length / 5) === 0);
-  const transformedLineData = filteredLineData.map(item => ({
+  const transformedLineData = formattedLineData.map(item => ({
     ...item,
     value: Math.round(item.value * 1000) / 1000
   }));

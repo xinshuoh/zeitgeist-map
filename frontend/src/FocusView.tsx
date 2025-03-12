@@ -27,6 +27,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
   let song = focusOptions.song;
   let artist = focusOptions.artist;
   let type = focusOptions.type;
+  let country = focusOptions.country;
 
   useEffect(() => {
     if (!focusOptions.isOpen) return; // Only run when popup is open
@@ -34,7 +35,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
     
   
     if (type == 'song' && song?.song_name) {
-      songCountryHistory(song.song_name).then((v) =>
+      songCountryHistory(song.song_name, country).then((v) =>
         v.json().then((d) => {
           setLineData(d);
           setViewReady(true);
@@ -47,7 +48,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
       );
     } else if (type == 'artist') {
 
-      artistCountryHistory(artist).then((v) =>
+      artistCountryHistory(artist, country).then((v) =>
         v.json().then((d) => {
           setLineData(d);
           setViewReady(true);
@@ -84,7 +85,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
             scrollableRef.current.scrollTop = 0;
           }
           if (type=='song') {
-            songCountryHistory(song.song_name).then((v) => {
+            songCountryHistory(song.song_name, country).then((v) => {
               v.json().then((d) => {
                 setLineData(d);
                 setViewReady(true);
@@ -96,7 +97,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
               });
             });
           } else if (type == 'artist') {
-            artistCountryHistory(artist).then((v) => {
+            artistCountryHistory(artist, country).then((v) => {
               v.json().then((d) => {
                 setLineData(d);
                 setViewReady(true);
@@ -113,7 +114,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
         }}
         onClose={() => {
           console.log("Closing");
-          setFocusOptions({ song: undefined, artist: undefined, isOpen: false });
+          setFocusOptions({ song: undefined, artist: undefined, isOpen: false, country: 'gb' });
         }}
       >
         {close => {
@@ -140,7 +141,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
                         { type == 'song' &&
                           <p className="viewSubheading">
                           <span className="viewLink" onClick={() => {
-                            setFocusOptions({ isOpen: true, artist: song.artist, type: "artist" });
+                            setFocusOptions({ isOpen: true, artist: song.artist, type: "artist", country: country });
                           }}>
                             {song ? song.artist : ""}
                           </span>
@@ -149,10 +150,19 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
                         
                       </div>
                     </div>
-
-                    <div className="graph-container">
-                      {type=='song' ? <PopularityLineChart lineData={lineData} song={song} artist_name={""} /> : <PopularityLineChart lineData={lineData} song={null} artist_name={artist} />}
-                    </div>
+                    
+                    
+                    {lineData && lineData.length ? (
+                       <div className="graph-container">
+                       {type=='song' ? <PopularityLineChart lineData={lineData} song={song} artist_name={""} /> : <PopularityLineChart lineData={lineData} song={null} artist_name={artist} />}
+                       </div>
+                    ) : (
+                      <div className="graph-container">
+                        We don't have trends data right now.
+                      </div>
+                    )}
+                    
+                    
                     
                     <button className="heatmapButton" onClick={viewPopularityHeatmap}>View heatmap</button>
 
