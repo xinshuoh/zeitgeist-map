@@ -8,12 +8,25 @@ import { artistCountryHistory, songCountryHistory, songTopCountries, artistTopCo
 
 import PopularityLineChart from './PopularityLineChart'
 import { TrendingUp, X } from 'lucide-react';
+import { count } from 'console';
+
+import ReactCountryFlag from "react-country-flag"
 
 interface FocusViewProps {
   focusOptions: any;
   setFocusOptions: any;
   viewPopularityHeatmap: any;
 }
+
+const getFlagEmoji = (countryCode: string) => {
+  return countryCode
+    .toUpperCase()
+    .replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt(0)));
+};
+
+const CountryFlag = ({ countryCode }: { countryCode: string }) => {
+  return <span>{getFlagEmoji(countryCode)}</span>;
+};
 
 const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: FocusViewProps) => {
 
@@ -27,15 +40,14 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
   let song = focusOptions.song;
   let artist = focusOptions.artist;
   let type = focusOptions.type;
-  let country = focusOptions.country;
+  let countryCode = focusOptions.countryCode;
+  let countryName = focusOptions.countryName;
 
   useEffect(() => {
     if (!focusOptions.isOpen) return; // Only run when popup is open
   
-    
-  
     if (type == 'song' && song?.song_name) {
-      songCountryHistory(song.song_name, country).then((v) =>
+      songCountryHistory(song.song_name, countryCode).then((v) =>
         v.json().then((d) => {
           setLineData(d);
           setViewReady(true);
@@ -48,7 +60,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
       );
     } else if (type == 'artist') {
 
-      artistCountryHistory(artist, country).then((v) =>
+      artistCountryHistory(artist, countryCode).then((v) =>
         v.json().then((d) => {
           setLineData(d);
           setViewReady(true);
@@ -85,7 +97,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
             scrollableRef.current.scrollTop = 0;
           }
           if (type=='song') {
-            songCountryHistory(song.song_name, country).then((v) => {
+            songCountryHistory(song.song_name, countryCode).then((v) => {
               v.json().then((d) => {
                 setLineData(d);
                 setViewReady(true);
@@ -97,7 +109,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
               });
             });
           } else if (type == 'artist') {
-            artistCountryHistory(artist, country).then((v) => {
+            artistCountryHistory(artist, countryCode).then((v) => {
               v.json().then((d) => {
                 setLineData(d);
                 setViewReady(true);
@@ -114,7 +126,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
         }}
         onClose={() => {
           console.log("Closing");
-          setFocusOptions({ song: undefined, artist: undefined, isOpen: false, country: 'gb' });
+          setFocusOptions({ song: undefined, artist: undefined, isOpen: false, countryCode: 'gb', countryName: 'Great Britain' });
         }}
       >
         {close => {
@@ -128,26 +140,35 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
                   
                   <div ref={scrollableRef} className="h-full overflow-y-auto pt-4 pl-10 pr-10">
                     <div
-                      style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "15px", width: "100%" }}>
+                      style={{ display: "flex", justifyContent: "space-between", padding: "15px", width: "100%" }}>
                       <div>
                         {/* Display a FocusView for either songs or artists */}
 
                         {/* Display a header for both songs and artists */}
-                        <div className="flex justify-centre">
-                          <div><strong className="viewHeading">{type=='song' ? song.song_name : artist}</strong></div>
-                          
-                        </div>
+                        <strong className="viewHeading">{type=='song' ? song.song_name : artist}</strong> 
+                        
                         {/* Display a link to the artist for songs */}
                         { type == 'song' &&
                           <p className="viewSubheading">
-                          <span className="viewLink" onClick={() => {
-                            setFocusOptions({ isOpen: true, artist: song.artist, type: "artist", country: country });
-                          }}>
-                            {song ? song.artist : ""}
-                          </span>
-                        </p>
+                            <span className="viewLink" onClick={() => {
+                              setFocusOptions({ isOpen: true, artist: song.artist, type: "artist", countryCode: countryCode, countryName: countryName });
+                            }}>
+                              {song ? song.artist : ""}
+                            </span>
+                          </p>
                         }
                         
+                      </div>
+
+                      <div>
+                        <span className="mx-5 flex flex-col items-center">
+                          <ReactCountryFlag 
+                            countryCode={countryCode.toUpperCase()} 
+                            svg 
+                            style={{ width: '3em', height: 'auto', marginBottom: '0.25em' }}
+                          />
+                          {`(${countryName})`}
+                        </span>
                       </div>
                     </div>
                     

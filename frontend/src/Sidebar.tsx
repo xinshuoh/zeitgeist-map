@@ -96,7 +96,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                             <div style={{ color: "white" }}>Top Songs</div>
                             
                             {selectedCountry?.songList.slice(0, 5).map((song: any) =>
-                                <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => { setFocusOptions({ isOpen: true, song: song, type: 'song', country: selectedCountry.countryCode}) }}>
+                                <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => { setFocusOptions({ isOpen: true, song: song, type: 'song', countryCode: selectedCountry.countryCode, countryName: selectedCountry.countryName}) }}>
                                     <ChartBox isOpen={isOpen} song={song} artist={null}></ChartBox>
                                 </div>
                             )}
@@ -116,7 +116,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                             <div style={{ color: "white" }}>Top Artists</div>
 
                             {selectedCountry?.artistList.slice(0, 5).map((artist: any) =>
-                                <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => { setFocusOptions({ isOpen: true, artist: artist.artist_name, type: 'artist', country: selectedCountry.countryCode }) }}>
+                                <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => { setFocusOptions({ isOpen: true, artist: artist.artist_name, type: 'artist', countryCode: selectedCountry.countryCode, countryName: selectedCountry.countryName }) }}>
                                     <ChartBox isOpen={isOpen} song={null} artist={artist}></ChartBox>
                                 </div>
                             )}
