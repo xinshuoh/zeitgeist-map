@@ -60,8 +60,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
         <div className="relative w-full h-screen flex">
 
             <div className={`h-full transition-all ${isOpen ? "w-100" : "w-0"} z-1`}>
-                <div className={`h-full flex-col border-r border-gray-300 shadow-lg overflow-y-scroll`}
-                    style={{ scrollbarWidth: "thin", backgroundColor: '#e0a7bb' }}>
+                <div className={`h-full flex-col border-r border-gray-300 shadow-lg overflow-y-scroll`} style={{ scrollbarWidth: "thin", backgroundColor: '#e0a7bb' }}>
 
                     <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
                         <div className={`
@@ -71,26 +70,26 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                     </div>
 
                     <div className="w-full flex justify-center p-4 ">
-                        <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white bg-white opacity-70" style={{ backgroundColor: '#fff', opacity : selectedCountry?.songList.length ? '100%' : '70%' }}>
+                        <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white bg-white opacity-25" style={{ backgroundColor: '#fff', opacity : selectedCountry?.songList.length ? '100%' : '70%' }}>
                             <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
                             <div id="embed-iframe"></div>
                         </div>
                     </div>
 
-                    {/* {display only this if the country has not loaded at all} */}
+                    {/* display only this if the country has not loaded at all */}
                     {selectedCountry?.countryName == 'loading...' ? (
                          <div className="w-full flex justify-center p-4">
-                         <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center p-4" style={{ backgroundColor: '#fff' }}>
-                             <h2 style={{ color: '#361836' }}>No country selected</h2>
-                         </div>
+                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center p-4" style={{ backgroundColor: '#fff' }}>
+                                <h2 style={{ color: '#361836' }}>No country selected</h2>
+                            </div>
                         </div>
                     ) : (
                         <>
                         {(!selectedCountry?.songList.length) ? (
                             <div className="w-full flex justify-center p-4">
-                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center p-4" style={{ backgroundColor: '#fff' }}>
-                                <h2 style={{ color: '#361836' }}>Unfortunately we don't have song data for {selectedCountry?.countryName} right now</h2>
-                            </div>
+                                <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center p-4" style={{ backgroundColor: '#fff' }}>
+                                    <h2 style={{ color: '#361836' }}>We don't have song data for {selectedCountry?.countryName} right now!</h2>
+                                </div>
                             </div>
                         ) : (
                             <>
@@ -105,7 +104,14 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                             <br></br> 
                             </>
                         )}
-                        {(selectedCountry?.artistList.length) && (
+
+                        {(!selectedCountry?.artistList.length) ? (
+                            <div className="w-full flex justify-center p-4">
+                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center p-4" style={{ backgroundColor: '#fff' }}>
+                                <h2 style={{ color: '#361836' }}>We don't have artist data for {selectedCountry?.countryName} right now!</h2>
+                            </div>
+                        </div>
+                        ) : (
                             <>
                             <div style={{ color: "white" }}>Top Artists</div>
 
@@ -115,12 +121,11 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                                 </div>
                             )}
                             </>
-                        )
-                        }
+                        )}
                         </>
                     )}
                     {/* {empty div designed to ensure scrollbar works properly} */}
-                   <div style = {{ minHeight: 80 }}></div>
+                   <div style = {{ minHeight: 135 }}></div>
 
                 </div>
             </div>
