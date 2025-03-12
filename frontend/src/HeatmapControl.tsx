@@ -12,7 +12,16 @@ interface HeatmapControlProps {
 
 export default function HeatmapControl({ start, end, viewPopularityHeatmap, sliderRef, close }: HeatmapControlProps) {
     const days = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    const initialSliderValue = Math.floor(days * 0.99);
     const localSliderRef = useRef<HTMLInputElement>(null); // Use local ref if needed
+
+    useEffect(() => {
+        if (sliderRef?.current || localSliderRef.current) {
+            const slider = sliderRef?.current || localSliderRef.current;
+            slider.value = initialSliderValue.toString();
+            updateSliderBackground({ target: slider } as React.ChangeEvent<HTMLInputElement>);
+        }
+    }, [initialSliderValue, sliderRef]);
 
     function updateSliderBackground(e: React.ChangeEvent<HTMLInputElement>) {
         const slider = e.target;
@@ -34,6 +43,7 @@ export default function HeatmapControl({ start, end, viewPopularityHeatmap, slid
                 type="range"
                 min="0"
                 max={days.toString()}
+                defaultValue={initialSliderValue.toString()}
                 list="timemarks"
                 onInput={updateSliderBackground} // Dynamically change background
             />
