@@ -191,13 +191,13 @@ function App() {
       //   '#AA0000',  // Dark red (High similarity)
       // ];
       const indexColor = [
-        '#330033',// Very light purple (Low similarity)
-        '#502450',
-        '#6D496D',
-        '#8A6D8A',
-        '#A892A8',
+        '#E2DBE2', // Very light purple (Low similarity)
         '#C5B6C5',
-        '#E2DBE2',  // Dark purple (High similarity)
+        '#A892A8',
+        '#8A6D8A',
+        '#6D496D',
+        '#502450',
+        '#330033' // Dark purple (High similarity)
       ];
 
 
