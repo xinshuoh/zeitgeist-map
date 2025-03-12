@@ -58,7 +58,7 @@ class DailyScraper:
         # Make Last.fm API calls
         self.lastfmAPI_call_count += 1
         if self.lastfmAPI_call_count % 20 == 0:
-            sleep(5)
+            sleep(10)
 
         params = {
             'method': 'track.gettoptags',
@@ -108,7 +108,7 @@ class DailyScraper:
 
         kworb_countries = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'by', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'kz', 'lt', 'lu', 'lv', 'ma', 'mt', 'mx', 'my', 'ng', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pk', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 've', 'vn', 'za']
 
-        for country_code in ['gb']:  # ['gb', 'fr', 'de', 'es', 'us', 'au'] for now for testing purposes
+        for country_code in  ['es', 'us', 'au']:  # ['gb', 'fr', 'de', 'es', 'us', 'au'] for now for testing purposes
             response = requests.get(f'https://kworb.net/spotify/country/{country_code}_daily.html')
             # Check the page exists
             if response.status_code == 200:
@@ -118,6 +118,7 @@ class DailyScraper:
                 # Store information to calculate genre data
                 track_information = []
 
+                # Each row is one track in the top 200 for a particular country
                 for row in soup.find_all('tr')[1:]:
                     elems = row.find_all('td')
                     links = elems[2].find_all('a')
@@ -173,18 +174,21 @@ class DailyScraper:
                         s_pop_today = SongHasPopularityToday(song = s, country = c, position = position, date = dt.datetime.now())
                         self.db.session.add(s_pop_today)
 
+                # Commit incrementally
+                self.db.session.commit()
+
                 self.calculate_genre_data(country_code, track_information)
 
     def fetch_artist_data(self):
         contents = requests.get(f'https://kworb.net/itunes/extended.html').text
         soup = BeautifulSoup(contents, features="html.parser")
-        for row in soup.find_all('tr')[1:41]:
+        for row in soup.find_all('tr')[1:101]:
             elems = row.find_all('td')
 
             artist_name = elems[1].text
             artist_page_link = elems[1].find('a').get('href')
 
-            a = self.db.session.execute(self.db.select(Artist).where(Artist.name == artist_name)).scalar()  # The artist should always already be present in the database 
+            a = self.db.session.execute(self.db.select(Artist).where(Artist.name == artist_name)).scalar()
             if not a:
                 a = Artist(name = artist_name, songs = [], spotify_id = None)
                 self.db.session.add(a)
@@ -233,13 +237,11 @@ class DailyScraper:
                     a = self.db.session.execute(self.db.select(Artist).where(Artist.name == name)).scalar()  # The artist should always already be present in the database 
 
                     # Add a relationship indicating the popularity of the artist in a particular country to the database if not present
-
-                    # only need to check if exists in todays data
                     a_pop = self.db.session.execute(self.db.select(ArtistHasPopularityToday).where(ArtistHasPopularityToday.artist == a, ArtistHasPopularityToday.country == c)).scalar()
                     if not a_pop:
-                        # add to both the main table and the
                         a_pop = ArtistHasPopularity(artist = a, country = c, position = position, popularity = popularity_measure, date = self.current_date)
                         self.db.session.add(a_pop)
+
                         a_pop_today = ArtistHasPopularityToday(artist = a, country = c, position = position, popularity = popularity_measure, date = self.current_date)
                         self.db.session.add(a_pop_today)
 
@@ -264,7 +266,7 @@ class DailyScraper:
         db.session.execute(db.delete(CountrySimilarity))
         db.session.commit()
 
-        countries = list(db.session.execute(db.select(Country)).scalars())  # Get all countries
+        countries = list(db.session.execute(db.select(Country)).scalars())  # get all countries
 
         # this loop should do every comparison once (not including comparing to itself)
         for i in range(len(countries) - 1):
@@ -287,10 +289,8 @@ class DailyScraper:
         self.fetch_track_data()
         self.fetch_artist_data()
 
-        self.db.session.commit()
-
         self.populate_database(self.artist_popularity_measures, Artist)
-        self.populate_database(self.genre_popularity_measures, Genre)
+        yyself.populate_database(self.genre_popularity_measures, Genre)
 
         self.db.session.commit()
 
