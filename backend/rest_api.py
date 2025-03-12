@@ -345,27 +345,14 @@ spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(cl
 # @args(p("playlist_id"))
 def spiritual_musical_home():
     results = spotify.playlist(request.args['playlist_id'])
-    tracks = results['tracks']
-    total = tracks['total']
-    songs = tracks['items']
-    names = set()
-    for i in range(total):
-        names.add(songs[i]['track']['name'])
 
-    #date = dt.datetime.now().date()
-
-    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.position == 1)).scalars()
     countries = {}
-    for val in vals:
-        similarity = 0
-        country = val.country
-        
-        billboard = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country)).scalars()
-        for track in billboard:
-            if track.song.name in names:
-                similarity += 1
-        countries[country.name] = similarity
+    for song in results['tracks']['items']:
+        s_val = db.session.execute(db.select(Song).where(Song.name == song['track']['name'])).scalar()
+        if s_val:
+            pop_val = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.song == s_val)).scalars()
+            for entry in pop_val:
+                countries[entry.country] = countries.get(entry.country, 0)+1
     
- 
-    return countries
+    return {k.name: v for k, v in countries.items()}
 
