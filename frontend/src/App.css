@@ -70,6 +70,7 @@
     box-shadow: none;
     font-size: 10pt;
   }
+
   .leaflet-tooltip-bottom:before {
     opacity: 0;
   }
@@ -78,19 +79,29 @@
 
 .popup-content {
   margin: auto;
-  background: hsl(0, 0%, 100%);
+  background: rgb(255, 255, 255);
   width: 50%;
   padding: 5px;
 }
 
 .popup-arrow {
-  color: rgb(255, 255, 255);
+  color: transparent;
+  height: 0;
 }
 
-[role='tooltip'].popup-content {
-  width: 200px;
+/* [role='tooltip'].popup-content {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 10rem;
+  height: auto;
+  margin: 0px;
+  padding: 0.5rem !important;
+  background-color: white;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
-}
+  border-width: 2px;
+} */
 
 .popup-overlay {
   background: rgba(0, 0, 0, 0.5);
@@ -103,7 +114,7 @@
 /* styling for the popups - feel free to adjust as wanted */
 
 .leaflet-popup-content-wrapper {
-  background: #e0a7bb !important;
+  background: #d6b8c3 !important;
   color: #333;
   box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
   border: 2.5px solid #361836;
@@ -116,12 +127,13 @@
 .leaflet-popup-close-button {
   color: #333 !important;
 }
+
 button.country-compare {
   background-color: white;
   color: gray;
   border: none;
   padding-top: 50px;
   cursor: pointer;
-  z-index: 1000; 
+  z-index: 1000;
 
 }

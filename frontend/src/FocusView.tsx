@@ -8,12 +8,25 @@ import { artistCountryHistory, songCountryHistory, songTopCountries, artistTopCo
 
 import PopularityLineChart from './PopularityLineChart'
 import { TrendingUp, X } from 'lucide-react';
+import { count } from 'console';
+
+import ReactCountryFlag from "react-country-flag"
 
 interface FocusViewProps {
   focusOptions: any;
   setFocusOptions: any;
   viewPopularityHeatmap: any;
 }
+
+const getFlagEmoji = (countryCode: string) => {
+  return countryCode
+    .toUpperCase()
+    .replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt(0)));
+};
+
+const CountryFlag = ({ countryCode }: { countryCode: string }) => {
+  return <span>{getFlagEmoji(countryCode)}</span>;
+};
 
 const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: FocusViewProps) => {
 
@@ -27,14 +40,14 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
   let song = focusOptions.song;
   let artist = focusOptions.artist;
   let type = focusOptions.type;
+  let countryCode = focusOptions.countryCode;
+  let countryName = focusOptions.countryName;
 
   useEffect(() => {
     if (!focusOptions.isOpen) return; // Only run when popup is open
   
-    
-  
     if (type == 'song' && song?.song_name) {
-      songCountryHistory(song.song_name).then((v) =>
+      songCountryHistory(song.song_name, countryCode).then((v) =>
         v.json().then((d) => {
           setLineData(d);
           setViewReady(true);
@@ -47,7 +60,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
       );
     } else if (type == 'artist') {
 
-      artistCountryHistory(artist).then((v) =>
+      artistCountryHistory(artist, countryCode).then((v) =>
         v.json().then((d) => {
           setLineData(d);
           setViewReady(true);
@@ -84,7 +97,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
             scrollableRef.current.scrollTop = 0;
           }
           if (type=='song') {
-            songCountryHistory(song.song_name).then((v) => {
+            songCountryHistory(song.song_name, countryCode).then((v) => {
               v.json().then((d) => {
                 setLineData(d);
                 setViewReady(true);
@@ -96,7 +109,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
               });
             });
           } else if (type == 'artist') {
-            artistCountryHistory(artist).then((v) => {
+            artistCountryHistory(artist, countryCode).then((v) => {
               v.json().then((d) => {
                 setLineData(d);
                 setViewReady(true);
@@ -113,7 +126,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
         }}
         onClose={() => {
           console.log("Closing");
-          setFocusOptions({ song: undefined, artist: undefined, isOpen: false });
+          setFocusOptions({ song: undefined, artist: undefined, isOpen: false, countryCode: 'gb', countryName: 'Great Britain' });
         }}
       >
         {close => {
@@ -127,80 +140,119 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
                   
                   <div ref={scrollableRef} className="h-full overflow-y-auto pt-4 pl-10 pr-10">
                     <div
-                      style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "15px", width: "100%" }}>
+                      style={{ display: "flex", justifyContent: "space-between", padding: "15px", width: "100%" }}>
                       <div>
                         {/* Display a FocusView for either songs or artists */}
 
                         {/* Display a header for both songs and artists */}
-                        <div className="flex justify-centre">
-                          <div><strong className="viewHeading">{type=='song' ? song.song_name : artist}</strong></div>
-                          
-                        </div>
+                        <strong className="viewHeading">{type=='song' ? song.song_name : artist}</strong> 
+                        
                         {/* Display a link to the artist for songs */}
                         { type == 'song' &&
                           <p className="viewSubheading">
-                          <span className="viewLink" onClick={() => {
-                            setFocusOptions({ isOpen: true, artist: song.artist, type: "artist" });
-                          }}>
-                            {song ? song.artist : ""}
-                          </span>
-                        </p>
+                            <span className="viewLink" onClick={() => {
+                              setFocusOptions({ isOpen: true, artist: song.artist, type: "artist", countryCode: countryCode, countryName: countryName });
+                            }}>
+                              {song ? song.artist : ""}
+                            </span>
+                          </p>
                         }
                         
                       </div>
-                    </div>
 
-                    <div className="graph-container">
-                      {type=='song' ? <PopularityLineChart lineData={lineData} song={song} artist_name={""} /> : <PopularityLineChart lineData={lineData} song={null} artist_name={artist} />}
+                      <div>
+                        <span className="mx-5 flex flex-col items-center">
+                          <ReactCountryFlag 
+                            countryCode={countryCode.toUpperCase()} 
+                            svg 
+                            style={{ width: '3em', height: 'auto', marginBottom: '0.25em' }}
+                          />
+                          {`(${countryName})`}
+                        </span>
+                      </div>
                     </div>
+                    
+                    
+                    {lineData && lineData.length ? (
+                       <div className="graph-container">
+                       {type=='song' ? <PopularityLineChart lineData={lineData} song={song} artist_name={""} /> : <PopularityLineChart lineData={lineData} song={null} artist_name={artist} />}
+                       </div>
+                    ) : (
+                      <div className="graph-container" style={{color: '#330033'}}>
+                        We don't have trends data right now.
+                      </div>
+                    )}
+                    
+                    
                     
                     <button className="heatmapButton" onClick={viewPopularityHeatmap}>View heatmap</button>
 
                     <br></br>
 
-                    {topCountries.length &&
-                      <>
-                      {type == 'song' ? (
-                        <div style={{ padding: "10px" }}>
-                        <strong style={{ color: '#fff' }}>Global Positions</strong>
-                        </div>
-                      ) : (
-                        <div style={{ padding: "10px" }}>
-                        <strong style={{ color: '#fff' }}>Global Popularity Scores</strong>
-                        </div>
-                      )}
-                      <div className="flex justify-centre" style={{ padding: "10px" }}>
-                      <div>
-                        <ul>
-                          {topCountries.slice(0, 5).map((country: any) =>
-                            <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>{country.country_name}: </li>
-                          )}
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        {type=='song' ? (
-                          <ul>
-                          {topCountries.slice(0, 5).map((country: any) =>
-                            <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>
-                              &nbsp; #{country.position} in charts
-                              </li>
-                          )}
-                          </ul>
-                        )  : (
-                          <ul>
-                          {topCountries.slice(0, 5).map((country: any) =>
-                            <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>
-                              &nbsp; {country.popularity ? country.popularity.toFixed(2) : 0} popularity score
-                              </li>
-                          )}
-                          </ul>
+                    <div className='flex'>
+                      {topCountries.length ? (
+                        <div>
+                        {type == 'song' ? (
+                          <div style={{ padding: "10px" }}>
+                          <strong style={{ color: '#fff' }}>Global Positions</strong>
+                          </div>
+                        ) : (
+                          <div style={{ padding: "10px" }}>
+                          <strong style={{ color: '#fff' }}>Global Popularity Scores</strong>
+                          </div>
                         )}
+                        <div className="flex justify-centre" style={{ padding: "10px" }}>
+                        <div>
+                          <ul>
+                            {topCountries.slice(0, 5).map((country: any) =>
+                              <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>{country.country_name}: </li>
+                            )}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          {type=='song' ? (
+                            <ul>
+                            {topCountries.slice(0, 5).map((country: any) =>
+                              <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>
+                                &nbsp;&nbsp; <strong style={{ color: '#330033' }}>#{country.position}</strong>&nbsp;in charts
+                                </li>
+                            )}
+                            </ul>
+                          ) : (
+                            <ul>
+                            {topCountries.slice(0, 5).map((country: any) =>
+                              <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>
+                                &nbsp;&nbsp; <strong style={{ color: '#330033' }}>{country.popularity ? country.popularity.toFixed(2) : 0}</strong>&nbsp;popularity score
+                                </li>
+                            )}
+                            </ul>
+                          )}
+                          
+                        </div>
+                      </div>
+                      </div>
+                      ) : ("")}
+
+                      <div className='pl-10'>
+                        {(type=="song" && song.genres && song.genres.length) ? (
+                          <>
+                          <div style={{ padding: "10px" }}>
+                            <strong style={{ color: '#fff' }}>Genres</strong>
+                          </div>
+                          <ul style={{ padding: "10px" }}>
+                            {song.genres.slice(0, 5).map((genre: any) =>
+                              <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>{genre} </li>
+                            )}
+                          </ul>
+                          </>
+                        ) : ("")}
                         
                       </div>
+                      
+
                     </div>
-                    </>
-                    }
+                    
 
                     
                   </div> : <p>Loading data...</p>

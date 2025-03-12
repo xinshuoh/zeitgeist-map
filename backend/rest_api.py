@@ -172,6 +172,7 @@ def get_top5_tracks(country):
             'spotify_id': v.song.spotify_id,
             'artist': v.song.artists[0].name,
             'position': v.position,
+            "genres": list(map(lambda genre : genre.name, v.song.genres))[:5]
         })
     return res
 
@@ -320,7 +321,7 @@ def country_compare():
 def search_complete():
     s = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
     a = db.session.execute(db.select(Artist).where(Artist.name.startswith(request.args['prefix']))).scalars()
-    song_names = list(map(lambda song: {"type": "song", "name": song.name, "artist_name": song.artists[0].name}, s))
+    song_names = list(map(lambda song: {"type": "song", "name": song.name, "artist_name": song.artists[0].name, "genres": list(map(lambda genre : genre.name, song.genres))[:5]}, s))
     artist_names = list(map(lambda artist: {"type": "artist", "name": artist.name}, a))
     
     return song_names + artist_names
@@ -345,27 +346,14 @@ spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(cl
 # @args(p("playlist_id"))
 def spiritual_musical_home():
     results = spotify.playlist(request.args['playlist_id'])
-    tracks = results['tracks']
-    total = tracks['total']
-    songs = tracks['items']
-    names = set()
-    for i in range(total):
-        names.add(songs[i]['track']['name'])
 
-    #date = dt.datetime.now().date()
-
-    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.position == 1)).scalars()
     countries = {}
-    for val in vals:
-        similarity = 0
-        country = val.country
-        
-        billboard = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country)).scalars()
-        for track in billboard:
-            if track.song.name in names:
-                similarity += 1
-        countries[country.name] = similarity
+    for song in results['tracks']['items']:
+        s_val = db.session.execute(db.select(Song).where(Song.name == song['track']['name'])).scalar()
+        if s_val:
+            pop_val = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.song == s_val)).scalars()
+            for entry in pop_val:
+                countries[entry.country] = countries.get(entry.country, 0)+1
     
- 
-    return countries
+    return {k.code: v for k, v in countries.items()}
 

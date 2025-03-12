@@ -65,7 +65,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                     <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
                         <div className={`
                     flex justify-center p-4 items-center overflow-hidden transition-all ${isOpen ? "w-100 ml-3" : "w-0"}`}>
-                            <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#330033' }}></span>
+                            <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#330033' }}>{selectedCountry?.countryName}</span>
                         </div>
                     </div>
 
@@ -96,7 +96,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                             <div style={{ color: "white" }}>Top Songs</div>
                             
                             {selectedCountry?.songList.slice(0, 5).map((song: any) =>
-                                <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => { setFocusOptions({ isOpen: true, song: song, type: 'song'}) }}>
+                                <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => { setFocusOptions({ isOpen: true, song: song, type: 'song', countryCode: selectedCountry.countryCode, countryName: selectedCountry.countryName}) }}>
                                     <ChartBox isOpen={isOpen} song={song} artist={null}></ChartBox>
                                 </div>
                             )}
@@ -116,12 +116,32 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                             <div style={{ color: "white" }}>Top Artists</div>
 
                             {selectedCountry?.artistList.slice(0, 5).map((artist: any) =>
-                                <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => { setFocusOptions({ isOpen: true, artist: artist.artist_name, type: 'artist' }) }}>
+                                <div className="w-full flex justify-center p-4 rounded-lg" onClick={() => { setFocusOptions({ isOpen: true, artist: artist.artist_name, type: 'artist', countryCode: selectedCountry.countryCode, countryName: selectedCountry.countryName }) }}>
                                     <ChartBox isOpen={isOpen} song={null} artist={artist}></ChartBox>
                                 </div>
                             )}
+                            <br></br>
                             </>
                         )}
+                        {(selectedCountry?.genreList.length) ? (
+                            <>
+                            <hr className="border-t-2 border-white w-[60%] mx-auto mb-4" />
+                            <div className="w-full flex justify-center p-4">
+                            <div className="w-[300px] rounded-lg shadow-md items-center justify-center p-4" style={{ backgroundColor: '#fff' }}>
+                                <div><strong style={{ color: "#330033" }}>Top Genres</strong></div>
+                                <br></br>
+                                <div className="pl-5">
+                                <ul>
+                                    {selectedCountry.genreList.slice(0, 5).map((genre: any, index: number) =>
+                                    <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>{index + 1}. {genre.genre_name} </li>
+                                    )}
+                                </ul>
+                                </div>
+                            </div>
+                            </div>
+                            </>
+                        ) : ("")}
+
                         </>
                     )}
                     {/* {empty div designed to ensure scrollbar works properly} */}

@@ -35,6 +35,8 @@ interface FocusOptions {
   song: any;
   artist: any;
   type: string;
+  countryCode: string;
+  countryName: string; 
 }
 
 export enum CountryCompareStatus {
@@ -54,7 +56,7 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
-  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false, type: "" });
+  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false, type: "", countryCode: "", countryName: "" });
   const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
   const [heatmapStartDate, setHeatmapStartDate] = useState<Date | null>(null);
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
@@ -233,7 +235,7 @@ function App() {
         const div = L.DomUtil.create("div", "heatmap-legend");
         div.innerHTML = `
           <div style="background: white; padding: 8px; border-radius: 5px; font-size: 12px; color:black; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-            <strong>Similarity Index</strong>
+            <strong>Musical Similarity Index</strong>
             <div style="margin-top: 5px;">
               ${indexColor.map((color, index) => `
                 <div style="display: flex; align-items: center; margin-top: 5px;">
@@ -265,6 +267,15 @@ function App() {
 
     return null;
   };
+
+
+  const visualiseSMH = async (playlistid: string) => {
+    const r = await fetch(`http://127.0.0.1:5000/spiritual_musical_home?playlist_id=${playlistid}`);
+    const data = await r.json();
+    console.log(data);
+    console.log("SMH");
+    mapStyle.activateSMHHeatmap(data);
+  }
 
 
   const geoJsonLayer = <GeoJSON
@@ -341,6 +352,7 @@ function App() {
           setFocusOptions={setFocusOptions}
           countryCompareStatus={countryCompareStatus}
           setHelpOptions={undefined}
+          visualiseSMH={visualiseSMH}
           onCountryCompare={() => {
             if (countryCompareStatus == CountryCompareStatus.Disabled) {
               setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
@@ -385,7 +397,7 @@ function App() {
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);
-        setFocusOptions({ song: undefined, artist: undefined, isOpen: false, type: "" });
+        setFocusOptions({ song: undefined, artist: undefined, isOpen: false, type: "", countryCode: "", countryName: "" });
         setSidebarOpen(false);
         setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
         setCountryCompareStatus(CountryCompareStatus.Disabled);

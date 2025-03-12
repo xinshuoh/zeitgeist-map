@@ -57,13 +57,13 @@ export const SearchBar = ({ onSelect, autocomplete, setFocusOptions }: SearchBar
         // Open focus view for song or artist
         if (selectedItem.type == "song") {
             // song focus views just require song name and artist name, they get the rest from there
-            setFocusOptions({ song: {song_name: selectedName, artist: selectedItem.artist_name}, isOpen: true, type: 'song' });
+            setFocusOptions({ song: { song_name: selectedName, artist: selectedItem.artist_name, genres: selectedItem.genres }, isOpen: true, type: 'song', countryCode: 'gb', countryName: 'Great Britain' });
         } else if (selectedItem.type == "artist") {
             // only artist name
-            setFocusOptions({ artist: selectedName, isOpen: true, type: 'artist' });
+            setFocusOptions({ artist: selectedName, isOpen: true, type: 'artist', countryCode: 'gb', countryName: 'Great Britain' });
         }
-        
-        
+
+
         resetSearchComplete();
     };
 
@@ -79,7 +79,7 @@ export const SearchBar = ({ onSelect, autocomplete, setFocusOptions }: SearchBar
             onBlur={resetSearchComplete}
             className="h-full self-start flex-row items-center relative z-2 outline-none">
             <input type="text" list="search-autocomplete"
-                className={`w-[40vw] min-w-120 p-2 bg-[#e0a7bb] text-center text-black cursor-text outline-none
+                className={`w-[40vw] min-w-120 mt-[2px] p-2 bg-[#e0a7bb] text-center text-black cursor-text outline-none
                     ${showResults ? "rounded-t-lg" : "rounded-lg"} border-[#361836]`}
                 placeholder="Search through songs/artists/genres here..."
                 value={input}
