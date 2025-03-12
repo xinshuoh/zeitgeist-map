@@ -22,10 +22,10 @@ const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, o
     <div id="global">
       <div id="taskbar" className="taskbar flex justify-between w-[100vw] h-20 p-[18px] bg-[#330033]">
         <div className="logo-help-group flex items-center p-5">
-          <img src="ZM.gif" alt="Zeitgeist Map" className="logo-image" />
+          <img src="ZM.gif" alt="Zeitgeist Map" className="logo-image w-10 h-auto" />
 
           <button className="help-button" onClick={() => {setHelpOptions({isOpen: true})}}>
-            <img src="help-512.png" alt="Help Page" className="w-7 h-7" />
+            <img src="help-512.png" alt="Help Page" className="min-w-3 w-7 h-auto" />
           </button>
         </div>
 

@@ -120,8 +120,28 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                                     <ChartBox isOpen={isOpen} song={null} artist={artist}></ChartBox>
                                 </div>
                             )}
+                            <br></br>
                             </>
                         )}
+                        {(selectedCountry?.genreList.length) ? (
+                            <>
+                            <hr className="border-t-2 border-white w-[60%] mx-auto mb-4" />
+                            <div className="w-full flex justify-center p-4">
+                            <div className="w-[300px] rounded-lg shadow-md items-center justify-center p-4" style={{ backgroundColor: '#fff' }}>
+                                <div><strong style={{ color: "#330033" }}>Top Genres</strong></div>
+                                <br></br>
+                                <div className="pl-5">
+                                <ul>
+                                    {selectedCountry.genreList.slice(0, 5).map((genre: any, index: number) =>
+                                    <li key={index} style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>{index + 1}. {genre.genre_name} </li>
+                                    )}
+                                </ul>
+                                </div>
+                            </div>
+                            </div>
+                            </>
+                        ) : ("")}
+
                         </>
                     )}
                     {/* {empty div designed to ensure scrollbar works properly} */}

@@ -158,49 +158,70 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
 
                     <br></br>
 
-                    {topCountries.length &&
-                      <>
-                      {type == 'song' ? (
-                        <div style={{ padding: "10px" }}>
-                        <strong style={{ color: '#fff' }}>Global Positions</strong>
-                        </div>
-                      ) : (
-                        <div style={{ padding: "10px" }}>
-                        <strong style={{ color: '#fff' }}>Global Popularity Scores</strong>
-                        </div>
-                      )}
-                      <div className="flex justify-centre" style={{ padding: "10px" }}>
-                      <div>
-                        <ul>
-                          {topCountries.slice(0, 5).map((country: any) =>
-                            <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>{country.country_name}: </li>
-                          )}
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        {type=='song' ? (
-                          <ul>
-                          {topCountries.slice(0, 5).map((country: any) =>
-                            <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>
-                              &nbsp; #{country.position} in charts
-                              </li>
-                          )}
-                          </ul>
-                        )  : (
-                          <ul>
-                          {topCountries.slice(0, 5).map((country: any) =>
-                            <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap" }}>
-                              &nbsp; {country.popularity ? country.popularity.toFixed(2) : 0} popularity score
-                              </li>
-                          )}
-                          </ul>
+                    <div className='flex'>
+                      {topCountries.length ? (
+                        <div>
+                        {type == 'song' ? (
+                          <div style={{ padding: "10px" }}>
+                          <strong style={{ color: '#fff' }}>Global Positions</strong>
+                          </div>
+                        ) : (
+                          <div style={{ padding: "10px" }}>
+                          <strong style={{ color: '#fff' }}>Global Popularity Scores</strong>
+                          </div>
                         )}
+                        <div className="flex justify-centre" style={{ padding: "10px" }}>
+                        <div>
+                          <ul>
+                            {topCountries.slice(0, 5).map((country: any) =>
+                              <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>{country.country_name}: </li>
+                            )}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          {type=='song' ? (
+                            <ul>
+                            {topCountries.slice(0, 5).map((country: any) =>
+                              <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>
+                                &nbsp;&nbsp; <strong style={{ color: '#330033' }}>#{country.position}</strong>&nbsp;in charts
+                                </li>
+                            )}
+                            </ul>
+                          ) : (
+                            <ul>
+                            {topCountries.slice(0, 5).map((country: any) =>
+                              <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>
+                                &nbsp;&nbsp; <strong style={{ color: '#330033' }}>{country.popularity ? country.popularity.toFixed(2) : 0}</strong>&nbsp;popularity score
+                                </li>
+                            )}
+                            </ul>
+                          )}
+                          
+                        </div>
+                      </div>
+                      </div>
+                      ) : ("")}
+
+                      <div className='pl-10'>
+                        {(type=="song" && song.genres && song.genres.length) ? (
+                          <>
+                          <div style={{ padding: "10px" }}>
+                            <strong style={{ color: '#fff' }}>Genres</strong>
+                          </div>
+                          <ul style={{ padding: "10px" }}>
+                            {song.genres.slice(0, 5).map((genre: any) =>
+                              <li style={{ fontSize: 14, display: "flex", whiteSpace: "nowrap", color: "#330033" }}>{genre} </li>
+                            )}
+                          </ul>
+                          </>
+                        ) : ("")}
                         
                       </div>
+                      
+
                     </div>
-                    </>
-                    }
+                    
 
                     
                   </div> : <p>Loading data...</p>
