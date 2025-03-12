@@ -159,7 +159,6 @@ def get_top_tracks(country):
             'spotify_id': v.song.spotify_id,
             'artist': v.song.artists[0].name,
             'position': v.position,
-            "genres": v.genres.map(lambda genre : genre.name)
         })
     return res
 
@@ -173,7 +172,7 @@ def get_top5_tracks(country):
             'spotify_id': v.song.spotify_id,
             'artist': v.song.artists[0].name,
             'position': v.position,
-            "genres": list(map(lambda genre : genre.name, v.song.genres))
+            "genres": list(map(lambda genre : genre.name, v.song.genres))[:5]
         })
     return res
 
@@ -322,7 +321,7 @@ def country_compare():
 def search_complete():
     s = db.session.execute(db.select(Song).where(Song.name.startswith(request.args['prefix']))).scalars()
     a = db.session.execute(db.select(Artist).where(Artist.name.startswith(request.args['prefix']))).scalars()
-    song_names = list(map(lambda song: {"type": "song", "name": song.name, "artist_name": song.artists[0].name}, s))
+    song_names = list(map(lambda song: {"type": "song", "name": song.name, "artist_name": song.artists[0].name, "genres": list(map(lambda genre : genre.name, song.genres))[:5]}, s))
     artist_names = list(map(lambda artist: {"type": "artist", "name": artist.name}, a))
     
     return song_names + artist_names

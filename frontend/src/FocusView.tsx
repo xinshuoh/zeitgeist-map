@@ -159,7 +159,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
                     <br></br>
 
                     <div className='flex'>
-                      {topCountries.length &&
+                      {topCountries.length ? (
                         <div>
                         {type == 'song' ? (
                           <div style={{ padding: "10px" }}>
@@ -201,7 +201,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
                         </div>
                       </div>
                       </div>
-                      }
+                      ) : ("")}
 
                       <div className='pl-10'>
                         {(type=="song" && song.genres && song.genres.length) ? (

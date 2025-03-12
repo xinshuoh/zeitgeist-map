@@ -57,7 +57,7 @@ export const SearchBar = ({ onSelect, autocomplete, setFocusOptions }: SearchBar
         // Open focus view for song or artist
         if (selectedItem.type == "song") {
             // song focus views just require song name and artist name, they get the rest from there
-            setFocusOptions({ song: {song_name: selectedName, artist: selectedItem.artist_name}, isOpen: true, type: 'song' });
+            setFocusOptions({ song: {song_name: selectedName, artist: selectedItem.artist_name, genres: selectedItem.genres}, isOpen: true, type: 'song' });
         } else if (selectedItem.type == "artist") {
             // only artist name
             setFocusOptions({ artist: selectedName, isOpen: true, type: 'artist' });
