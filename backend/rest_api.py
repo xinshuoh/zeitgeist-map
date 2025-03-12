@@ -159,6 +159,7 @@ def get_top_tracks(country):
             'spotify_id': v.song.spotify_id,
             'artist': v.song.artists[0].name,
             'position': v.position,
+            "genres": v.genres.map(lambda genre : genre.name)
         })
     return res
 
@@ -172,6 +173,7 @@ def get_top5_tracks(country):
             'spotify_id': v.song.spotify_id,
             'artist': v.song.artists[0].name,
             'position': v.position,
+            "genres": list(map(lambda genre : genre.name, v.song.genres))
         })
     return res
 

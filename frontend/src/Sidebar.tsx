@@ -123,7 +123,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                             <br></br>
                             </>
                         )}
-                        {(selectedCountry?.genreList.length) && (
+                        {(selectedCountry?.genreList.length) ? (
                             <>
                             <hr className="border-t-2 border-white w-[60%] mx-auto mb-4" />
                             <div className="w-full flex justify-center p-4">
@@ -140,7 +140,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                             </div>
                             </div>
                             </>
-                        )}
+                        ) : ("")}
 
                         </>
                     )}
