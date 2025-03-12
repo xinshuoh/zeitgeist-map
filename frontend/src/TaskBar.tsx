@@ -12,9 +12,10 @@ interface TaskBarProps {
   setHelpOptions: any;
   autocomplete: any;
   countryCompareStatus: CountryCompareStatus;
+  visualiseSMH: any;
 }
 
-const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, onCountryCompare, setFocusOptions, setHelpOptions: setHelpOptionsProp }) => {
+const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, onCountryCompare, setFocusOptions, setHelpOptions: setHelpOptionsProp, visualiseSMH }) => {
   const [helpOptions, setHelpOptions] = useState({ isOpen: false });
 
 
@@ -38,7 +39,7 @@ const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, o
 
         <div className="flex justify-between gap-4">
           <div className="compare">
-            <SpiritualMusicalHome />
+            <SpiritualMusicalHome visualiseSMH={visualiseSMH}/>
           </div>
           <div className="compare">
             <button

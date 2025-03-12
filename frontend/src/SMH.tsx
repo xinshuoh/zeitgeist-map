@@ -10,7 +10,11 @@ import Cookies from 'js-cookie'
 
 import './SMH.css';
 
-export const SpiritualMusicalHome = () => {
+interface SpiritualMusicalHomeProps {
+    visualiseSMH: any;
+}
+
+export const SpiritualMusicalHome = ({visualiseSMH}: SpiritualMusicalHomeProps) => {
     const [token, setToken] = React.useState(Cookies.get("spotifyAuthToken"))
   return (
     <div className='app'>
@@ -27,7 +31,10 @@ export const SpiritualMusicalHome = () => {
                 const data = await res.json();
 
                 const playlists = data.items.filter((item:any) => item.public);
-                return playlists.map((item:any) => <button className="songbutton" onClick={() => {alert(item.id)}}>{item.name}</button>);
+                return playlists.map((item:any) => 
+                <button className="songbutton" onClick={async () => {
+                    visualiseSMH(item.id);
+                }}>{item.name}</button>);
 
             })() : 
                 <SpotifyAuth

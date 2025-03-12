@@ -1,12 +1,14 @@
 import {useState} from 'react';
 import 'leaflet/dist/leaflet.css';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { set } from 'date-fns';
 
 enum MapMode {
     Plain,
     Heatmap,
     Selecting,
-    PopularityHeatmap
+    PopularityHeatmap,
+    SMHHeatmap,
 }
 
 type CountrySimilarityData = {
@@ -40,6 +42,12 @@ export default function mapStyler(geoJsonRef: any) {
         setPopularityData(data);
         setMapMode(MapMode.PopularityHeatmap);
         //geoJsonRef.current.resetStyle();
+    }
+
+    function activateSMHHeatmap(data: PopularityData) {
+        setPopularityData(data);
+        setMapMode(MapMode.SMHHeatmap);
+        geoJsonRef.current.resetStyle(); // doesn't seem to work...
     }
 
     function activateSelecting() {
@@ -135,6 +143,19 @@ export default function mapStyler(geoJsonRef: any) {
                     weight: 1,
                     color: '#d0d0d0',
                   });
+
+            case MapMode.SMHHeatmap:
+                if (popularityData && feature?.properties?.wb_a2.toLowerCase() in popularityData) {
+                    let k = Object.values<number>(popularityData);
+                    const m = Math.max(...k);
+                    const v = (popularityData[feature?.properties?.wb_a2.toLowerCase()])/m;
+                    const ccolor = `#330033`;
+                    return { fillColor: ccolor, fillOpacity: v, weight: 1, color: '#d0d0d0' };
+                } else                 return ({
+                    fillColor: getColor(feature?.properties?.pop_est || 0),
+                    weight: 1,
+                    color: '#d0d0d0',
+                  });
         }
     }
 
@@ -153,7 +174,8 @@ export default function mapStyler(geoJsonRef: any) {
         activatePlain,
         activatePopularityHeatmap,
         mouseover, 
-        mouseout
+        mouseout,
+        activateSMHHeatmap
     };
 }
 

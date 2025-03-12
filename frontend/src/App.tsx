@@ -267,6 +267,15 @@ function App() {
   };
 
 
+  const visualiseSMH = async (playlistid: string) => {
+    const r = await fetch(`http://127.0.0.1:5000/spiritual_musical_home?playlist_id=${playlistid}`);
+    const data = await r.json();
+    console.log(data);
+    console.log("SMH");
+    mapStyle.activateSMHHeatmap(data);
+  }
+
+
   const geoJsonLayer = <GeoJSON
     data={worldGeoJSON as GeoJSON.GeoJsonObject}
     style={mapStyle.styleFeature} //sets unclicked default style
@@ -341,6 +350,7 @@ function App() {
           setFocusOptions={setFocusOptions}
           countryCompareStatus={countryCompareStatus}
           setHelpOptions={undefined}
+          visualiseSMH={visualiseSMH}
           onCountryCompare={() => {
             if (countryCompareStatus == CountryCompareStatus.Disabled) {
               setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);

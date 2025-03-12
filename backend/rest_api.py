@@ -355,5 +355,5 @@ def spiritual_musical_home():
             for entry in pop_val:
                 countries[entry.country] = countries.get(entry.country, 0)+1
     
-    return {k.name: v for k, v in countries.items()}
+    return {k.code: v for k, v in countries.items()}
 
