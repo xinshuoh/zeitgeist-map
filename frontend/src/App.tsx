@@ -13,7 +13,7 @@ import useStableCallback from './useStableCallback';
 
 import mapStyler from './MapStyling';
 
-import { heatMapPopularity, fetchSearchComplete, fetchMusicStats, fetchCountryCompareData } from './Api';
+import { heatMapPopularity, fetchSearchComplete, fetchMusicStats, fetchCountryCompareData, fetchHeatmapStartDate } from './Api';
 
 interface CountryData {
   countryName: string;
@@ -56,7 +56,7 @@ function App() {
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
   const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false, type: "" });
   const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
-
+  const [heatmapStartDate, setHeatmapStartDate] = useState<Date | null>(null);
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
   const [popularityHeatmapStatus, setPopularityHeatmapStatus] = useState<PopularityHeatmapStatus>(PopularityHeatmapStatus.Disabled);
 
@@ -164,6 +164,31 @@ function App() {
     });
   };
 
+  // const viewPopularityHeatmap = (date: Date, song_name: string | undefined) => {
+  //   var song = song_name || heatmapSong;
+  //   if (!song) return;
+  //   heatMapPopularity(date, song).then((res) => {
+  //     res.json().then(data => {
+  //       mapStyle.activatePopularityHeatmap(data);
+  //     });
+  //     useEffect(() => {
+  //       if (heatmapSong) {
+  //         fetchHeatmapStartDate(heatmapSong)
+  //           .then(date => setHeatmapStartDate(date))
+  //           .catch(error => console.error("Error fetching heatmap start date:", error));
+  //       }
+  //     }, [heatmapSong]);
+      
+  //   });
+  // }
+  useEffect(() => {
+    if (heatmapSong) {
+      fetchHeatmapStartDate(heatmapSong)
+        .then(date => setHeatmapStartDate(date))
+        .catch(error => console.error("Error fetching heatmap start date:", error));
+    }
+  }, [heatmapSong]);
+  
   const viewPopularityHeatmap = (date: Date, song_name: string | undefined) => {
     var song = song_name || heatmapSong;
     if (!song) return;
@@ -172,7 +197,8 @@ function App() {
         mapStyle.activatePopularityHeatmap(data);
       });
     });
-  }
+  };
+  
   const HeatmapLegend = ({ countryCompareStatus }: { countryCompareStatus: CountryCompareStatus }) => {
     const map = useMap();
 
@@ -345,14 +371,14 @@ function App() {
 
         </MapContainer>
       </div>
-      {popularityHeatmapStatus == PopularityHeatmapStatus.Active && <HeatmapControl start={new Date(2017, 2, 5)} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap} sliderRef={sliderRef}
+      {popularityHeatmapStatus == PopularityHeatmapStatus.Active && heatmapStartDate && <HeatmapControl start={heatmapStartDate} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap} sliderRef={sliderRef}
         close={() => {
           setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
           mapStyle.activatePlain();
         }} />}
 
         {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
-            <div style={{ position: 'absolute', top: '10%', right: '1%', backgroundColor: '#e0a7bb', color:'#361836', padding: '5px', borderRadius: '5px', zIndex: 1000, boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+            <div style={{ position: 'absolute', top: '10%', right: '1%', backgroundColor: '#e0a7bb', color:'#361836', padding: '5px', borderRadius: '5px', zIndex: 2, boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
               <strong>Popularity Heat Map for: {heatmapSong}</strong>
             </div>
         )}

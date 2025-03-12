@@ -42,7 +42,8 @@ const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, o
           </div>
           <div className="compare">
             <button
-              onClick={onCountryCompare}>
+              onClick={onCountryCompare}
+              style={{ backgroundColor: 'transparent' }}>
               {(() => {
                 switch (countryCompareStatus) {
                   case CountryCompareStatus.Active:

@@ -89,6 +89,12 @@ export const fetchSearchComplete = async (prefix: string) => {
 export function heatMapPopularity(date: Date, name: string) {
   return fetch(serverUrl+`/heat_map_song_popularity?date=${formatDate(date)}&name=${name}`)
 }
+export async function fetchHeatmapStartDate(songName: string) {
+  console.log("API call (fetchHeatmapStartDate)");
+  const response = await fetch(`${serverUrl}/heat_map_song_first_date?name=${encodeURIComponent(songName)}`);
+  const data = await response.text();
+  return new Date(data);
+}
 
 export const fetchMusicStats = async (countryCode: string, stat: string) => {
   //if (!serverResponsive) return [];
