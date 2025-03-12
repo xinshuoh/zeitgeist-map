@@ -35,6 +35,8 @@ interface FocusOptions {
   song: any;
   artist: any;
   type: string;
+  countryCode: string;
+  countryName: string; 
 }
 
 export enum CountryCompareStatus {
@@ -54,7 +56,7 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
-  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false, type: "" });
+  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false, type: "", countryCode: "", countryName: "" });
   const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
   const [heatmapStartDate, setHeatmapStartDate] = useState<Date | null>(null);
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
@@ -395,7 +397,7 @@ function App() {
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);
-        setFocusOptions({ song: undefined, artist: undefined, isOpen: false, type: "" });
+        setFocusOptions({ song: undefined, artist: undefined, isOpen: false, type: "", countryCode: "", countryName: "" });
         setSidebarOpen(false);
         setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
         setCountryCompareStatus(CountryCompareStatus.Disabled);

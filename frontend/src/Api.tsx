@@ -60,15 +60,15 @@ export function artistTopCountries(artistName: string) {
   return res;
 }
 
-export function songCountryHistory(song_name: string) {
+export function songCountryHistory(song_name: string, country: string) {
     console.log("API call (songCountryHistory)");
-    const res = fetch(serverUrl + `/song_country_history?country_code=${'gb'}&song_name=${song_name}`);
+    const res = fetch(serverUrl + `/song_country_history?country_code=${country}&song_name=${song_name}`);
     return res;
 }
 
-export function artistCountryHistory(artist_name: string) {
+export function artistCountryHistory(artist_name: string, country: string) {
     console.log("API call (artistCountryHistory)");
-    const res = fetch(serverUrl + `/artist_country_history?country_code=${'gb'}&artist_name=${artist_name}`);
+    const res = fetch(serverUrl + `/artist_country_history?country_code=${country}&artist_name=${artist_name}`);
     return res;
 }
 

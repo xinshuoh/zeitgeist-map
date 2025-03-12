@@ -43,11 +43,11 @@ p{
 }
 
 .popup-content {
-    border-radius: 10px !important;
+    border-radius: 10px;
     background-color: #d6b8c3;
     border-color: #361836;
     border-width: 4px;
-    padding: 20px !important;
+    padding: 20px;
     font-family: "Roboto Mono", monospace;
 }
 
