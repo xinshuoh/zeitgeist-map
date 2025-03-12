@@ -43,15 +43,16 @@ const PopularityLineChart = ({ lineData, song, artist_name }: lineChartProps) =>
               tick={{ fill: '#6b7280' }}
               axisLine={{ stroke: '#d1d5db' }}
               width={40}
+              interval={Math.floor(transformedLineData.length / 5)}
             />
             
             <YAxis 
               dataKey="value"
               tick={{ fill: '#6b7280' }}
-              domain={song ? [1, maxValue + 1] : [0, Math.ceil(maxValue)]}
-              allowDecimals={song ? false : true}
               axisLine={{ stroke: '#d1d5db' }}
               width={40}
+              domain={song ? [1, maxValue + 1] : [0, Math.ceil(maxValue)]}
+              allowDecimals={song ? false : true}
               reversed={song ? true : false}
             />
             <Tooltip 

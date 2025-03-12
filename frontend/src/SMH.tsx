@@ -31,13 +31,13 @@ export const SpiritualMusicalHome = () => {
 
             })() : 
                 <SpotifyAuth
-                redirectUri='http://localhost:5173/callback'
-                clientID='a33619059e2f4f34b1fb6b4439c75290'
-                scopes={[Scopes.userReadPrivate, Scopes.playlistReadPrivate]} // either style will work
-                onAccessToken={(token:any) => {
-                    console.log("Authenticated with Spotify");
-                }}
-                btnClassName='authbutton'
+                    redirectUri='http://localhost:5173/callback'
+                    clientID='a33619059e2f4f34b1fb6b4439c75290'
+                    scopes={[Scopes.userReadPrivate, Scopes.playlistReadPrivate]} // either style will work
+                    onAccessToken={(token:any) => {
+                        console.log("Authenticated with Spotify");
+                    }}
+                    btnClassName='authbutton'
                 />
             }
             

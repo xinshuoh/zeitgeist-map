@@ -71,7 +71,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                         </div>
 
                         <div className="w-full flex justify-center p-4 ">
-                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white bg-white opacity-70" style={{ backgroundColor: '#fff' }}>
+                            <div className="w-[300px] rounded-lg shadow-md flex items-center justify-center border-5 border-white bg-white opacity-25" style={{ backgroundColor: '#fff' }}>
                                 <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
                                 <div id="embed-iframe"></div>
                             </div>
