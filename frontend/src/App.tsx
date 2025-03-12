@@ -13,7 +13,7 @@ import useStableCallback from './useStableCallback';
 
 import mapStyler from './MapStyling';
 
-import { heatMapPopularity, fetchSearchComplete, fetchMusicStats, fetchCountryCompareData } from './Api';
+import { heatMapPopularity, fetchSearchComplete, fetchMusicStats, fetchCountryCompareData, fetchHeatmapStartDate } from './Api';
 
 interface CountryData {
   countryName: string;
@@ -34,6 +34,7 @@ interface FocusOptions {
   isOpen: boolean;
   song: any;
   artist: any;
+  type: string;
 }
 
 export enum CountryCompareStatus {
@@ -53,9 +54,9 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [mouseoverCountry, setMouseoverCountry] = useState<string | null>(null);
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
-  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false });
+  const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false, type: "" });
   const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
-
+  const [heatmapStartDate, setHeatmapStartDate] = useState<Date | null>(null);
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
   const [popularityHeatmapStatus, setPopularityHeatmapStatus] = useState<PopularityHeatmapStatus>(PopularityHeatmapStatus.Disabled);
 
@@ -131,8 +132,6 @@ function App() {
         genreList: genreList,
         streams: "todo"
       });
-
-      // setForceRenderKey(prev => prev + 1);
     }
 
     // opens the correct thing, but with selected country already set
@@ -165,6 +164,31 @@ function App() {
     });
   };
 
+  // const viewPopularityHeatmap = (date: Date, song_name: string | undefined) => {
+  //   var song = song_name || heatmapSong;
+  //   if (!song) return;
+  //   heatMapPopularity(date, song).then((res) => {
+  //     res.json().then(data => {
+  //       mapStyle.activatePopularityHeatmap(data);
+  //     });
+  //     useEffect(() => {
+  //       if (heatmapSong) {
+  //         fetchHeatmapStartDate(heatmapSong)
+  //           .then(date => setHeatmapStartDate(date))
+  //           .catch(error => console.error("Error fetching heatmap start date:", error));
+  //       }
+  //     }, [heatmapSong]);
+      
+  //   });
+  // }
+  useEffect(() => {
+    if (heatmapSong) {
+      fetchHeatmapStartDate(heatmapSong)
+        .then(date => setHeatmapStartDate(date))
+        .catch(error => console.error("Error fetching heatmap start date:", error));
+    }
+  }, [heatmapSong]);
+  
   const viewPopularityHeatmap = (date: Date, song_name: string | undefined) => {
     var song = song_name || heatmapSong;
     if (!song) return;
@@ -173,7 +197,8 @@ function App() {
         mapStyle.activatePopularityHeatmap(data);
       });
     });
-  }
+  };
+  
   const HeatmapLegend = ({ countryCompareStatus }: { countryCompareStatus: CountryCompareStatus }) => {
     const map = useMap();
 
@@ -182,15 +207,25 @@ function App() {
         return;
       }
 
+      // const indexColor = [
+      //   '#FFCCCC',// Very light red (Low similarity)
+      //   '#FFAAAA',
+      //   '#FF6666',
+      //   '#FF4444',
+      //   '#FF0000',
+      //   '#D50000',
+      //   '#AA0000',  // Dark red (High similarity)
+      // ];
       const indexColor = [
-        '#FFCCCC',// Very light red (Low similarity)
-        '#FFAAAA',
-        '#FF6666',
-        '#FF4444',
-        '#FF0000',
-        '#D50000',
-        '#AA0000',  // Dark red (High similarity)
+        '#E2DBE2', // Very light purple (Low similarity)
+        '#C5B6C5',
+        '#A892A8',
+        '#8A6D8A',
+        '#6D496D',
+        '#502450',
+        '#330033' // Dark purple (High similarity)
       ];
+
 
       const legend = new L.Control({ position: "bottomright" });
 
@@ -336,21 +371,21 @@ function App() {
 
         </MapContainer>
       </div>
-      {popularityHeatmapStatus == PopularityHeatmapStatus.Active && <HeatmapControl start={new Date(2017, 2, 5)} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap} sliderRef={sliderRef}
+      {popularityHeatmapStatus == PopularityHeatmapStatus.Active && heatmapStartDate && <HeatmapControl start={heatmapStartDate} end={new Date()} viewPopularityHeatmap={viewPopularityHeatmap} sliderRef={sliderRef}
         close={() => {
           setPopularityHeatmapStatus(PopularityHeatmapStatus.Disabled);
           mapStyle.activatePlain();
         }} />}
 
         {popularityHeatmapStatus == PopularityHeatmapStatus.Active && (
-            <div style={{ position: 'absolute', top: '10%', right: '1%', backgroundColor: '#ffa7c9', color:'#361836', padding: '5px', borderRadius: '5px', zIndex: 1000, boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+            <div style={{ position: 'absolute', top: '10%', right: '1%', backgroundColor: '#e0a7bb', color:'#361836', padding: '5px', borderRadius: '5px', zIndex: 2, boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
               <strong>Popularity Heat Map for: {heatmapSong}</strong>
             </div>
         )}
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
         setHeatmapSong(focusOptions.song.song_name);
-        setFocusOptions({ song: undefined, artist: undefined, isOpen: false });
+        setFocusOptions({ song: undefined, artist: undefined, isOpen: false, type: "" });
         setSidebarOpen(false);
         setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
         setCountryCompareStatus(CountryCompareStatus.Disabled);

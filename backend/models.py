@@ -43,6 +43,8 @@ class Artist(db.Model):
 
     popularities: Mapped[List[ArtistHasPopularity]] = relationship(back_populates="artist")
 
+    today_popularities: Mapped[List[ArtistHasPopularityToday]] = relationship(back_populates="artist")
+
 
 class Genre(db.Model):
     __tablename__ = "genre"
@@ -71,6 +73,7 @@ class Country(db.Model):
     genre_popularities: Mapped[List[GenreHasPopularity]] = relationship(back_populates="country")
  
     today_song_popularities: Mapped[List[SongHasPopularityToday]] = relationship(back_populates="country")
+    today_artist_popularities: Mapped[List[ArtistHasPopularityToday]] = relationship(back_populates="country")
 
 
 credit = Table(
@@ -102,7 +105,7 @@ class SongHasPopularity(db.Model):
     song: Mapped[Song] = relationship(back_populates="popularities")
     country: Mapped[Country] = relationship(back_populates="song_popularities")
 
-
+# denormalised version of song has popularity storing just the current day
 class SongHasPopularityToday(db.Model):
     __tablename__ = "song_has_popularity_today"
 
@@ -127,11 +130,28 @@ class ArtistHasPopularity(db.Model):
     country_id: Mapped[int] = mapped_column(ForeignKey("country.id"))
     date: Mapped[date] = mapped_column(Date)
 
-    position: Mapped[int] = mapped_column(Integer)
+    position: Mapped[int] = mapped_column(Integer, nullable=True)
     popularity: Mapped[int] = mapped_column(Integer, nullable=True)
 
     artist: Mapped[Artist] = relationship(back_populates="popularities")
     country: Mapped[Country] = relationship(back_populates="artist_popularities")
+
+# denormalised
+class ArtistHasPopularityToday(db.Model):
+    __tablename__ = "artist_has_popularity_today"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    artist_id: Mapped[int] = mapped_column(ForeignKey("artist.id"))
+    country_id: Mapped[int] = mapped_column(ForeignKey("country.id"))
+    date: Mapped[date] = mapped_column(Date)
+
+    position: Mapped[int] = mapped_column(Integer, nullable=True)
+    popularity: Mapped[int] = mapped_column(Integer, nullable=True)
+
+    artist: Mapped[Artist] = relationship(back_populates="today_popularities")
+    country: Mapped[Country] = relationship(back_populates="today_artist_popularities")
+
 
 
 class GenreHasPopularity(db.Model):

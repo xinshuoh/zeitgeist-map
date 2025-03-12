@@ -100,9 +100,28 @@ def song_top_countries():
     res = []
     if vals:
         v = vals[0]
-        pops = sorted(filter(lambda v: v.date == dt.datetime.now().date(), v.popularities), key=lambda x : x.position)
-        for p in pops:
+        # gets the top 5 countries
+        pops = sorted(v.today_popularities, key=lambda x : x.position)
+        for p in pops[:5]:
             res.append({'country_name': p.country.name, 'position': p.position})
+
+    return res
+
+@app.route("/artist_top_countries")
+# @args(p("artist_id")|p("name"))
+def artist_top_countries():
+    if 'artist_id' in request.args:
+        vals = list(db.session.execute(db.select(Artist).where(Artist.id == request.args['artist_id'])).scalars())
+    if 'name' in request.args:
+        vals = list(db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['name']))).scalars())
+
+    res = []
+    if vals:
+        v = vals[0]
+        # gets the top 5 countries
+        pops = sorted(v.today_popularities, key=lambda x : x.popularity, reverse=True)
+        for p in pops:
+            res.append({'country_name': p.country.name, 'popularity': p.popularity})
 
     return res
 
@@ -117,9 +136,8 @@ def country_top_tracks():
 @app.route("/country_top_artists")
 # @args(p("country_code"))
 def country_top_artists():
-    current_date = dt.datetime.now().date()
     c = db.session.execute(db.select(Country).where(Country.code == request.args['country_code'])).scalar()
-    return get_top_artists(c, current_date)
+    return get_top_artists(c)
 
 
 @app.route("/country_top_genres")
@@ -133,7 +151,7 @@ def country_top_genres():
 
 def get_top_tracks(country):
     # gets todays popularities, don't need to check the date as it must be today
-    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country).order_by(SongHasPopularityToday.position)).scalars()
+    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country)).scalars()
     res = []
     for v in vals:
         res.append({
@@ -158,8 +176,8 @@ def get_top5_tracks(country):
     return res
 
 
-def get_top_artists(country, date):
-    vals = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.country == country, ArtistHasPopularity.date == date).order_by(ArtistHasPopularity.position)).scalars()
+def get_top_artists(country):
+    vals = db.session.execute(db.select(ArtistHasPopularityToday).where(ArtistHasPopularityToday.country == country).limit(5)).scalars()
     res = []
     for v in vals:
         res.append({
@@ -171,7 +189,7 @@ def get_top_artists(country, date):
 
 
 def get_top_genres(country, date):
-    vals = db.session.execute(db.select(GenreHasPopularity).where(GenreHasPopularity.country == country, GenreHasPopularity.date == date).order_by(GenreHasPopularity.position)).scalars()
+    vals = db.session.execute(db.select(GenreHasPopularity).where(GenreHasPopularity.country == country, GenreHasPopularity.date == date).limit(5)).scalars()
     res = []
     for v in vals:
         res.append({
@@ -204,7 +222,7 @@ def song_country_history():
     for p in pops:
         res.append({
             'date': p.date,
-            'popularity': p.position
+            'value': p.position
         })
 
     return res
@@ -224,7 +242,7 @@ def artist_country_history():
     for p in pops:
         res.append({
             'date': p.date,
-            'popularity': p.position
+            'value': p.popularity
         })
     return res
 
@@ -334,18 +352,15 @@ def spiritual_musical_home():
     for i in range(total):
         names.add(songs[i]['track']['name'])
 
-    #names = set(["Dream"])
+    #date = dt.datetime.now().date()
 
-
-    date = dt.datetime.now().date()
-    #date = "2025-03-03"
-    vals = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.date == date, SongHasPopularity.position == 1)).scalars()
+    vals = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.position == 1)).scalars()
     countries = {}
     for val in vals:
         similarity = 0
         country = val.country
         
-        billboard = db.session.execute(db.select(SongHasPopularity).where(SongHasPopularity.country == country, SongHasPopularity.date == date)).scalars()
+        billboard = db.session.execute(db.select(SongHasPopularityToday).where(SongHasPopularityToday.country == country)).scalars()
         for track in billboard:
             if track.song.name in names:
                 similarity += 1
