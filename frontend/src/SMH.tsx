@@ -17,6 +17,7 @@ interface SpiritualMusicalHomeProps {
 export const SpiritualMusicalHome = ({visualiseSMH}: SpiritualMusicalHomeProps) => {
     const [token, setToken] = useState(Cookies.get("spotifyAuthToken"))
     const [isHovered, setIsHovered] = useState(false);
+    const [playlistData, setPlaylistData] = useState([]);
   return (
     <div className='app'>
         <PopupComponent className="smhbox" trigger={        
@@ -27,17 +28,23 @@ export const SpiritualMusicalHome = ({visualiseSMH}: SpiritualMusicalHomeProps) 
                 onMouseOver={(e) => e.currentTarget.src = 'smh_logo_hover.svg'}
                 onMouseOut={(e) => e.currentTarget.src = 'smh_logo.svg'}
                 className="cursor-pointer min-w-3 w-7 h-auto" />
-        </button>}>
-            {token ? (async () => {
-                const res = await fetch("https://api.spotify.com/v1/me/playlists", {
+        </button>}
+            onOpen={() => {
+                fetch("https://api.spotify.com/v1/me/playlists", {
                     headers: {
                         'Authorization':  `Bearer ${token}`
                     }
+                }).then(res => {
+                    res.json().then(data => {
+                        const playlists = data.items.filter((item:any) => item.public);
+                        setPlaylistData(playlists);
+                    });
                 });
-                const data = await res.json();
-
-                const playlists = data.items.filter((item:any) => item.public);
-                return playlists.map((item:any) => <button className="songbutton" onClick={async () => {
+                
+            }}>
+            {token ? (() => {
+                
+                return playlistData.map((item:any) => <button className="songbutton" onClick={() => {
                     visualiseSMH(item.id);
                 }}>{item.name}</button>);
 
