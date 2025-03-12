@@ -178,7 +178,7 @@ const FocusView = ({ focusOptions, setFocusOptions, viewPopularityHeatmap }: Foc
                        {type=='song' ? <PopularityLineChart lineData={lineData} song={song} artist_name={""} /> : <PopularityLineChart lineData={lineData} song={null} artist_name={artist} />}
                        </div>
                     ) : (
-                      <div className="graph-container">
+                      <div className="graph-container" style={{color: '#330033'}}>
                         We don't have trends data right now.
                       </div>
                     )}

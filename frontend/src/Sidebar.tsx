@@ -65,7 +65,7 @@ const Sidebar = ({ isOpen, toggle, selectedCountry, setFocusOptions }: SidebarPr
                     <div className={`border-t flex ${isOpen ? "pt-3 pl-3 pr-3" : "p-0"}`}>
                         <div className={`
                     flex justify-center p-4 items-center overflow-hidden transition-all ${isOpen ? "w-100 ml-3" : "w-0"}`}>
-                            <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#330033' }}></span>
+                            <span className={`text-2xl font-semibold overflow-hidden transition-all ${isOpen ? "w-full" : "w-0"} `} style={{ color: '#330033' }}>{selectedCountry?.countryName}</span>
                         </div>
                     </div>
 
