@@ -19,7 +19,7 @@ export const SpiritualMusicalHome = ({visualiseSMH}: SpiritualMusicalHomeProps) 
     const [isHovered, setIsHovered] = useState(false);
     const [playlistData, setPlaylistData] = useState([]);
   return (
-    <div className='app'>
+    <div className='relative flex items-center'>
         <PopupComponent className="smhbox" trigger={        
             <button style= {{ backgroundColor: 'transparent' }}
             onMouseOver={() => setIsHovered(true)}
