@@ -38,7 +38,7 @@ def heat_map_song_first_date():
 def heat_map_artist_first_date():
     val = db.session.execute(db.select(Artist).where(Artist.name == unquote(request.args['artist_name']))).scalar()
 
-    pop = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.song == val).order_by(ArtistHasPopularity.date)).scalar()
+    pop = db.session.execute(db.select(ArtistHasPopularity).where(ArtistHasPopularity.artist == val).order_by(ArtistHasPopularity.date)).scalar()
 
     return str(pop.date)
 

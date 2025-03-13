@@ -89,9 +89,20 @@ export const fetchSearchComplete = async (prefix: string) => {
 export function heatMapPopularity(date: Date, name: string) {
   return fetch(serverUrl+`/heat_map_song_popularity?date=${formatDate(date)}&name=${name}`)
 }
+
+export function heatMapArtistPopularity(date: Date, name: string) {
+  return fetch(serverUrl+`/heat_map_artist_popularity?date=${formatDate(date)}&artist_name=${name}`)
+}
+
 export async function fetchHeatmapStartDate(songName: string) {
   console.log("API call (fetchHeatmapStartDate)");
   const response = await fetch(`${serverUrl}/heat_map_song_first_date?name=${encodeURIComponent(songName)}`);
+  const data = await response.text();
+  return new Date(data);
+}
+
+export async function fetchHeatmapArtistStartDate(artist: string) {
+  const response = await fetch(`${serverUrl}/heat_map_artist_first_date?artist_name=${encodeURIComponent(artist)}`);
   const data = await response.text();
   return new Date(data);
 }
