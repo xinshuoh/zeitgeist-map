@@ -204,14 +204,14 @@ function App() {
       var artist = song_name || heatmapSong;
       if (!artist) return;
       heatMapArtistPopularity(date, artist).then((res) => res.json().then(data => {
-        mapStyle.activatePopularityHeatmap(data);
+        mapStyle.activatePopularityHeatmap({heat_data: data, isArtist: true});
       }))
     } else {
       var song = song_name || heatmapSong;
       if (!song) return;
       heatMapPopularity(date, song).then((res) => {
         res.json().then(data => {
-          mapStyle.activatePopularityHeatmap(data);
+          mapStyle.activatePopularityHeatmap({heat_data: data, isArtist: false});
         });
       });
     }
