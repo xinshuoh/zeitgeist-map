@@ -42,7 +42,7 @@ const TaskBar: React.FC<TaskBarProps> = ({ autocomplete, countryCompareStatus, o
           <SpiritualMusicalHome visualiseSMH={visualiseSMH}/>
 
           <PopupComponent trigger={
-            <button
+            <button style= {{ backgroundColor: 'transparent' }}
               onClick={onCountryCompare}>
               <img src="compare.svg" alt="Country compare"
                 onMouseOver={(e) => e.currentTarget.src = 'compare_hover.svg'}

@@ -2,11 +2,11 @@
 
 import { Popup as PopupComponent } from 'reactjs-popup';
 
-import { SpotifyAuth, Scopes } from 'react-spotify-auth'
+import { SpotifyAuth, Scopes } from 'react-spotify-auth';
 //import 'react-spotify-auth/dist/index.css'
-import { useState } from 'react'
+import { useState } from 'react';
 //import { SpotifyApiContext } from 'react-spotify-api'
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 
 import './SMH.css';
 
@@ -21,7 +21,7 @@ export const SpiritualMusicalHome = ({visualiseSMH}: SpiritualMusicalHomeProps) 
   return (
     <div className='relative flex items-center'>
         <PopupComponent className="smhbox" trigger={        
-            <button
+            <button style= {{ backgroundColor: 'transparent' }}
             onMouseOver={() => setIsHovered(true)}
             onMouseOut={() => setIsHovered(false)}>
             <img src="smh_logo.svg" alt="Find your spiritual musical home"
