@@ -13,7 +13,7 @@ import useStableCallback from './useStableCallback';
 
 import mapStyler from './MapStyling';
 
-import { heatMapPopularity, fetchSearchComplete, fetchMusicStats, fetchCountryCompareData, fetchHeatmapStartDate } from './Api';
+import { heatMapPopularity, fetchSearchComplete, fetchMusicStats, fetchCountryCompareData, fetchHeatmapStartDate, heatMapArtistPopularity, fetchHeatmapArtistStartDate } from './Api';
 
 interface CountryData {
   countryName: string;
@@ -58,6 +58,7 @@ function App() {
   const [mouseoverCountryTooltipPosition, setMouseoverCountryTooltipPosition] = useState<LatLng | undefined>(undefined);
   const [focusOptions, setFocusOptions] = useState<FocusOptions>({ song: undefined, artist: undefined, isOpen: false, type: "", countryCode: "", countryName: "" });
   const [heatmapSong, setHeatmapSong] = useState<string | null>(null);
+  const [isHeatmapArtist, setIsHeatmapArtist] = useState<boolean>(false);
   const [heatmapStartDate, setHeatmapStartDate] = useState<Date | null>(null);
   const [countryCompareStatus, setCountryCompareStatus] = useState<CountryCompareStatus>(CountryCompareStatus.Disabled);
   const [popularityHeatmapStatus, setPopularityHeatmapStatus] = useState<PopularityHeatmapStatus>(PopularityHeatmapStatus.Disabled);
@@ -185,20 +186,36 @@ function App() {
   // }
   useEffect(() => {
     if (heatmapSong) {
-      fetchHeatmapStartDate(heatmapSong)
-        .then(date => setHeatmapStartDate(date))
-        .catch(error => console.error("Error fetching heatmap start date:", error));
+      if (isHeatmapArtist) {
+        fetchHeatmapArtistStartDate(heatmapSong)
+          .then(date => setHeatmapStartDate(date))
+          .catch(error => console.log("Error fetching heatmap start date:", error));
+      } else {
+        fetchHeatmapStartDate(heatmapSong)
+          .then(date => setHeatmapStartDate(date))
+          .catch(error => console.error("Error fetching heatmap start date:", error));
+      }
     }
   }, [heatmapSong]);
   
-  const viewPopularityHeatmap = (date: Date, song_name: string | undefined) => {
-    var song = song_name || heatmapSong;
-    if (!song) return;
-    heatMapPopularity(date, song).then((res) => {
-      res.json().then(data => {
+  const viewPopularityHeatmap = (date: Date, song_name: string | undefined, isArtist: boolean | undefined) => {
+    const isa = isArtist == undefined ? isHeatmapArtist : isArtist;
+    if (isa) {
+      var artist = song_name || heatmapSong;
+      if (!artist) return;
+      heatMapArtistPopularity(date, artist).then((res) => res.json().then(data => {
         mapStyle.activatePopularityHeatmap(data);
+      }))
+    } else {
+      var song = song_name || heatmapSong;
+      if (!song) return;
+      heatMapPopularity(date, song).then((res) => {
+        res.json().then(data => {
+          mapStyle.activatePopularityHeatmap(data);
+        });
       });
-    });
+    }
+
   };
   
   const HeatmapLegend = ({ countryCompareStatus }: { countryCompareStatus: CountryCompareStatus }) => {
@@ -396,12 +413,21 @@ function App() {
         )}
 
       <FocusView focusOptions={focusOptions} setFocusOptions={setFocusOptions} viewPopularityHeatmap={() => {
-        setHeatmapSong(focusOptions.song.song_name);
         setFocusOptions({ song: undefined, artist: undefined, isOpen: false, type: "", countryCode: "", countryName: "" });
         setSidebarOpen(false);
+        const isa = focusOptions.song == undefined;
+        if (isa) {
+          // is artist
+          setIsHeatmapArtist(true);
+          setHeatmapSong(focusOptions.artist);
+        } else {
+          // is song
+          setIsHeatmapArtist(false);
+          setHeatmapSong(focusOptions.song.song_name);
+        }
         setPopularityHeatmapStatus(PopularityHeatmapStatus.Active);
         setCountryCompareStatus(CountryCompareStatus.Disabled);
-        viewPopularityHeatmap(new Date(), focusOptions.song.song_name);
+        viewPopularityHeatmap(new Date(), focusOptions.song.song_name, isa);
       }}></FocusView>
     </div>
   );
