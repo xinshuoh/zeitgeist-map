@@ -134,10 +134,11 @@ export default function mapStyler(geoJsonRef: any) {
                   });
 
             case MapMode.PopularityHeatmap:
-                if (popularityData && feature?.properties?.wb_a2.toLowerCase() in popularityData) {
-                    const v = (200-popularityData[feature?.properties?.wb_a2.toLowerCase()])/199;
+                if (popularityData && feature?.properties?.wb_a2.toLowerCase() in popularityData.heat_data) {
+                    const v = popularityData.heat_data[feature?.properties?.wb_a2.toLowerCase()];
+                    const v1 = (popularityData.isArtist) ? v : (200-v)/199
                     const ccolor = `#330033`;
-                    return { fillColor: ccolor, fillOpacity: v, weight: 1, color: '#d0d0d0' };
+                    return { fillColor: ccolor, fillOpacity: v1, weight: 1, color: '#d0d0d0' };
                 } else                 return ({
                     fillColor: getColor(feature?.properties?.pop_est || 0),
                     weight: 1,

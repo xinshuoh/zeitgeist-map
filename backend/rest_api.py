@@ -71,7 +71,7 @@ def heat_map_artist_popularity():
 
     d = {}
     for pop in pops:
-        d[pop.country.code] = pop.position
+        d[pop.country.code] = pop.popularity
 
     return d
 
